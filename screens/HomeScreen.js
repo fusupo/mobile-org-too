@@ -2,6 +2,7 @@ import React from "react";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import OrgTree from "../components/OrgTree.js";
+import OrgBuffer from "../components/OrgBuffer.js";
 import loadParseOrgFilesAsync from "../utilities/loadParseOrgFilesAsync.js";
 
 export default class HomeScreen extends React.Component {
@@ -40,20 +41,21 @@ export default class HomeScreen extends React.Component {
 
   render() {
     if (this.state.viewIsReady) {
-      const listItems = this.state.orgTree === null
-        ? null
-        : this.state.orgTree.children.map((tree, idx) => (
-            <OrgTree key={idx} tree={tree} />
-          ));
-      return (
-        <View style={{ marginTop: 40 }}>
-          <ScrollView>
-            {listItems}
-          </ScrollView>
-        </View>
-      );
+      // const listItems = this.state.orgTree === null
+      //   ? null
+      //   : this.state.orgTree.children.map((tree, idx) => (
+      //       <OrgTree key={idx} tree={tree} />
+      //     ));
+      // return (
+      //   <View style={{ marginTop: 10 }}>
+      //     <ScrollView>
+      //       {listItems}
+      //     </ScrollView>
+      //   </View>
+      // );
+      const listItems = this.state.orgTree === null ? null : this.state.orgTree;
+      return <OrgBuffer orgTree={listItems} />;
     } else {
-      // return <View style={styles.container} />;
       return <View />;
     }
   }

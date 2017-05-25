@@ -1,45 +1,95 @@
-import React, { Component } from "react";
-import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { Component } from 'react';
+import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import OrgDrawer from "./OrgDrawer.js";
-import OrgLogbook from "./OrgLogbook.js";
+import OrgDrawer from './OrgDrawer.js';
+import OrgLogbook from './OrgLogbook.js';
 
 class OrgNode extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { isCollapsed: this.props.isCollapsed };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.isCollapsed !== this.state.isCollapsed) {
+      this.setState({ isCollapsed: nextProps.isCollapsed });
+    }
   }
 
   render() {
-    switch (this.props.isCollapsed) {
+    // todo keyword
+    const todoKeyword = this.props.node.headline.todoKeyword
+      ? <Text
+          style={{
+            backgroundColor: this.props.node.headline.todoKeywordColor
+          }}>
+          {this.props.node.headline.todoKeyword}
+        </Text>
+      : null;
+
+    // tags
+    const tags = this.props.node.headline.tags.length > 0
+      ? this.props.node.headline.tags.map((tag, idx) => {
+          return (
+            <Text
+              key={idx}
+              style={{
+                fontFamily: 'space-mono',
+                backgroundColor: '#cccccc',
+                fontSize: 10
+              }}>
+              {tag}
+            </Text>
+          );
+        })
+      : null;
+    const tagList = tags ? <Text>{tags}</Text> : null;
+    switch (this.state.isCollapsed) {
       case true:
         return (
           <View>
-            <Text style={styles.bigblue} onPress={this.props.toggleCollapse}>
+            <Text style={styles.bigblue}>
+              {todoKeyword}
               {this.props.node.headline.content}
             </Text>
+            {tagList}
           </View>
         );
         break;
       case false:
+        const scheduled = this.props.node.scheduled
+          ? <Text
+              style={{
+                fontFamily: 'space-mono',
+                fontSize: 12
+              }}>
+              {'SCHEDULED: ' + this.props.node.scheduled.srcStr}
+            </Text>
+          : null;
+        const closed = this.props.node.closed
+          ? <Text
+              style={{
+                fontFamily: 'space-mono',
+                fontSize: 12
+              }}>
+              {'CLOSED: ' + this.props.node.closed.srcStr}
+            </Text>
+          : null;
+        const body = this.props.node.body
+          ? <Text>{this.props.node.body}</Text>
+          : null;
         return (
           <View>
-            <Text style={styles.bigblue} onPress={this.props.toggleCollapse}>
+            <Text style={styles.bigblue}>
+              {todoKeyword}
               {this.props.node.headline.content}
             </Text>
-            <Text>
-              {this.props.node.scheduled &&
-                "SCHEDULED " + this.props.node.scheduled.srcStr}
-            </Text>
+            {tagList}
+            {scheduled}
+            {closed}
             <OrgDrawer drawer={this.props.node.propDrawer} />
             <OrgLogbook log={this.props.node.logbook} />
-            <Text>
-              {this.props.node.opened &&
-                "OPENED " + this.props.node.opened.srcStr}
-            </Text>
-            <Text>
-              {this.props.node.body && this.props.node.body}
-            </Text>
+            {body}
           </View>
         );
         break;
@@ -49,7 +99,9 @@ class OrgNode extends Component {
 
 const styles = StyleSheet.create({
   bigblue: {
-    fontSize: 24
+    fontSize: 12,
+    fontWeight: 'bold',
+    fontFamily: 'space-mono'
   }
 });
 

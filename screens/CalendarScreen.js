@@ -1,13 +1,13 @@
-import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import React from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import OrgNode from "../components/OrgNode.js";
-import loadParseOrgFilesAsync from "../utilities/loadParseOrgFilesAsync.js";
+import OrgNode from '../components/OrgNode.js';
+import loadParseOrgFilesAsync from '../utilities/loadParseOrgFilesAsync.js';
 
 export default class CalendarScreen extends React.Component {
   static route = {
     navigationBar: {
-      title: "Calendar"
+      title: 'Calendar'
     }
   };
 
@@ -21,7 +21,7 @@ export default class CalendarScreen extends React.Component {
   }
 
   componentWillMount() {
-    console.log("START LOAD/PARSE");
+    console.log('START LOAD/PARSE');
     this._loadParseOrgFilesAsync();
   }
 
@@ -31,7 +31,7 @@ export default class CalendarScreen extends React.Component {
       this.setState(foo);
     } catch (e) {
       console.warn(
-        "There was an error retrieving files from drobbox on the calendar screen"
+        'There was an error retrieving files from drobbox on the calendar screen'
       );
       console.log(e.message);
     } finally {
@@ -41,7 +41,8 @@ export default class CalendarScreen extends React.Component {
 
   render() {
     if (this.state.viewIsReady) {
-      console.log("RENDER THE SHIT FOR REAL");
+      console.log('RENDER THE SHIT FOR REAL');
+
       const parseDate = timestamp => {
         //          <2017-05-06 Sat 15:00>
         //          <2017-05-02 Tue 21:00>--<2017-05-02 Tue 23:00>
@@ -58,8 +59,10 @@ export default class CalendarScreen extends React.Component {
 
         month = month === 0 ? 11 : month - 1;
 
-        return new Date(year, month, day, hour, minute);
+        const d = new Date(year, month, day, hour, minute);
+        return d;
       };
+
       var q = new Date();
       var m = q.getMonth();
       var d = q.getDate();
@@ -84,22 +87,33 @@ export default class CalendarScreen extends React.Component {
         return dateA.getTime() - dateB.getTime();
       });
 
-      // const nodeItems = candidates.map((node, idx)=> <OrgNode key={idx} node={node}></OrgNode>);
-
       const hours = [6, 9, 12, 13, 18, 24];
       let preListItems = [];
       let idx = 0;
 
       const consumeCandidates = (year, month, date, hour) => {
+        const localDate = new Date(year, month, date, hour);
         while (
           candidates.length > 0 &&
-          parseDate(candidates[0].activeTimeStamp) <
-            new Date(year, month, date, hour)
+          parseDate(candidates[0].activeTimeStamp) < localDate
         ) {
           const node = candidates.shift();
+          console.log(
+            node.activeTimeStamp,
+            node.headline.content,
+            parseDate(node.activeTimeStamp).toString(),
+            localDate.toString()
+          );
           preListItems.push({
             date: parseDate(node.activeTimeStamp),
-            jsx: <OrgNode key={idx} node={node} />
+            jsx: (
+              <View key={idx} style={{ flexDirection: 'row' }}>
+                <Text style={{ fontFamily: 'space-mono', fontSize: 12 }}>
+                  {node.activeTimeStamp.substr(16, 5)}
+                </Text>
+                <OrgNode node={node} isCollapsed={true} />
+              </View>
+            )
           });
           idx++;
         }
@@ -109,48 +123,68 @@ export default class CalendarScreen extends React.Component {
         let localDate = new Date(y, m, date);
         preListItems.push({
           date: localDate,
-          jsx: <View key={label}><Text>{localDate.toString()}</Text></View>
+          jsx: (
+            <View key={label}>
+              <Text
+                style={{
+                  color: 'white',
+                  backgroundColor: 'black',
+                  fontFamily: 'space-mono',
+                  fontSize: 12
+                }}>
+                {localDate.toDateString()}
+              </Text>
+            </View>
+          )
         });
-        consumeCandidates(y, m, date, hours[0]);
-        for (let i = 0; i < hours.length - 1; i++) {
-          preListItems.push({
-            date: new Date(y, m, date, hours[i]),
-            jsx: <View key={idx}><Text>{hours[i]}</Text></View>
-          });
-          idx++;
+        for (let i = 0; i < hours.length; i++) {
+          console.log(hours[i]);
           consumeCandidates(y, m, date, hours[i]);
+
+          if (i < hours.length - 1) {
+            preListItems.push({
+              date: new Date(y, m, date, hours[i]),
+              jsx: (
+                <View key={idx}>
+                  <Text style={{ fontFamily: 'space-mono', fontSize: 12 }}>
+                    {hours[i].toString().padStart(2, '0') + ':00----------'}
+                  </Text>
+                </View>
+              )
+            });
+            idx++;
+          }
         }
-        preListItems.push({
-          date: new Date(y, m, date, hours[hours.length - 1]),
-          jsx: <View key={idx}><Text>{hours[hours.length - 1]}</Text></View>
-        });
-        idx++;
       };
 
-      buildDay(d - 1, "yesterday");
-      buildDay(d, "today");
-      buildDay(d + 1, "tomorrow");
+      buildDay(d - 1, 'yesterday');
+      buildDay(d, 'today');
+      buildDay(d + 1, 'tomorrow');
 
       let listItems = [];
-      for (let i = 0; i < preListItems.length - 1; i++) {
+      for (let i = 0; i < preListItems.length; i++) {
         listItems.push(preListItems[i].jsx);
         if (q >= preListItems[i].date && q <= preListItems[i + 1].date) {
-          listItems.push(<View key={idx}><Text>{"----NOW----"}</Text></View>);
+          listItems.push(
+            <View key={'now'}>
+              <Text
+                style={{
+                  fontFamily: 'space-mono',
+                  fontSize: 12,
+                  backgroundColor: '#b0c4de'
+                }}>
+                {q.getHours().toString().padStart(2, '0') +
+                  ':' +
+                  q.getMinutes().toString().padStart(2, '0') +
+                  '-----NOW-------'}
+              </Text>
+            </View>
+          );
         }
       }
 
-      // listItems.push(<View key={'today'}><Text>{today.toString()}</Text></View>);
-      // for(let i = 0; i < hours.length; i++) {
-      //   listItems.push(<View key={hours.length * 2 + i}><Text>{hours[i]}</Text></View>);
-      // }
-
-      // listItems.push(<View key={'tomorrow'}><Text>{tomorrow.toString()}</Text></View>);
-      // for(let i = 0;i < hours.length; i++) {
-      //   listItems.push(<View key={hours.length * 3 + i}><Text>{hours[i]}</Text></View>);
-      // }
-
       return (
-        <View style={{ marginTop: 40 }}>
+        <View>
           <ScrollView>
             {listItems}
           </ScrollView>

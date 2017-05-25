@@ -1,17 +1,17 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Notifications } from 'expo';
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import { Notifications } from "expo";
 import {
   StackNavigation,
   TabNavigation,
   TabNavigationItem,
-} from '@expo/ex-navigation';
-import { FontAwesome } from '@expo/vector-icons';
+} from "@expo/ex-navigation";
+import { FontAwesome } from "@expo/vector-icons";
 
-import Alerts from '../constants/Alerts';
-import Colors from '../constants/Colors';
+import Alerts from "../constants/Alerts";
+import Colors from "../constants/Colors";
 import registerForPushNotificationsAsync
-  from '../api/registerForPushNotificationsAsync';
+  from "../api/registerForPushNotificationsAsync";
 
 export default class RootNavigation extends React.Component {
   componentDidMount() {
@@ -24,22 +24,25 @@ export default class RootNavigation extends React.Component {
 
   render() {
     return (
-      <TabNavigation tabBarHeight={56} initialTab="home">
+      <TabNavigation tabBarHeight={56} initialTab="calendar">
         <TabNavigationItem
           id="home"
-          renderIcon={isSelected => this._renderIcon('database', isSelected)}>
+          renderIcon={isSelected => this._renderIcon("database", isSelected)}
+        >
           <StackNavigation initialRoute="home" />
         </TabNavigationItem>
 
         <TabNavigationItem
-          id="links"
-          renderIcon={isSelected => this._renderIcon('calendar', isSelected)}>
+          id="calendar"
+          renderIcon={isSelected => this._renderIcon("calendar", isSelected)}
+        >
           <StackNavigation initialRoute="calendar" />
         </TabNavigationItem>
 
         <TabNavigationItem
           id="settings"
-          renderIcon={isSelected => this._renderIcon('cog', isSelected)}>
+          renderIcon={isSelected => this._renderIcon("cog", isSelected)}
+        >
           <StackNavigation initialRoute="settings" />
         </TabNavigationItem>
       </TabNavigation>
@@ -65,14 +68,14 @@ export default class RootNavigation extends React.Component {
 
     // Watch for incoming notifications
     this._notificationSubscription = Notifications.addListener(
-      this._handleNotification
+      this._handleNotification,
     );
   }
 
   _handleNotification = ({ origin, data }) => {
     this.props.navigator.showLocalAlert(
       `Push notification ${origin} with data: ${JSON.stringify(data)}`,
-      Alerts.notice
+      Alerts.notice,
     );
   };
 }
@@ -80,7 +83,7 @@ export default class RootNavigation extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   selectedTab: {
     color: Colors.tabIconSelected,
