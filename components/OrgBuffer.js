@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
-import OrgNode from './OrgNode.js';
 import OrgTree from './OrgTree.js';
 
 class OrgBuffer extends Component {
@@ -14,19 +13,20 @@ class OrgBuffer extends Component {
   }
 
   _cycleCollapse() {
-    let newCollapseState = this.state.collapseStatus + 1;
-    newCollapseState = newCollapseState > 2 ? 0 : newCollapseState;
-    this.setState({ collapseStatus: newCollapseState });
+    // let newCollapseState = this.state.collapseStatus + 1;
+    // newCollapseState = newCollapseState > 2 ? 0 : newCollapseState;
+    // this.setState({ collapseStatus: newCollapseState });
   }
 
   render() {
-    const listItems = this.state.orgTree === null
+    const listItems = this.props.orgTree === null
       ? null
       : this.props.orgTree.children.map((tree, idx) => (
           <OrgTree
             key={idx}
             tree={tree}
             collapseStatus={this.state.collapseStatus}
+            navigation={this.props.navigation}
           />
         ));
 

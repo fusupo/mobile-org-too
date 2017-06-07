@@ -1,21 +1,21 @@
-import React from "react";
-import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import React from 'react';
+import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import OrgTree from "../components/OrgTree.js";
-import OrgBuffer from "../components/OrgBuffer.js";
-import loadParseOrgFilesAsync from "../utilities/loadParseOrgFilesAsync.js";
+import OrgTree from '../components/OrgTree.js';
+import OrgBuffer from '../components/OrgBuffer.js';
+import DropboxDataSource from '../utilities/DropboxDataSource.js';
 
 export default class HomeScreen extends React.Component {
   static route = {
     navigationBar: {
-      title: "Root"
+      title: 'Root'
     }
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      orgText: "",
+      orgText: '',
       orgTree: null,
       viewIsReady: false
     };
@@ -26,12 +26,13 @@ export default class HomeScreen extends React.Component {
   }
 
   async _loadParseOrgFilesAsync() {
+    const ds = new DropboxDataSource();
     try {
-      let foo = await loadParseOrgFilesAsync();
+      let foo = await ds.loadParseOrgFilesAsync();
       this.setState(foo);
     } catch (e) {
       console.warn(
-        "There was an error retrieving files from drobbox on the home screen"
+        'There was an error retrieving files from drobbox on the home screen'
       );
       console.log(e.message);
     } finally {
@@ -41,20 +42,12 @@ export default class HomeScreen extends React.Component {
 
   render() {
     if (this.state.viewIsReady) {
-      // const listItems = this.state.orgTree === null
-      //   ? null
-      //   : this.state.orgTree.children.map((tree, idx) => (
-      //       <OrgTree key={idx} tree={tree} />
-      //     ));
-      // return (
-      //   <View style={{ marginTop: 10 }}>
-      //     <ScrollView>
-      //       {listItems}
-      //     </ScrollView>
-      //   </View>
-      // );
-      const listItems = this.state.orgTree === null ? null : this.state.orgTree;
-      return <OrgBuffer orgTree={listItems} />;
+      return (
+        <OrgBuffer
+          orgTree={this.state.orgTree}
+          navigation={this.props.screenProps.navigation}
+        />
+      );
     } else {
       return <View />;
     }

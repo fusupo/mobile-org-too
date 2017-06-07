@@ -1,11 +1,26 @@
 import Expo from 'expo';
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
-import { NavigationProvider, StackNavigation } from '@expo/ex-navigation';
-import { FontAwesome } from '@expo/vector-icons';
+import { StyleSheet, View, ScrollView, Button, Text } from 'react-native';
+import { StackNavigator } from 'react-navigation';
+import type { Children } from 'react';
 
-import Router from './navigation/Router';
+import TabNav from './navigation/RootNavigation.js';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
+
+import NewNodeScreen from './screens/NewNodeScreen';
+import NodeDetailScreen from './screens/NodeDetailScreen';
+import TestScreen from './screens/TestScreen';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  statusBarUnderlay: {
+    height: 24,
+    backgroundColor: 'rgba(0,0,0,0.2)'
+  }
+});
 
 class AppContainer extends React.Component {
   state = {
@@ -21,7 +36,7 @@ class AppContainer extends React.Component {
       await cacheAssetsAsync({
         images: [require('./assets/images/expo-wordmark.png')],
         fonts: [
-          FontAwesome.font,
+          //FontAwesome.font,
           { 'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf') }
         ]
       });
@@ -38,34 +53,23 @@ class AppContainer extends React.Component {
 
   render() {
     if (this.state.appIsReady) {
-      return (
-        <View style={styles.container}>
-          <NavigationProvider router={Router}>
-            <StackNavigation
-              id="root"
-              initialRoute={Router.getRoute('rootNavigation')}
-            />
-          </NavigationProvider>
-          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-          {Platform.OS === 'android' &&
-            <View style={styles.statusBarUnderlay} />}
-        </View>
-      );
+      const StacksOverTabs = StackNavigator({
+        Root: {
+          screen: TestScreen
+        },
+        NodeDetail: {
+          screen: NodeDetailScreen
+        },
+        NewNode: {
+          screen: NewNodeScreen
+        }
+      });
+
+      return <StacksOverTabs />;
     } else {
       return <Expo.AppLoading />;
     }
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff'
-  },
-  statusBarUnderlay: {
-    height: 24,
-    backgroundColor: 'rgba(0,0,0,0.2)'
-  }
-});
 
 Expo.registerRootComponent(AppContainer);

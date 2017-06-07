@@ -1,8 +1,21 @@
 import React, { Component } from 'react';
-import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, TouchableHighlight } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
 import OrgDrawer from './OrgDrawer.js';
 import OrgLogbook from './OrgLogbook.js';
+
+const styles = StyleSheet.create({
+  nodeHeader: {
+    flexDirection: 'row'
+  },
+  nodeHeaderTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    fontFamily: 'space-mono',
+    flex: 1
+  }
+});
 
 class OrgNode extends Component {
   constructor(props) {
@@ -28,7 +41,8 @@ class OrgNode extends Component {
       : null;
 
     // tags
-    const tags = this.props.node.headline.tags.length > 0
+    const tags = this.props.node.headline.tags &&
+      this.props.node.headline.tags.length > 0
       ? this.props.node.headline.tags.map((tag, idx) => {
           return (
             <Text
@@ -44,14 +58,28 @@ class OrgNode extends Component {
         })
       : null;
     const tagList = tags ? <Text>{tags}</Text> : null;
+
+    const headerIcon = this.state.isCollapsed ? 'caret-down' : 'caret-up';
+    const header = (
+      <View style={styles.nodeHeader}>
+        <Text style={styles.nodeTodoKeyword}>{todoKeyword}</Text>
+        <Text style={styles.nodeHeaderTitle}>
+          {this.props.node.headline.content}
+        </Text>
+        <TouchableHighlight
+          underlayColor="#00ff00"
+          onPress={this.props.cycleCollapse}
+          style={{ width: 20 }}>
+          <FontAwesome name={headerIcon} size={10} />
+        </TouchableHighlight>
+      </View>
+    );
+
     switch (this.state.isCollapsed) {
       case true:
         return (
           <View>
-            <Text style={styles.bigblue}>
-              {todoKeyword}
-              {this.props.node.headline.content}
-            </Text>
+            {header}
             {tagList}
           </View>
         );
@@ -79,11 +107,8 @@ class OrgNode extends Component {
           ? <Text>{this.props.node.body}</Text>
           : null;
         return (
-          <View>
-            <Text style={styles.bigblue}>
-              {todoKeyword}
-              {this.props.node.headline.content}
-            </Text>
+          <View style={{ flex: 1 }}>
+            {header}
             {tagList}
             {scheduled}
             {closed}
@@ -96,13 +121,5 @@ class OrgNode extends Component {
     }
   }
 }
-
-const styles = StyleSheet.create({
-  bigblue: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    fontFamily: 'space-mono'
-  }
-});
 
 export default OrgNode;

@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 class OrgLogbook extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
-    this.state = { isCollapsed: true };
+    this.state = { isCollapsed: this.props.isCollapsed };
   }
 
   _toggleCollapse() {
@@ -29,22 +28,26 @@ class OrgLogbook extends Component {
         </View>
       );
     } else {
-      const listItems = this.props.log.log.map((l, idx) => {
-        return (
-          <Text
-            style={{
-              fontFamily: 'space-mono',
-              backgroundColor: '#cccccc',
-              fontSize: 10
-            }}
-            key={idx}>
-            {l}
-          </Text>
-        );
-      });
+      const listItems =
+        this.props.log &&
+        this.props.log.entries &&
+        this.props.log.entries.map((l, idx) => {
+          return (
+            <View style={{ width: 100, height: 50 }} key={idx}>
+              <Text
+                style={{
+                  fontFamily: 'space-mono',
+                  backgroundColor: '#cccccc',
+                  fontSize: 10
+                }}>
+                {l[0]}
+              </Text>
+            </View>
+          );
+        });
 
       return (
-        <View className="OrgLogbook">
+        <View className="OrgLogbook" style={{ flex: 1 }}>
           <Text
             className="OrgDrawerName"
             style={{

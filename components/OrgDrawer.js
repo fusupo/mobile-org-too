@@ -4,7 +4,7 @@ import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 class OrgDrawer extends Component {
   constructor(props) {
     super(props);
-    this.state = { isCollapsed: true };
+    this.state = { isCollapsed: this.props.isCollapsed };
   }
 
   _toggleCollapse() {
@@ -28,8 +28,8 @@ class OrgDrawer extends Component {
       );
     } else {
       const listItems = this.props.drawer.properties.map((keyval, idx) => {
-        const key = Object.keys(keyval)[0];
-        const val = keyval[key];
+        const key = keyval[0];
+        const val = keyval[1];
         return (
           <Text
             style={{

@@ -1,14 +1,27 @@
 import React, { Component } from 'react';
-import {
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  TouchableHighlight
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableHighlight } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
 import OrgNode from './OrgNode.js';
+import OrgHeadline from './OrgHeadline.js';
+
+const styles = StyleSheet.create({
+  txt: {
+    textAlign: 'left',
+    fontSize: 14
+  },
+  border: {
+    borderTopWidth: 1,
+    borderStyle: 'solid',
+    paddingLeft: 5
+  },
+  padded: {
+    paddingLeft: 5
+  },
+  orgTree: {
+    flex: 1
+  }
+});
 
 class OrgTree extends Component {
   constructor(props) {
@@ -26,92 +39,73 @@ class OrgTree extends Component {
 
   _cycleCollapse() {
     let newCollapseState = this.state.collapseStatus + 1;
-
     newCollapseState = newCollapseState > 2 ? 0 : newCollapseState;
-
-    console.log(this.props.tree.children.length, newCollapseState);
-
-    newCollapseState = newCollapseState === 1 &&
-      this.props.tree.children.length === 0
-      ? 2
-      : newCollapseState;
-
+    // newCollapseState = newCollapseState === 1 &&
+    //   this.props.tree.children.length === 0
+    //   ? 2
+    //   : newCollapseState;
     this.setState({ collapseStatus: newCollapseState });
   }
 
   render() {
+    const headerIcon = ['angle-down', 'angle-double-down', 'angle-up'][
+      this.state.collapseStatus
+    ];
+    const headerTouchable = this.props.tree.children.length === 0
+      ? null
+      : <TouchableHighlight
+          underlayColor="#00ff00"
+          onPress={this._cycleCollapse.bind(this)}
+          style={{ width: 20 }}>
+          <FontAwesome name={headerIcon} size={12} />
+        </TouchableHighlight>;
+    const header = (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          underlayColor="#00ff00"
+          onPress={() => {
+            this.props.navigation.navigate('NodeDetail', {
+              tree: this.props.tree
+            });
+          }}
+          // .bind(this)
+          style={{ flex: 1 }}>
+          <View>
+            <OrgHeadline headline={this.props.tree.node.headline} />
+          </View>
+        </TouchableHighlight>
+        {headerTouchable}
+      </View>
+    );
+
     switch (this.state.collapseStatus) {
       case 0:
-        return (
-          <TouchableHighlight onPress={this._cycleCollapse.bind(this)}>
-            <View style={styles.border}>
-              <OrgNode node={this.props.tree.node} isCollapsed={true} />
-            </View>
-          </TouchableHighlight>
-        );
+        return <View style={styles.border}>{header}</View>;
         break;
       case 1:
         const listItems = this.props.tree.children.map((tree, idx) => (
           <OrgTree
             key={idx}
             tree={tree}
-            collapseStatus={this.state.collapseStatus}
+            collapseStatus={0}
+            navigation={this.props.navigation}
           />
         ));
-        return (
-          <TouchableHighlight onPress={this._cycleCollapse.bind(this)}>
-            <View
-              style={styles.border}
-              onPress={this._cycleCollapse.bind(this)}>
-              <OrgNode node={this.props.tree.node} isCollapsed={true} />
-              <View style={styles.padded} className="OrgTreeChildren">
-                {listItems}
-              </View>
-            </View>
-          </TouchableHighlight>
-        );
+        return <View style={styles.border}>{header}{listItems}</View>;
         break;
       case 2:
-        const listItemstoo = this.props.tree.children.map((tree, idx) => (
+        const listItemsToo = this.props.tree.children.map((tree, idx) => (
           <OrgTree
             key={idx}
             tree={tree}
-            collapseStatus={this.state.collapseStatus}
+            collapseStatus={2}
+            navigation={this.props.navigation}
           />
         ));
-        return (
-          <TouchableHighlight onPress={this._cycleCollapse.bind(this)}>
-            <View
-              style={styles.border}
-              onPress={this._cycleCollapse.bind(this)}>
-              <OrgNode node={this.props.tree.node} isCollapsed={false} />
-              <View style={styles.padded} className="OrgTreeChildren">
-                {listItemstoo}
-              </View>
-            </View>
-          </TouchableHighlight>
-        );
+        return <View style={styles.border}>{header}{listItemsToo}</View>;
         break;
     }
   }
 }
-
-const styles = StyleSheet.create({
-  txt: {
-    textAlign: 'left',
-    fontSize: 14
-  },
-  border: {
-    borderWidth: 0,
-    borderStyle: 'solid',
-    marginLeft: 5,
-    marginRight: 5,
-    marginBottom: 0,
-    padding: 5
-  },
-  padded: {
-    paddingLeft: 5
-  }
-});
 
 export default OrgTree;

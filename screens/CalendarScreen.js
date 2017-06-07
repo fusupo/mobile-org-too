@@ -2,7 +2,17 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import OrgNode from '../components/OrgNode.js';
-import loadParseOrgFilesAsync from '../utilities/loadParseOrgFilesAsync.js';
+import OrgTree from '../components/OrgTree.js';
+import DropboxDataSource from '../utilities/DropboxDataSource.js';
+
+const orgUtils = require('org-parse').utils;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 15
+  }
+});
 
 export default class CalendarScreen extends React.Component {
   static route = {
@@ -26,8 +36,9 @@ export default class CalendarScreen extends React.Component {
   }
 
   async _loadParseOrgFilesAsync() {
+    const ds = new DropboxDataSource();
     try {
-      let foo = await loadParseOrgFilesAsync();
+      let foo = await ds.loadParseOrgFilesAsync();
       this.setState(foo);
     } catch (e) {
       console.warn(
@@ -72,18 +83,20 @@ export default class CalendarScreen extends React.Component {
       var today = new Date(y, m, d);
       var tomorrow = new Date(y, m, d + 2);
 
-      const candidates = this.state.orgNodes.filter((node, idx) => {
-        const nodeDate = node.activeTimeStamp === null
-          ? null
-          : parseDate(node.activeTimeStamp);
+      const candidates = this.state.orgNodes.filter(node => {
+        let nodeDate = null;
+        if (orgUtils.nodeHasActiveTimeStamp_p(node)) {
+          let ts = orgUtils.activeTimeStampFromNode(node);
+          nodeDate = parseDate(ts.srcStr);
+        }
         return (
           nodeDate !== null && nodeDate >= yesterday && nodeDate <= tomorrow
         );
       });
 
       candidates.sort((a, b) => {
-        var dateA = parseDate(a.activeTimeStamp);
-        var dateB = parseDate(b.activeTimeStamp);
+        var dateA = parseDate(orgUtils.activeTimeStampFromNode(a).srcStr);
+        var dateB = parseDate(orgUtils.activeTimeStampFromNode(b).srcStr);
         return dateA.getTime() - dateB.getTime();
       });
 
@@ -95,21 +108,16 @@ export default class CalendarScreen extends React.Component {
         const localDate = new Date(year, month, date, hour);
         while (
           candidates.length > 0 &&
-          parseDate(candidates[0].activeTimeStamp) < localDate
+          parseDate(orgUtils.activeTimeStampFromNode(candidates[0]).srcStr) <
+            localDate
         ) {
           const node = candidates.shift();
-          console.log(
-            node.activeTimeStamp,
-            node.headline.content,
-            parseDate(node.activeTimeStamp).toString(),
-            localDate.toString()
-          );
           preListItems.push({
-            date: parseDate(node.activeTimeStamp),
+            date: parseDate(orgUtils.activeTimeStampFromNode(node).srcStr),
             jsx: (
               <View key={idx} style={{ flexDirection: 'row' }}>
                 <Text style={{ fontFamily: 'space-mono', fontSize: 12 }}>
-                  {node.activeTimeStamp.substr(16, 5)}
+                  {orgUtils.activeTimeStampFromNode(node).srcStr.substr(16, 5)}
                 </Text>
                 <OrgNode node={node} isCollapsed={true} />
               </View>
@@ -138,7 +146,7 @@ export default class CalendarScreen extends React.Component {
           )
         });
         for (let i = 0; i < hours.length; i++) {
-          console.log(hours[i]);
+          // console.log(hours[i]);
           consumeCandidates(y, m, date, hours[i]);
 
           if (i < hours.length - 1) {
@@ -195,10 +203,3 @@ export default class CalendarScreen extends React.Component {
     }
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 15
-  }
-});
