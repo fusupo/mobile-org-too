@@ -2,14 +2,11 @@ import Expo from 'expo';
 import React from 'react';
 import { StyleSheet, View, ScrollView, Button, Text } from 'react-native';
 import { StackNavigator } from 'react-navigation';
-import type { Children } from 'react';
-
-import TabNav from './navigation/RootNavigation.js';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 
 import NewNodeScreen from './screens/NewNodeScreen';
 import NodeDetailScreen from './screens/NodeDetailScreen';
-import TestScreen from './screens/TestScreen';
+import MainScreen from './screens/MainScreen';
 
 const styles = StyleSheet.create({
   container: {
@@ -45,7 +42,6 @@ class AppContainer extends React.Component {
         'There was an error caching assets (see: main.js), perhaps due to a ' +
           'network timeout, so we skipped caching. Reload the app to try again.'
       );
-      console.log(e.message);
     } finally {
       this.setState({ appIsReady: true });
     }
@@ -55,7 +51,7 @@ class AppContainer extends React.Component {
     if (this.state.appIsReady) {
       const StacksOverTabs = StackNavigator({
         Root: {
-          screen: TestScreen
+          screen: MainScreen
         },
         NodeDetail: {
           screen: NodeDetailScreen

@@ -1,12 +1,13 @@
 const parseOrg = require('org-parse').parseOrg;
 const serializeTree = require('org-parse').serializeTree;
-
 const Dropbox = require('dropbox');
+
+import { gitHubAccessToken } from '../secrets';
 
 export default class DropboxDataSource {
   constructor() {
     this.dbx = new Dropbox({
-      accessToken: '6GWVlsFxXhcAAAAAAAAGZuGZiFMrvMmtuoD7nxlK_ShjfsL1_w7Yp0QQfMpbTq7M'
+      accessToken: gitHubAccessToken
     });
   }
 

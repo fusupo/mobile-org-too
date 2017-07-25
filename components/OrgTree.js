@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, TouchableHighlight } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
-import OrgNode from './OrgNode.js';
 import OrgHeadline from './OrgHeadline.js';
 
 const styles = StyleSheet.create({
@@ -40,10 +39,6 @@ class OrgTree extends Component {
   _cycleCollapse() {
     let newCollapseState = this.state.collapseStatus + 1;
     newCollapseState = newCollapseState > 2 ? 0 : newCollapseState;
-    // newCollapseState = newCollapseState === 1 &&
-    //   this.props.tree.children.length === 0
-    //   ? 2
-    //   : newCollapseState;
     this.setState({ collapseStatus: newCollapseState });
   }
 

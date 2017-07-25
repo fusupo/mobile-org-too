@@ -1,7 +1,6 @@
 import React from 'react';
-import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { View } from 'react-native';
 
-import OrgTree from '../components/OrgTree.js';
 import OrgBuffer from '../components/OrgBuffer.js';
 import DropboxDataSource from '../utilities/DropboxDataSource.js';
 
@@ -34,7 +33,6 @@ export default class HomeScreen extends React.Component {
       console.warn(
         'There was an error retrieving files from drobbox on the home screen'
       );
-      console.log(e.message);
     } finally {
       this.setState({ viewIsReady: true });
     }

@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  TouchableHighlight,
-  View,
-  Text,
-  ScrollView,
-  StyleSheet
-} from 'react-native';
+import { TouchableHighlight, View, StyleSheet } from 'react-native';
 import { ExpoConfigView } from '@expo/samples';
 
 import Colors from '../constants/Colors';
