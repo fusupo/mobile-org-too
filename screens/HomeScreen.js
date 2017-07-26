@@ -42,9 +42,10 @@ export default class HomeScreen extends React.Component {
     // if (this.state.viewIsReady) {
     // orgTree={this.state.orgTree}
     // navigation={this.props.screenProps.navigation}
+
     return (
       <View>
-        <OrgBuffer />
+        <OrgBuffer navigation={this.props.screenProps.navigation} />
       </View>
     );
     // } else {

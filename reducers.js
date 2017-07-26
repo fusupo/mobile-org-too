@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 
+import { StacksOverTabs } from './navigation/StacksOverTabs';
 import { CYCLE_NODE_COLLAPSE } from './actions';
 
 const OrgDrawer = require('org-parse').OrgDrawer;
@@ -101,12 +102,50 @@ function orgTree(state = {}, action) {
   return state;
 }
 
+///////////////////////////////////////////////////////////////////////  ORG TREE
+
+function focusNode(state = null, action) {
+  switch (action.type) {
+    default:
+      return state;
+      break;
+  }
+  return state;
+}
+
+////////////////////////////////////////////////////////////////////////////  NAV
+
+function nav(state, action) {
+  let nextState;
+  switch (action.type) {
+    // case 'Login':
+    //   nextState = StacksOverTabs.router.getStateForAction(
+    //     NavigationActions.back(),
+    //     state
+    //   );
+    //   break;
+    // case 'Logout':
+    //   nextState = StacksOverTabs.router.getStateForAction(
+    //     NavigationActions.navigate({ routeName: 'Login' }),
+    //     state
+    //   );
+    //   break;
+    default:
+      nextState = StacksOverTabs.router.getStateForAction(action, state);
+      break;
+  }
+
+  // Simply return the original `state` if `nextState` is null or undefined.
+  return nextState || state;
+}
+
 /////////////////////////////////////////////////////////////////  MOBILE ORG TOO
 
 const mobileOrgTooApp = combineReducers({
   orgText,
   orgTree,
-  orgNodes
+  orgNodes,
+  nav
 });
 
 export default mobileOrgTooApp;

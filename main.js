@@ -1,19 +1,15 @@
 import Expo from 'expo';
 import React from 'react';
-import { StyleSheet, View, ScrollView, Button, Text } from 'react-native';
-import { StackNavigator } from 'react-navigation';
+import { StyleSheet } from 'react-native';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 
-import NewNodeScreen from './screens/NewNodeScreen';
-import NodeDetailScreen from './screens/NodeDetailScreen';
-import MainScreen from './screens/MainScreen';
-
 import DropboxDataSource from './utilities/DropboxDataSource.js';
 import mobileOrgTooApp from './reducers';
 
+import StacksOverTabs from './navigation/StacksOverTabs';
 let store;
 
 const styles = StyleSheet.create({
@@ -85,18 +81,6 @@ class AppContainer extends React.Component {
 
   render() {
     if (this.state.appIsReady) {
-      const StacksOverTabs = StackNavigator({
-        Root: {
-          screen: MainScreen
-        },
-        NodeDetail: {
-          screen: NodeDetailScreen
-        },
-        NewNode: {
-          screen: NewNodeScreen
-        }
-      });
-
       return (
         <Provider store={store}>
           <StacksOverTabs />

@@ -24,19 +24,6 @@ const styles = StyleSheet.create({
 
 const TabNav = TabNavigator(
   {
-    // AddOne: {
-    //   screen: NewNodeScreen,
-    //   path: '/add',
-    //   navigationOptions: {
-    //     tabBarIcon: ({ tintColor, focused }) => (
-    //       <Ionicons
-    //         name={focused ? 'ios-add' : 'ios-add'}
-    //         size={26}
-    //         style={{ color: tintColor }}
-    //       />
-    //     )
-    //   }
-    // },
     MainTab: {
       screen: HomeScreen,
       path: '/',

@@ -25,7 +25,8 @@ const styles = StyleSheet.create({
   }
 });
 
-const OrgTree = ({ nodes, tree, onNodeTitleClick }) => {
+const OrgTree = ({ navigator, nodes, tree, onNodeTitleClick }) => {
+  console.log('foo');
   if (tree.nodeID === 'root') {
     return (
       <View>
