@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { ScrollView } from 'react-native';
 
-import OrgBuffer from '../components/OrgBuffer.js';
-import DropboxDataSource from '../utilities/DropboxDataSource.js';
+import OrgTreeContainer from '../components/OrgTree.js';
 
 export default class HomeScreen extends React.Component {
   static route = {
@@ -44,9 +43,9 @@ export default class HomeScreen extends React.Component {
     // navigation={this.props.screenProps.navigation}
 
     return (
-      <View>
-        <OrgBuffer navigation={this.props.screenProps.navigation} />
-      </View>
+      <ScrollView>
+        <OrgTreeContainer />
+      </ScrollView>
     );
     // } else {
     //   return <View />;

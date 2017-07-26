@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 
 import { StacksOverTabs } from './navigation/StacksOverTabs';
-import { CYCLE_NODE_COLLAPSE } from './actions';
+import { CYCLE_NODE_COLLAPSE, FOCUS_NODE } from './actions';
 
 const OrgDrawer = require('org-parse').OrgDrawer;
 
@@ -80,7 +80,6 @@ function orgNodes(state = {}, action) {
       let newNodeObj = {};
       const newNode = orgNode(state[nodeID], action);
       newNodeObj[nodeID] = newNode;
-      console.log(newNode);
       const newNodes = Object.assign({}, state, newNodeObj);
       return newNodes;
       break;
@@ -104,14 +103,7 @@ function orgTree(state = {}, action) {
 
 ///////////////////////////////////////////////////////////////////////  ORG TREE
 
-function focusNode(state = null, action) {
-  switch (action.type) {
-    default:
-      return state;
-      break;
-  }
-  return state;
-}
+function focusNode(state = null, action) {}
 
 ////////////////////////////////////////////////////////////////////////////  NAV
 

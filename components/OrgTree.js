@@ -1,8 +1,10 @@
-import React, { Component } from 'react';
-import { StyleSheet, View, Text, TouchableHighlight } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, TouchableHighlight } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { cycleNodeCollapse } from '../actions';
+import { NavigationActions } from 'react-navigation';
 
-import OrgHeadline from './OrgHeadline';
+import { connect } from 'react-redux';
 import OrgNode from './OrgNode';
 
 const OrgDrawerUtil = require('org-parse').OrgDrawer;
@@ -25,8 +27,12 @@ const styles = StyleSheet.create({
   }
 });
 
-const OrgTree = ({ nodes, tree, onNodeTitleClick, onNodeArrowClick }) => {
-  console.log('foo');
+export const OrgTree = ({
+  nodes,
+  tree,
+  onNodeTitleClick,
+  onNodeArrowClick
+}) => {
   if (tree.nodeID === 'root') {
     return (
       <View>
@@ -110,4 +116,27 @@ const OrgTree = ({ nodes, tree, onNodeTitleClick, onNodeArrowClick }) => {
   }
 };
 
-export default OrgTree;
+const mapStateToProps = state => {
+  return {
+    nodes: state.orgNodes,
+    tree: state.orgTree
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onNodeArrowClick: nodeID => {
+      dispatch(cycleNodeCollapse(nodeID));
+    },
+    onNodeTitleClick: nodeID => {
+      dispatch(
+        NavigationActions.navigate({
+          routeName: 'NodeDetail',
+          params: { nodeID: nodeID }
+        })
+      );
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrgTree);
