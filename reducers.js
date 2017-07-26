@@ -32,15 +32,15 @@ function propDrawer(state = {}, action) {
   switch (action.type) {
     case CYCLE_NODE_COLLAPSE:
       const key = 'collapseStatus';
-      console.log('foo');
       let idx = OrgDrawer.indexOfKey(state, key);
       if (idx === -1 || state.properties[idx][1] === 'collapsed') {
         return OrgDrawer.insertOrUpdate(state, [key, 'expanded']);
       } else if (state.properties[idx][1] === 'expanded') {
-        return OrgDrawer.insertOrUpdate(state, [key, 'maximized']);
-      } else if (state.properties[idx][1] === 'maximized') {
         return OrgDrawer.insertOrUpdate(state, [key, 'collapsed']);
       }
+      // else if (state.properties[idx][1] === 'maximized') {
+      //     return OrgDrawer.insertOrUpdate(state, [key, 'collapsed']);
+      //   }
       break;
     default:
       return state;
