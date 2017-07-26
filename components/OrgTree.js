@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const OrgTree = ({ navigator, nodes, tree, onNodeTitleClick }) => {
+const OrgTree = ({ nodes, tree, onNodeTitleClick, onNodeArrowClick }) => {
   console.log('foo');
   if (tree.nodeID === 'root') {
     return (
@@ -37,6 +37,7 @@ const OrgTree = ({ navigator, nodes, tree, onNodeTitleClick }) => {
               nodes={nodes}
               tree={t}
               onNodeTitleClick={onNodeTitleClick}
+              onNodeArrowClick={onNodeArrowClick}
             />
           );
         })}
@@ -63,7 +64,7 @@ const OrgTree = ({ navigator, nodes, tree, onNodeTitleClick }) => {
             />
             <TouchableHighlight
               style={{ width: 40 }}
-              onPress={() => onNodeTitleClick(tree.nodeID)}>
+              onPress={() => onNodeArrowClick(tree.nodeID)}>
               <FontAwesome name={'caret-down'} size={10} />
             </TouchableHighlight>
           </View>
@@ -85,7 +86,7 @@ const OrgTree = ({ navigator, nodes, tree, onNodeTitleClick }) => {
               />
               <TouchableHighlight
                 style={{ width: 40 }}
-                onPress={() => onNodeTitleClick(tree.nodeID)}>
+                onPress={() => onNodeArrowClick(tree.nodeID)}>
                 <FontAwesome name={'caret-up'} size={10} />
               </TouchableHighlight>
             </View>
@@ -97,6 +98,7 @@ const OrgTree = ({ navigator, nodes, tree, onNodeTitleClick }) => {
                     nodes={nodes}
                     tree={t}
                     onNodeTitleClick={onNodeTitleClick}
+                    onNodeArrowClick={onNodeArrowClick}
                   />
                 );
               })}

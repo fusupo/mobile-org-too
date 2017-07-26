@@ -16,6 +16,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
+    onNodeArrowClick: nodeID => {
+      dispatch(cycleNodeCollapse(nodeID));
+    },
     onNodeTitleClick: nodeID => {
       dispatch(cycleNodeCollapse(nodeID));
     }

@@ -42,7 +42,10 @@ const OrgNode = ({ id, headline, propDrawer, onTitleClick }) => {
     : null;
 
   return (
-    <TouchableHighlight underlayColor="#00ff00" style={{ flex: 1 }}>
+    <TouchableHighlight
+      underlayColor="#00ff00"
+      style={{ flex: 1 }}
+      onPress={onTitleClick}>
       <View style={{ flexDirection: 'row' }}>
         <Text>{todoKeyword}</Text>
         <Text style={{ flex: 1 }}>
