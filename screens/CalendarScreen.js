@@ -2,7 +2,6 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import OrgNode from '../components/OrgNode.js';
-import OrgTree from '../components/OrgTree.js';
 import DropboxDataSource from '../utilities/DropboxDataSource.js';
 
 const orgUtils = require('org-parse').utils;
@@ -31,7 +30,6 @@ export default class CalendarScreen extends React.Component {
   }
 
   componentWillMount() {
-    console.log('START LOAD/PARSE');
     this._loadParseOrgFilesAsync();
   }
 
@@ -52,8 +50,6 @@ export default class CalendarScreen extends React.Component {
 
   render() {
     if (this.state.viewIsReady) {
-      console.log('RENDER THE SHIT FOR REAL');
-
       const parseDate = timestamp => {
         //          <2017-05-06 Sat 15:00>
         //          <2017-05-02 Tue 21:00>--<2017-05-02 Tue 23:00>

@@ -18,7 +18,8 @@
     "org-parse": "file:///home/marc/Documents/labs/org-parse",
     "react": "16.0.0-alpha.6",
     "react-native": "https://github.com/expo/react-native/archive/sdk-16.0.0.tar.gz",
-    "react-navigation": "^1.0.0-beta.11"
+    "react-navigation": "^1.0.0-beta.11",
+    "react-redux": "^5.0.5"
   },
   "devDependencies": {
     "jest-expo": "0.4.0"

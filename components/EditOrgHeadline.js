@@ -1,11 +1,5 @@
 import React, { Component } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  TouchableHighlight
-} from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 const styles = StyleSheet.create({
   txt: {
@@ -21,7 +15,7 @@ const styles = StyleSheet.create({
   }
 });
 
-class EditOrgHeadline extends Component {
+export default class EditOrgHeadline extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -75,13 +69,3 @@ class EditOrgHeadline extends Component {
     );
   }
 }
-
-export default EditOrgHeadline;
-/*
-  
-  <View style={[styles.container, styles.border]}>
-  {todoKeyword}
-  
-  {tags}
-  </View>
-  */

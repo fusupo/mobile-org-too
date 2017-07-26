@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Text, View } from 'react-native';
 
-class OrgLogbook extends Component {
+export default class OrgLogbook extends Component {
   constructor(props) {
     super(props);
     this.state = { isCollapsed: this.props.isCollapsed };
@@ -72,4 +72,3 @@ class OrgLogbook extends Component {
     }
   }
 }
-export default OrgLogbook;

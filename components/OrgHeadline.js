@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 const styles = StyleSheet.create({
   txt: {
@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   }
 });
 
-class OrgHeadline extends Component {
+export default class OrgHeadline extends Component {
   constructor(props) {
     super(props);
   }
@@ -59,5 +59,3 @@ class OrgHeadline extends Component {
     );
   }
 }
-
-export default OrgHeadline;

@@ -4,9 +4,17 @@ import { StyleSheet, View, ScrollView, Button, Text } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+
 import NewNodeScreen from './screens/NewNodeScreen';
 import NodeDetailScreen from './screens/NodeDetailScreen';
 import MainScreen from './screens/MainScreen';
+
+import DropboxDataSource from './utilities/DropboxDataSource.js';
+import mobileOrgTooApp from './reducers';
+
+let store;
 
 const styles = StyleSheet.create({
   container: {
@@ -25,7 +33,19 @@ class AppContainer extends React.Component {
   };
 
   componentWillMount() {
-    this._loadAssetsAsync();
+    this._loadEverything();
+  }
+
+  async _loadEverything() {
+    try {
+      await this._loadAssetsAsync();
+      await this._loadParseOrgFilesAsync();
+    } catch (e) {
+      console.warn('error in "load everything"', e);
+    } finally {
+      console.log('completed loading everything');
+      this.setState({ appIsReady: true });
+    }
   }
 
   async _loadAssetsAsync() {
@@ -43,7 +63,23 @@ class AppContainer extends React.Component {
           'network timeout, so we skipped caching. Reload the app to try again.'
       );
     } finally {
-      this.setState({ appIsReady: true });
+    }
+  }
+
+  async _loadParseOrgFilesAsync() {
+    const ds = new DropboxDataSource();
+    try {
+      let foo = await ds.loadParseOrgFilesAsync();
+      console.log(Object.keys(foo));
+      store = createStore(mobileOrgTooApp, foo);
+      console.log(store);
+    } catch (e) {
+      console.warn(
+        'There was an error retrieving files from drobbox on the home screen'
+      );
+      console.log(e);
+      throw e;
+    } finally {
     }
   }
 
@@ -61,7 +97,11 @@ class AppContainer extends React.Component {
         }
       });
 
-      return <StacksOverTabs />;
+      return (
+        <Provider store={store}>
+          <StacksOverTabs />
+        </Provider>
+      );
     } else {
       return <Expo.AppLoading />;
     }
