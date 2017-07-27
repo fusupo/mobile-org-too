@@ -7,6 +7,7 @@ const OrgNodeUtil = require('org-parse').OrgNode;
 export const CYCLE_NODE_COLLAPSE = 'CYCLE_NODE_COLLAPSE';
 export const UPDATE_NODE_HEADLINE_CONTENT = 'UPDATE_NODE_HEADLINE_CONTENT';
 export const ADD_NEW_NODE = 'ADD_NEW_NODE';
+export const DELETE_NODE = 'DELETE_NODE';
 
 /*
  * other constants
@@ -32,4 +33,8 @@ export function updateNodeHeadlineContent(nodeID, text) {
 
 export function addNewNode() {
   return { type: ADD_NEW_NODE, nodeID: OrgNodeUtil.newNodeID() };
+}
+
+export function deleteNode(nodeID) {
+  return { type: DELETE_NODE, nodeID };
 }

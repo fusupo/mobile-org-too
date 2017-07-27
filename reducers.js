@@ -4,6 +4,7 @@ import { NavigationActions } from 'react-navigation';
 import { StacksOverTabs } from './navigation/StacksOverTabs';
 
 import {
+  DELETE_NODE,
   ADD_NEW_NODE,
   CYCLE_NODE_COLLAPSE,
   UPDATE_NODE_HEADLINE_CONTENT
@@ -103,7 +104,12 @@ const orgNode = combineReducers({
 });
 
 function orgNodes(state = {}, action) {
+  let nextState;
   switch (action.type) {
+    case DELETE_NODE:
+      nextState = Object.assign({}, state);
+      delete nextState[action.nodeID];
+      break;
     case ADD_NEW_NODE:
     case CYCLE_NODE_COLLAPSE:
     case UPDATE_NODE_HEADLINE_CONTENT:
@@ -111,23 +117,27 @@ function orgNodes(state = {}, action) {
       let newNodeObj = {};
       const newNode = orgNode(state[nodeID], action);
       newNodeObj[nodeID] = newNode;
-      return Object.assign({}, state, newNodeObj);
+      nextState = Object.assign({}, state, newNodeObj);
       break;
     default:
-      return state;
       break;
   }
-  return state;
+  return nextState || state;
 }
 
 ///////////////////////////////////////////////////////////////////////  ORG TREE
 
 function orgTree(state = {}, action) {
-  let nextState;
+  let nextState, clonedKids;
   switch (action.type) {
     case ADD_NEW_NODE:
-      let clonedKids = state.children.slice(0);
+      clonedKids = state.children.slice(0);
       clonedKids.push({ nodeID: action.nodeID, children: [] });
+      nextState = Object.assign({}, state, { children: clonedKids });
+      break;
+    case DELETE_NODE:
+      clonedKids = state.children.slice(0);
+      clonedKids = clonedKids.filter(n => n.nodeID !== action.nodeID);
       nextState = Object.assign({}, state, { children: clonedKids });
       break;
     default:
@@ -147,6 +157,12 @@ function nav(state, action) {
           routeName: 'NewNode',
           params: { nodeID: action.nodeID }
         }),
+        state
+      );
+      break;
+    case DELETE_NODE:
+      nextState = StacksOverTabs.router.getStateForAction(
+        NavigationActions.back(),
         state
       );
       break;
