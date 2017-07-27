@@ -1,5 +1,5 @@
 const parseOrg = require('org-parse').parseOrg;
-const serializeTree = require('org-parse').serializeTree;
+const serialize = require('org-parse').serialize;
 const Dropbox = require('dropbox');
 
 import { gitHubAccessToken } from '../secrets';
@@ -33,11 +33,11 @@ export default class DropboxDataSource {
     });
   }
 
-  serialize() {
+  serialize(nodes, tree) {
     return new Promise((resolve, reject) => {
       this.dbx
         .filesUpload({
-          contents: serializeTree(this.state.tree),
+          contents: serialize(nodes, tree),
           path: '/org/inboxDummyOut.org',
           mode: { '.tag': 'overwrite' }
         })

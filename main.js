@@ -3,13 +3,15 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
 
 import DropboxDataSource from './utilities/DropboxDataSource.js';
 import mobileOrgTooApp from './reducers';
 
 import StacksOverTabs from './navigation/StacksOverTabs';
+
 let store;
 
 const styles = StyleSheet.create({
@@ -66,7 +68,7 @@ class AppContainer extends React.Component {
     const ds = new DropboxDataSource();
     try {
       let foo = await ds.loadParseOrgFilesAsync();
-      store = createStore(mobileOrgTooApp, foo);
+      store = createStore(mobileOrgTooApp, foo, applyMiddleware(thunk));
     } catch (e) {
       console.warn(
         'There was an error retrieving files from drobbox on the home screen'
@@ -91,3 +93,22 @@ class AppContainer extends React.Component {
 }
 
 Expo.registerRootComponent(AppContainer);
+
+// super duper hacky to at least get dropbox upload wired up
+export function doCloudUpload() {
+  return dispatch => {
+    const ds = new DropboxDataSource();
+    const state = store.getState();
+    try {
+      let foo = ds.serialize(state.orgNodes, state.orgTree);
+      console.log(foo);
+    } catch (e) {
+      console.warn(
+        'There was an error serializing and/or uploading files to drobbox on the home screen'
+      );
+      console.log(e);
+      throw e;
+    } finally {
+    }
+  };
+}
