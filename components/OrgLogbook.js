@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 export default class OrgLogbook extends Component {
   constructor(props) {
@@ -31,19 +31,51 @@ export default class OrgLogbook extends Component {
       const listItems =
         this.props.log &&
         this.props.log.entries &&
-        this.props.log.entries.map((l, idx) => {
-          return (
-            <View style={{ width: 100, height: 50 }} key={idx}>
-              <Text
-                style={{
-                  fontFamily: 'space-mono',
-                  backgroundColor: '#cccccc',
-                  fontSize: 10
-                }}>
-                {l[0]}
-              </Text>
-            </View>
-          );
+        this.props.log.entries.map((le, idx) => {
+          let ret;
+          text = le.text ? <Text>{le.text}</Text> : null;
+          switch (le.type) {
+            case 'state':
+              ret = (
+                <View>
+                  <Text>{`State ${le.state} from ${le.from} ${le.timestamp}`}</Text>
+                  {text}
+                </View>
+              );
+              break;
+            case 'note':
+              ret = (
+                <View>
+                  <Text>{`Note taken on ${le.timestamp}`}</Text>
+                  {text}
+                </View>
+              );
+              break;
+            default:
+              ret = (
+                <View>
+                  <Text>{`DONT KNOW WHAT TO DO HERE!!`}</Text>
+                  {text}
+                </View>
+              );
+              break;
+          }
+          // return (
+          //   <View key={idx}>
+          //     {l.map((x, idx2) => (
+          //       <Text
+          //         key={idx2}
+          //         style={{
+          //           fontFamily: 'space-mono',
+          //           backgroundColor: '#cccccc',
+          //           fontSize: 10
+          //         }}>
+          //         {x}
+          //       </Text>
+          //     ))}
+          //   </View>
+          // );
+          return ret;
         });
 
       return (
@@ -58,15 +90,13 @@ export default class OrgLogbook extends Component {
             onPress={this._toggleCollapse.bind(this)}>
             LOGBOOK
           </Text>
-          <Text
+          <ScrollView
             className="OrgLogbookItems"
             style={{
-              fontFamily: 'space-mono',
-              backgroundColor: '#cccccc',
-              fontSize: 10
+              backgroundColor: '#cccccc'
             }}>
             {listItems}
-          </Text>
+          </ScrollView>
         </View>
       );
     }
