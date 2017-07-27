@@ -66,9 +66,7 @@ class AppContainer extends React.Component {
     const ds = new DropboxDataSource();
     try {
       let foo = await ds.loadParseOrgFilesAsync();
-      console.log(Object.keys(foo));
       store = createStore(mobileOrgTooApp, foo);
-      console.log(store);
     } catch (e) {
       console.warn(
         'There was an error retrieving files from drobbox on the home screen'

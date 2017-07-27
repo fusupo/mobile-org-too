@@ -7,7 +7,6 @@ import Colors from '../constants/Colors';
 
 import { TabNavigator } from 'react-navigation';
 
-import NewNodeScreen from '../screens/NewNodeScreen';
 import HomeScreen from '../screens/HomeScreen';
 import CalendarScreen from '../screens/CalendarScreen';
 import SettingsScreen from '../screens/SettingsScreen';

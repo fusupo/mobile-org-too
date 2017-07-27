@@ -2,19 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { addNavigationHelpers, StackNavigator } from 'react-navigation';
 
-import NewNodeScreen from '../screens/NewNodeScreen';
 import NodeDetailScreen from '../screens/NodeDetailScreen';
-import MainScreen from '../screens/MainScreen';
+import RootScreen from '../screens/RootScreen';
 
 export const StacksOverTabs = StackNavigator({
   Root: {
-    screen: MainScreen
+    screen: RootScreen
   },
   NodeDetail: {
     screen: NodeDetailScreen
   },
   NewNode: {
-    screen: NewNodeScreen
+    screen: NodeDetailScreen
   }
 });
 
