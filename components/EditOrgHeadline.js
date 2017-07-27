@@ -60,8 +60,8 @@ export default class EditOrgHeadline extends Component {
           style={{ flex: 1, height: 40, borderColor: 'gray', borderWidth: 1 }}
           value={this.state.content}
           onChangeText={content => this.setState({ content })}
-          onEndEditing={() => {
-            console.log('EDITING COMPLETE');
+          onEndEditing={e => {
+            this.props.onEndEditing(this.state.content);
           }}
         />
         {tagList}

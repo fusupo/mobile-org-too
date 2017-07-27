@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { cycleNodeCollapse } from '../actions';
+import { cycleNodeCollapse, updateNodeHeadlineContent } from '../actions';
 import { NavigationActions } from 'react-navigation';
 
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -31,7 +31,8 @@ const NodeDetailScreen = ({
   nodes,
   tree,
   onNodeTitleClick,
-  onNodeArrowClick
+  onNodeArrowClick,
+  onHeadlineEndEditing
 }) => {
   const nodeID = navigation.state.params.nodeID;
   const node = nodes[nodeID];
@@ -109,7 +110,10 @@ const NodeDetailScreen = ({
     <View style={styles.container}>
       <ScrollView style={styles.container}>
         <View style={[styles.container, styles.border]}>
-          <EditOrgHeadline headline={node.headline} />
+          <EditOrgHeadline
+            headline={node.headline}
+            onEndEditing={onHeadlineEndEditing(nodeID)}
+          />
           {scheduled}
           {closed}
         </View>
@@ -145,7 +149,9 @@ const mapDispatchToProps = dispatch => {
           params: { nodeID: nodeID }
         })
       );
-    }
+    },
+    onHeadlineEndEditing: nodeID => text =>
+      dispatch(updateNodeHeadlineContent(nodeID, text))
   };
 };
 
