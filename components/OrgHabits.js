@@ -1,10 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { ScrollView, StyleSheet, View } from 'react-native';
-
-import OrgHabits from '../components/OrgHabits';
-import OrgAgenda from '../components/OrgAgenda';
+import {
+  TouchableHighlight,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
+} from 'react-native';
 
 const orgDrawerUtils = require('org-parse').OrgDrawer;
 const orgTimestampUtils = require('org-parse').OrgTimestamp;
@@ -18,10 +21,23 @@ const styles = StyleSheet.create({
   }
 });
 
-const CalendarScreen = ({ habits, habitData, onHabitPress }) => (
+const OrgHabits = ({ habits, habitData, onHabitPress }) => (
   <ScrollView>
-    <OrgAgenda />
-    <OrgHabits />
+    {habits.map((h, idx) => (
+      <View key={h.id} style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          underlayColor="#00ff00"
+          style={{ flex: 2 }}
+          onPress={() => onHabitPress(h.id)}>
+          <Text style={{ textAlign: 'right', fontSize: 12 }}>
+            {h.headline.content}
+          </Text>
+        </TouchableHighlight>
+        <Text style={{ flex: 1 }}>
+          {habitData[idx]}
+        </Text>
+      </View>
+    ))}
   </ScrollView>
 );
 
@@ -97,4 +113,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CalendarScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(OrgHabits);
