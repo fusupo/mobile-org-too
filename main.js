@@ -1,6 +1,6 @@
 import Expo from 'expo';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, AsyncStorage } from 'react-native';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 
 import { createStore, applyMiddleware } from 'redux';
@@ -12,7 +12,7 @@ import mobileOrgTooApp from './reducers';
 
 import StacksOverTabs from './navigation/StacksOverTabs';
 
-let store;
+let store, settings;
 
 const styles = StyleSheet.create({
   container: {
@@ -36,8 +36,10 @@ class AppContainer extends React.Component {
 
   async _loadEverything() {
     try {
+      //await this._loadSettingsAsync();
+      store = createStore(mobileOrgTooApp, applyMiddleware(thunk));
       await this._loadAssetsAsync();
-      await this._loadParseOrgFilesAsync();
+      //await this._loadParseOrgFilesAsync();
     } catch (e) {
       console.warn('error in "load everything"', e);
     } finally {
@@ -68,15 +70,50 @@ class AppContainer extends React.Component {
     const ds = new DropboxDataSource();
     try {
       let foo = await ds.loadParseOrgFilesAsync();
+      foo.settings = settings;
       store = createStore(mobileOrgTooApp, foo, applyMiddleware(thunk));
     } catch (e) {
       console.warn(
-        'There was an error retrieving files from drobbox on the home screen'
+        'There was an error retrieving files from drobbox on the home screen '
       );
       console.log(e);
       throw e;
     } finally {
     }
+  }
+
+  async _loadSettingsAsync() {
+    // try {
+    //   console.log('set item');
+    //   await AsyncStorage.setItem('@mobile-org-too:test', 'I like to save it.');
+    // } catch (error) {
+    //   console.warn('foobarbaz');
+    //   // Error saving data
+    // }
+
+    try {
+      const value = await AsyncStorage.getItem('@mobile-org-too:settings');
+      if (value !== null) {
+        // We have data!!
+        console.log(value);
+        settings = value;
+      } else {
+        console.log('no value');
+        settings = null;
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.warn('error loading settings from AsyncStorage');
+    }
+
+    // try {
+    //   console.log('remove');
+    //   const value = await AsyncStorage.removeItem('@mobile-org-too:test');
+    //   console.log('removed?');
+    // } catch (error) {
+    //   // Error retrieving data
+    //   console.warn('error removing settings from AsyncStorage');
+    // }
   }
 
   render() {

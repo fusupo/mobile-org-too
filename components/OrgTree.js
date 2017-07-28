@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, TouchableHighlight } from 'react-native';
+import { Text, StyleSheet, View, TouchableHighlight } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { cycleNodeCollapse } from '../actions';
 import { NavigationActions } from 'react-navigation';
@@ -49,7 +49,7 @@ export const OrgTree = ({
         })}
       </View>
     );
-  } else {
+  } else if (Object.keys(tree).length > 0) {
     const node = nodes[tree.nodeID];
     const idx = OrgDrawerUtil.indexOfKey(node.propDrawer, 'collapseStatus');
     const collapseStatus = idx === -1
@@ -113,6 +113,12 @@ export const OrgTree = ({
         );
         break;
     }
+  } else {
+    return (
+      <View>
+        <Text>{'Empty'}</Text>
+      </View>
+    );
   }
 };
 

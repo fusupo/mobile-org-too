@@ -204,13 +204,20 @@ function nav(state, action) {
   return nextState || state;
 }
 
+///////////////////////////////////////////////////////////////////////  SETTINGS
+
+function settings(state = null, action) {
+  return state;
+}
+
 /////////////////////////////////////////////////////////////////  MOBILE ORG TOO
 
 const mobileOrgTooApp = combineReducers({
   orgText,
   orgTree,
   orgNodes,
-  nav
+  nav,
+  settings
 });
 
 export default mobileOrgTooApp;
