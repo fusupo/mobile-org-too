@@ -77,7 +77,7 @@ const NodeDetailScreen = ({
             fontFamily: 'space-mono',
             fontSize: 12
           }}>
-          {'SCHEDULED: ' + node.scheduled.srcStr}
+          {`SCHEDULED: ${node.scheduled.year}-${node.scheduled.month}-${node.scheduled.date} ${node.scheduled.day} ${node.scheduled.hour}:${node.scheduled.minute} ${node.scheduled.repInt}${node.scheduled.repMin}${node.scheduled.repMax !== null ? '/' + node.scheduled.repMax : ''}`}
         </Text>
       : null;
     // closed
@@ -147,6 +147,8 @@ const NodeDetailScreen = ({
     return <View><Text>{'fooosball'}</Text></View>;
   }
 };
+
+////////////////////////////////////////////////////////////////////////////////
 
 const mapStateToProps = state => ({
   nodes: state.orgNodes,

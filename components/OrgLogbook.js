@@ -37,7 +37,7 @@ export default class OrgLogbook extends Component {
           switch (le.type) {
             case 'state':
               ret = (
-                <View>
+                <View key={idx}>
                   <Text>{`State ${le.state} from ${le.from} ${le.timestamp}`}</Text>
                   {text}
                 </View>
@@ -45,7 +45,7 @@ export default class OrgLogbook extends Component {
               break;
             case 'note':
               ret = (
-                <View>
+                <View key={idx}>
                   <Text>{`Note taken on ${le.timestamp}`}</Text>
                   {text}
                 </View>
@@ -53,7 +53,7 @@ export default class OrgLogbook extends Component {
               break;
             default:
               ret = (
-                <View>
+                <View key={idx}>
                   <Text>{`DONT KNOW WHAT TO DO HERE!!`}</Text>
                   {text}
                 </View>

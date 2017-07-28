@@ -4,13 +4,16 @@ import { NavigationActions } from 'react-navigation';
 import { StacksOverTabs } from './navigation/StacksOverTabs';
 
 import {
+  COMPLETE_HABIT,
+  RESET_HABIT,
   DELETE_NODE,
   ADD_NEW_NODE,
   CYCLE_NODE_COLLAPSE,
   UPDATE_NODE_HEADLINE_CONTENT
 } from './actions';
 
-const OrgDrawer = require('org-parse').OrgDrawer;
+const OrgDrawerUtils = require('org-parse').OrgDrawer;
+const OrgTimestampUtils = require('org-parse').OrgTimestamp;
 
 ///////////////////////////////////////////////////////////////////////  ORG TEXT
 
@@ -52,7 +55,13 @@ function headline(
 }
 
 function scheduled(state = null, action) {
-  return state;
+  let nextState;
+  switch (action.type) {
+    case COMPLETE_HABIT:
+      nextState = OrgTimestampUtils.calcNextRepeat(state, action.timestampStr);
+      break;
+  }
+  return nextState || state;
 }
 
 function closed(state = null, action) {
@@ -63,15 +72,21 @@ function propDrawer(state = { name: 'properties', properties: [] }, action) {
   switch (action.type) {
     case CYCLE_NODE_COLLAPSE:
       const key = 'collapseStatus';
-      let idx = OrgDrawer.indexOfKey(state, key);
+      let idx = OrgDrawerUtils.indexOfKey(state, key);
       if (idx === -1 || state.properties[idx][1] === 'collapsed') {
-        return OrgDrawer.insertOrUpdate(state, [key, 'expanded']);
+        return OrgDrawerUtils.insertOrUpdate(state, [key, 'expanded']);
       } else if (state.properties[idx][1] === 'expanded') {
-        return OrgDrawer.insertOrUpdate(state, [key, 'collapsed']);
+        return OrgDrawerUtils.insertOrUpdate(state, [key, 'collapsed']);
       }
       // else if (state.properties[idx][1] === 'maximized') {
-      //     return OrgDrawer.insertOrUpdate(state, [key, 'collapsed']);
+      //     return OrgDrawerUtils.insertOrUpdate(state, [key, 'collapsed']);
       //   }
+      break;
+    case COMPLETE_HABIT:
+      return OrgDrawerUtils.insertOrUpdate(state, [
+        'LAST_REPEAT',
+        action.timestampStr
+      ]);
       break;
     default:
       return state;
@@ -81,7 +96,21 @@ function propDrawer(state = { name: 'properties', properties: [] }, action) {
 }
 
 function logbook(state = { entries: [] }, action) {
-  return state;
+  let nextState;
+  switch (action.type) {
+    case COMPLETE_HABIT:
+      // i think I may need to deep copy this stuff
+      const clonedEntries = state.entries.slice(0);
+      clonedEntries.unshift({
+        type: 'state',
+        state: '"DONE"',
+        from: '"TODO"',
+        timestamp: action.timestampStr
+      });
+      nextState = Object.assign({}, state, { entries: clonedEntries });
+      break;
+  }
+  return nextState || state;
 }
 
 function opened(state = {}, action) {
@@ -110,6 +139,8 @@ function orgNodes(state = {}, action) {
       nextState = Object.assign({}, state);
       delete nextState[action.nodeID];
       break;
+    case COMPLETE_HABIT:
+    case RESET_HABIT:
     case ADD_NEW_NODE:
     case CYCLE_NODE_COLLAPSE:
     case UPDATE_NODE_HEADLINE_CONTENT:
