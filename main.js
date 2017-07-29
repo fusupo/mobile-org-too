@@ -36,8 +36,12 @@ class AppContainer extends React.Component {
 
   async _loadEverything() {
     try {
-      //await this._loadSettingsAsync();
-      store = createStore(mobileOrgTooApp, applyMiddleware(thunk));
+      await this._loadSettingsAsync();
+      store = createStore(
+        mobileOrgTooApp,
+        { settings },
+        applyMiddleware(thunk)
+      );
       await this._loadAssetsAsync();
       //await this._loadParseOrgFilesAsync();
     } catch (e) {
@@ -99,7 +103,7 @@ class AppContainer extends React.Component {
         settings = value;
       } else {
         console.log('no value');
-        settings = null;
+        settings = undefined;
       }
     } catch (error) {
       // Error retrieving data
@@ -132,6 +136,7 @@ class AppContainer extends React.Component {
 Expo.registerRootComponent(AppContainer);
 
 // super duper hacky to at least get dropbox upload wired up
+// function is her because reference to store is here
 export function doCloudUpload() {
   return dispatch => {
     const ds = new DropboxDataSource();

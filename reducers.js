@@ -206,8 +206,52 @@ function nav(state, action) {
 
 ///////////////////////////////////////////////////////////////////////  SETTINGS
 
-function settings(state = null, action) {
-  return state;
+function idFromPath(path) {
+  const pathArr = path.split('/');
+  const id = pathArr[pathArr.length - 1];
+  return id;
+}
+
+function settings(state = { all: null, tree: null, selected: null }, action) {
+  let nextState;
+  switch (action.type) {
+    case 'got dropbox entries':
+      state.all = state.all || {};
+      const allClone = Object.assign({}, state.all);
+      action.data.forEach(d => {
+        allClone[d.id] = d;
+      });
+      nextState = Object.assign({}, state, { all: allClone });
+
+      if (state.tree === null) {
+        const newTree = { id: '', children: {} };
+        action.data.forEach(d => {
+          const child = { id: d.id, children: {} };
+          newTree.children[idFromPath(d.path_lower)] = child;
+        });
+        nextState = Object.assign({}, nextState, { tree: newTree });
+      } else {
+        const treeClone = Object.assign({}, state.tree);
+        action.data.forEach(d => {
+          const path = d.path_lower;
+          const pathArr = d.path_lower.split('/');
+          pathArr.shift();
+          pathArr.pop();
+          //         console.log(pathArr);
+          let currBranch = treeClone;
+          pathArr.forEach(p => {
+            currBranch = currBranch.children[p];
+          });
+          //          console.log(currBranch);
+          const child = { id: d.id, children: {} };
+          currBranch.children[idFromPath(path)] = child;
+        });
+        //console.log(treeClone);
+        nextState = Object.assign({}, nextState, { tree: treeClone });
+      }
+      break;
+  }
+  return nextState || state;
 }
 
 /////////////////////////////////////////////////////////////////  MOBILE ORG TOO

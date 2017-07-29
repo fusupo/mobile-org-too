@@ -33,6 +33,23 @@ export default class DropboxDataSource {
     });
   }
 
+  filesListFolderAsync(path) {
+    let obj = {};
+    return new Promise((resolve, reject) => {
+      this.dbx
+        .filesListFolder({
+          path: path
+        })
+        .then(res => {
+          if (res.has_more) {
+            console.warn('Dropbox filesListFolderAsync has more!!!');
+          }
+          resolve(res);
+        })
+        .catch(err => reject(err));
+    });
+  }
+
   serialize(nodes, tree) {
     return new Promise((resolve, reject) => {
       this.dbx

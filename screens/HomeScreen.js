@@ -1,14 +1,16 @@
 import React from 'react';
+import { NavigationActions } from 'react-navigation';
+import { connect } from 'react-redux';
 import { ScrollView } from 'react-native';
 
 import OrgTreeContainer from '../components/OrgTree.js';
 
-export default class HomeScreen extends React.Component {
-  static route = {
-    navigationBar: {
-      title: 'Root'
-    }
-  };
+class HomeScreen extends React.Component {
+  // static route = {
+  //   navigationBar: {
+  //     title: 'Root'
+  //   }
+  // };
 
   // constructor(props) {
   //   super(props);
@@ -22,6 +24,13 @@ export default class HomeScreen extends React.Component {
   // componentWillMount() {
   //   this._loadParseOrgFilesAsync();
   // }
+
+  componentDidMount() {
+    //console.log(this.props);
+    //console.log(this.props.initApp);
+    //this.props.navigation.navigate('SettingsTab');
+    this.props.initApp();
+  }
 
   // async _loadParseOrgFilesAsync() {
   //   const ds = new DropboxDataSource();
@@ -52,3 +61,33 @@ export default class HomeScreen extends React.Component {
     // }
   }
 }
+
+const mapStateToProps = state => ({
+  nodes: state.orgNodes,
+  tree: state.orgTree
+});
+
+const mapDispatchToProps = dispatch => {
+  return {
+    initApp: () => {
+      dispatch(someAction());
+    },
+    foo: () => {
+      console.log('oofo');
+    }
+  };
+};
+
+function someAction() {
+  return (dispatch, getState) => {
+    const state = getState(); // get state from store here,
+    if (state.settings.all === null && state.settings.selected === null) {
+      dispatch(
+        NavigationActions.navigate({
+          routeName: 'SettingsTab'
+        })
+      );
+    }
+  };
+}
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
