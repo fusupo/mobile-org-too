@@ -28,13 +28,15 @@ const styles = StyleSheet.create({
 class EditOrgHeadline extends Component {
   constructor(props) {
     super(props);
+    let keywords = orgHeadlineUtil.keywords().slice(0);
+    keywords.push('none');
     this.state = {
-      content: props.headline.content
+      content: props.headline.content,
+      keywords
     };
   }
 
   render() {
-    const keywords = orgHeadlineUtil.keywords();
     const todoKeywordStr = this.props.headline.todoKeyword;
     // todo keyword
     const todoKeyword = todoKeywordStr
@@ -42,10 +44,10 @@ class EditOrgHeadline extends Component {
           onPress={() => {
             ActionSheetIOS.showActionSheetWithOptions(
               {
-                options: keywords
+                options: this.state.keywords
               },
               idx => {
-                this.props.onNodeTodoKeywordUpdate(keywords[idx]);
+                this.props.onNodeTodoKeywordUpdate(this.state.keywords[idx]);
               }
             );
           }}>
@@ -60,10 +62,10 @@ class EditOrgHeadline extends Component {
           onPress={() => {
             ActionSheetIOS.showActionSheetWithOptions(
               {
-                options: keywords
+                options: this.state.keywords
               },
               idx => {
-                this.props.onNodeTodoKeywordUpdate(keywords[idx]);
+                this.props.onNodeTodoKeywordUpdate(this.state.keywords[idx]);
               }
             );
           }}>
