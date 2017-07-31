@@ -177,9 +177,31 @@ function orgTree(state = {}, action) {
   return nextState || state;
 }
 
+/////////////////////////////////////////////////////////////////////  ORG BUFFER
+
+function orgBuffers(state = {}, action) {
+  let nextState;
+  switch (action.type) {
+    case 'addOrgBuffer':
+      console.log('addOrgBuffer');
+      nextState = Object.assign({}, state);
+      nextState[action.path] = action.data;
+      break;
+    case CYCLE_NODE_COLLAPSE:
+      nextState = Object.assign({}, state);
+      nextState[action.bufferID].orgNodes = orgNodes(
+        nextState[action.bufferID].orgNodes,
+        action
+      );
+      break;
+  }
+  return nextState || state;
+}
+
 ////////////////////////////////////////////////////////////////////////////  NAV
 
 function nav(state, action) {
+  console.log('nav');
   let nextState;
   switch (action.type) {
     case ADD_NEW_NODE:
@@ -206,60 +228,39 @@ function nav(state, action) {
 
 ///////////////////////////////////////////////////////////////////////  SETTINGS
 
-function idFromPath(path) {
-  const pathArr = path.split('/');
-  const id = pathArr[pathArr.length - 1];
-  return id;
-}
-
-function settings(state = { all: null, tree: null, selected: null }, action) {
+function settings(
+  state = {
+    inboxFile: { path: 'insert filepath', isFolder: false, isOk: null },
+    orgFiles: []
+  },
+  action
+) {
+  console.log('settings');
   let nextState;
   switch (action.type) {
-    case 'got dropbox entries':
-      state.all = state.all || {};
-      const allClone = Object.assign({}, state.all);
-      action.data.forEach(d => {
-        allClone[d.id] = d;
+    case 'settings:inboxFile:ok':
+      nextState = Object.assign({}, state, {
+        inboxFile: { path: action.path, isFolder: action.isFolder, isOk: true }
       });
-      nextState = Object.assign({}, state, { all: allClone });
-
-      if (state.tree === null) {
-        const newTree = { id: '', children: {} };
-        action.data.forEach(d => {
-          const child = { id: d.id, children: {} };
-          newTree.children[idFromPath(d.path_lower)] = child;
-        });
-        nextState = Object.assign({}, nextState, { tree: newTree });
-      } else {
-        const treeClone = Object.assign({}, state.tree);
-        action.data.forEach(d => {
-          const path = d.path_lower;
-          const pathArr = d.path_lower.split('/');
-          pathArr.shift();
-          pathArr.pop();
-          //         console.log(pathArr);
-          let currBranch = treeClone;
-          pathArr.forEach(p => {
-            currBranch = currBranch.children[p];
-          });
-          //          console.log(currBranch);
-          const child = { id: d.id, children: {} };
-          currBranch.children[idFromPath(path)] = child;
-        });
-        //console.log(treeClone);
-        nextState = Object.assign({}, nextState, { tree: treeClone });
-      }
+      break;
+    case 'settings:inboxFile:error':
+      nextState = Object.assign({}, state, {
+        inboxFile: { path: action.path, isFolder: action.isFolder, isOk: false }
+      });
       break;
   }
-  return nextState || state;
+
+  const res = nextState || state;
+  return res;
 }
 
 /////////////////////////////////////////////////////////////////  MOBILE ORG TOO
 
 const mobileOrgTooApp = combineReducers({
-  orgText,
-  orgTree,
-  orgNodes,
+  // orgText,
+  // orgTree,
+  // orgNodes,
+  orgBuffers,
   nav,
   settings
 });

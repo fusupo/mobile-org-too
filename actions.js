@@ -24,8 +24,8 @@ export const RESET_HABIT = 'RESET_HABIT';
  * action creators
  */
 
-export function cycleNodeCollapse(nodeID) {
-  return { type: CYCLE_NODE_COLLAPSE, nodeID };
+export function cycleNodeCollapse(bufferID, nodeID) {
+  return { type: CYCLE_NODE_COLLAPSE, bufferID, nodeID };
 }
 
 export function updateNodeHeadlineContent(nodeID, text) {

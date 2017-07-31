@@ -6,7 +6,10 @@ import {
   View,
   ScrollView,
   Text,
-  StyleSheet
+  TextInput,
+  StyleSheet,
+  Button,
+  AsyncStorage
 } from 'react-native';
 
 import DropboxDataSource from '../utilities/DropboxDataSource';
@@ -19,58 +22,67 @@ const styles = StyleSheet.create({
   }
 });
 
-class FileTree extends React.Component {
+class FileNameInput extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { text: 'Useless Placeholder' };
+  }
+  componentDidMount() {
+    if (this.props.file === undefined) {
+    } else {
+      this.setState({ text: this.props.file.path });
+    }
+  }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.file && nextProps.file.path) {
+      this.setState({ text: nextProps.file.path });
+    }
+  }
   render() {
-    const fileName = this.props.tree === null ||
-      this.props.allFiles === null ||
-      Object.keys(this.props.allFiles).length === 0 ||
-      this.props.tree.id === ''
-      ? null
-      : <View style={{ flexDirection: 'row', paddingLeft: 5 }}>
-          <Switch disabled={false} value={false} tintColor={'#0f0f00'} />
-          <TouchableHighlight
-            onPress={() =>
-              this.props.toggleDropboxFolderExpand(
-                this.props.allFiles[this.props.tree.id].path_lower
-              )}>
-            <View style={{ paddingLeft: 5, flexDirection: 'row' }}>
-              <Ionicons
-                name={
-                  this.props.allFiles[this.props.tree.id]['.tag'] === 'file'
-                    ? 'ios-document'
-                    : 'ios-folder'
-                }
-                size={15}
-              />
-              <Text style={{ paddingLeft: 5 }}>
-                {this.props.allFiles[this.props.tree.id].name}
-              </Text>
-            </View>
-          </TouchableHighlight>
-        </View>;
-
-    const list = this.props.tree === null ||
-      Object.keys(this.props.tree.children).length === 0
-      ? null
-      : Object.values(this.props.tree.children).map((f, idx) => {
-          const id = f.id;
-          const node = this.props.allFiles[id];
-          return (
-            <FileTree
-              key={f.id + idx}
-              allFiles={this.props.allFiles}
-              selectedFiles={this.props.selectedFiles}
-              tree={f}
-              toggleDropboxFolderExpand={this.props.toggleDropboxFolderExpand}
-              depth={this.props.depth + 1}
-            />
-          );
-        });
-
+    let borderColor;
+    switch (this.props.isOk) {
+      case null:
+        borderColor = 'grey';
+        break;
+      case true:
+        borderColor = 'green';
+        break;
+      case false:
+        borderColor = 'red';
+        break;
+    }
     return (
-      <View style={{ flex: 1, paddingLeft: this.props.depth * 10 }}>
-        {fileName}
-        {list}
+      <View style={{ padding: 10, flexDirection: 'row' }}>
+        <TextInput
+          style={{
+            padding: 5,
+            height: 40,
+            borderColor,
+            borderWidth: 4,
+            flex: 1
+          }}
+          onChangeText={text => this.setState({ text })}
+          onEndEditing={() => this.props.onEndEditing(this.state.text)}
+          value={this.state.text}
+        />
+        <Button
+          onPress={() => {
+            console.log('foo');
+          }}
+          title="X"
+          color="#841584"
+          style={{ flex: 1 }}
+        />
+      </View>
+    );
+  }
+}
+
+class FileNameInputList extends React.Component {
+  render() {
+    return (
+      <View style={{ padding: 10, flexDirection: 'row' }}>
+        <Text>{'foo'}</Text>
       </View>
     );
   }
@@ -83,74 +95,129 @@ class SettingsScreen extends React.Component {
     }
   };
 
-  componentWillMount = () => {
-    console.log(
-      'mounting settings screen...need dropbox dir struct + list of files to track to crossreference with'
-    );
-  };
-
-  componentDidMount = () => {
-    if (this.props.allFiles === null) {
-      this.props.initDropboxFileList();
-    }
-  };
+  // componentDidMount = () => {
+  //   if (this.props.allFiles === null) {
+  //     this.props.initDropboxFileList();
+  //   }
+  // };
 
   render() {
     return (
-      <ScrollView style={styles.container}>
-        <FileTree
-          allFiles={this.props.allFiles}
-          selectedFiles={this.props.selectedFiles}
-          tree={this.props.tree}
-          toggleDropboxFolderExpand={this.props.toggleDropboxFolderExpand}
-          depth={this.props.depth}
+      <View>
+        <Text>{'inbox'}</Text>
+        <FileNameInput
+          file={this.props.inboxFile}
+          isOk={
+            this.props.inboxFile === null || this.props.inboxFile === undefined
+              ? null
+              : this.props.inboxFile.isOk
+          }
+          onEndEditing={this.props.tryUpdateInboxFile}
         />
-      </ScrollView>
+        <FileNameInputList files={this.props.orgFiles} />
+      </View>
     );
   }
 }
 
 const mapStateToProps = state => {
-  const allFiles = state.settings != null ? state.settings.all : null;
-  const selectedFiles = state.settings != null ? state.settings.selected : null;
-  const tree = state.settings != null ? state.settings.tree : null;
   return {
-    allFiles,
-    selectedFiles,
-    tree,
-    depth: 0
+    inboxFile: state.settings.inboxFile,
+    orgFiles: state.settings.orgFiles
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    initDropboxFileList: () => {
-      dispatch(someAction(''));
-    },
-    toggleDropboxFolderExpand: path => {
-      dispatch(someAction(path));
+    tryUpdateInboxFile: path => {
+      dispatch(someActionToo(path));
     }
+    // initDropboxFileList: () => {
+    //   dispatch(someAction(''));
+    // },
+    // toggleDropboxFolderExpand: path => {
+    //   dispatch(someAction(path));
+    // }
   };
 };
 
-function someAction(path) {
+function someActionToo(path) {
   return (dispatch, getState) => {
-    const state = getState(); // get state from store here,
     const ds = new DropboxDataSource();
+    const success = (path, res) => {
+      dispatch({
+        type: 'settings:inboxFile:ok',
+        path: path,
+        isFolder: res['.tag'] === 'folder'
+      });
+      dispatch(someActionThree());
+    };
+    const err = path => {
+      dispatch({
+        type: 'settings:inboxFile:error',
+        path: path,
+        isFolder: false
+      });
+    };
     foo = ds
-      .filesListFolderAsync(path)
-      .then(res => dispatch({ type: 'got dropbox entries', data: res.entries }))
-      .catch(e => console.log(e));
-
-    //console.log(navigator);
-    // dispatch(otherAction()).then(.....); //dispatch actions here
-    // dispatch(
-    //   NavigationActions.navigate({
-    //     routeName: 'SettingsTab'
-    //     // params: { nodeID: action.nodeID }
-    //   })
-    // );
+      .filesGetMetadataAsync(path)
+      .then(res => {
+        if (res['.tag'] === 'folder') {
+          err(path);
+        } else {
+          success(path, res);
+        }
+      })
+      .catch(e => err(path));
   };
+}
+
+function someActionThree() {
+  return async (dispatch, getState) => {
+    try {
+      await AsyncStorage.setItem(
+        '@mobile-org-too:settings',
+        JSON.stringify(getState().settings)
+      );
+      dispatch(loadInboxFile());
+    } catch (error) {
+      console.log('err saving data:', error);
+      // Error saving data
+    }
+  };
+}
+///// duplicated in homescreen.js
+function loadInboxFile() {
+  return async (dispatch, getState) => {
+    console.log('LOAD INBOX FILE');
+    console.log(getState().settings.inboxFile.path);
+    const foo = await loadParseOrgFilesAsync(
+      getState().settings.inboxFile.path
+    );
+    console.log(foo);
+    dispatch({
+      type: 'addOrgBuffer',
+      path: getState().settings.inboxFile.path,
+      data: foo
+    });
+  };
+}
+
+async function loadParseOrgFilesAsync(filePath) {
+  const ds = new DropboxDataSource();
+  try {
+    console.log(filePath);
+    let foo = await ds.loadParseOrgFilesAsync(filePath);
+    console.log('loadparse success:');
+    return foo;
+  } catch (e) {
+    console.warn(
+      'There was an error retrieving files from drobbox on the home screen '
+    );
+    console.log(e);
+    return null;
+    throw e;
+  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen);

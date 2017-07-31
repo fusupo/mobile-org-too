@@ -43,7 +43,6 @@ class AppContainer extends React.Component {
         applyMiddleware(thunk)
       );
       await this._loadAssetsAsync();
-      //await this._loadParseOrgFilesAsync();
     } catch (e) {
       console.warn('error in "load everything"', e);
     } finally {
@@ -70,37 +69,13 @@ class AppContainer extends React.Component {
     }
   }
 
-  async _loadParseOrgFilesAsync() {
-    const ds = new DropboxDataSource();
-    try {
-      let foo = await ds.loadParseOrgFilesAsync();
-      foo.settings = settings;
-      store = createStore(mobileOrgTooApp, foo, applyMiddleware(thunk));
-    } catch (e) {
-      console.warn(
-        'There was an error retrieving files from drobbox on the home screen '
-      );
-      console.log(e);
-      throw e;
-    } finally {
-    }
-  }
-
   async _loadSettingsAsync() {
-    // try {
-    //   console.log('set item');
-    //   await AsyncStorage.setItem('@mobile-org-too:test', 'I like to save it.');
-    // } catch (error) {
-    //   console.warn('foobarbaz');
-    //   // Error saving data
-    // }
-
     try {
       const value = await AsyncStorage.getItem('@mobile-org-too:settings');
       if (value !== null) {
         // We have data!!
         console.log(value);
-        settings = value;
+        settings = JSON.parse(value);
       } else {
         console.log('no value');
         settings = undefined;
@@ -112,7 +87,7 @@ class AppContainer extends React.Component {
 
     // try {
     //   console.log('remove');
-    //   const value = await AsyncStorage.removeItem('@mobile-org-too:test');
+    //   const value = await AsyncStorage.removeItem('@mobile-org-too:settings');
     //   console.log('removed?');
     // } catch (error) {
     //   // Error retrieving data
@@ -135,8 +110,7 @@ class AppContainer extends React.Component {
 
 Expo.registerRootComponent(AppContainer);
 
-// super duper hacky to at least get dropbox upload wired up
-// function is her because reference to store is here
+//
 export function doCloudUpload() {
   return dispatch => {
     const ds = new DropboxDataSource();

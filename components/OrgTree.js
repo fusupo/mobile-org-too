@@ -122,27 +122,21 @@ export const OrgTree = ({
   }
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   return {
-    nodes: state.orgNodes,
-    tree: state.orgTree
+    nodes: ownProps.nodes,
+    tree: ownProps.tree
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    onNodeArrowClick: nodeID => {
-      dispatch(cycleNodeCollapse(nodeID));
-    },
-    onNodeTitleClick: nodeID => {
-      dispatch(
-        NavigationActions.navigate({
-          routeName: 'NodeDetail',
-          params: { nodeID: nodeID }
-        })
-      );
-    }
-  };
+const mapDispatchToProps = (dispatch, ownProps) => {
+  const ret = {};
+  ret.onNodeTitleClick = ownProps.onNodeTitleClick
+    ? ownProps.onNodeTitleClick
+    : nodeID => {
+        console.log(nodeID);
+      };
+  return ret;
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrgTree);

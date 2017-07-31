@@ -11,12 +11,12 @@ export default class DropboxDataSource {
     });
   }
 
-  loadParseOrgFilesAsync() {
+  loadParseOrgFilesAsync(filePath) {
     let obj = {};
     return new Promise((resolve, reject) => {
       this.dbx
         .filesGetTemporaryLink({
-          path: '/org/inboxDummyIn.org'
+          path: filePath
         })
         .then(res => fetch(res.link))
         .then(res => res.text())
@@ -34,7 +34,6 @@ export default class DropboxDataSource {
   }
 
   filesListFolderAsync(path) {
-    let obj = {};
     return new Promise((resolve, reject) => {
       this.dbx
         .filesListFolder({
@@ -44,6 +43,19 @@ export default class DropboxDataSource {
           if (res.has_more) {
             console.warn('Dropbox filesListFolderAsync has more!!!');
           }
+          resolve(res);
+        })
+        .catch(err => reject(err));
+    });
+  }
+
+  filesGetMetadataAsync(path) {
+    return new Promise((resolve, reject) => {
+      this.dbx
+        .filesGetMetadata({
+          path: path
+        })
+        .then(res => {
           resolve(res);
         })
         .catch(err => reject(err));

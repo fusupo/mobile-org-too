@@ -33,16 +33,18 @@ const styles = StyleSheet.create({
 
 const NodeDetailScreen = ({
   navigation,
-  nodes,
-  tree,
+  buffers,
   onNodeTitleClick,
   onNodeArrowClick,
   onHeadlineEndEditing,
   onPressDeleteNode
 }) => {
-  const nodeID = navigation.state.params.nodeID;
-  const node = nodes[nodeID];
-  if (node !== undefined) {
+  const params = navigation.state.params;
+  if (params && params.bufferID && params.nodeID) {
+    const { bufferID, nodeID } = params;
+    const nodes = buffers[bufferID].orgNodes;
+    const tree = buffers[bufferID].orgTree;
+    const node = nodes[nodeID];
     // headlineContent
     const headlineContent = node.headline.content;
     // todo keyword
@@ -93,8 +95,7 @@ const NodeDetailScreen = ({
     // body
     const body = node.body ? <Text>{node.body}</Text> : null;
     // childNodes
-    const childIDs = OrgTreeUtil.childIDs(tree, nodeID);
-    console.log(childIDs);
+    const childIDs = OrgTreeUtil.findBranch(tree, nodeID).children;
     const listItems = childIDs.length === 0
       ? null
       : childIDs.map((cn, idx) => (
@@ -102,12 +103,8 @@ const NodeDetailScreen = ({
             key={cn.nodeID}
             nodes={nodes}
             tree={OrgTreeUtil.findBranch(tree, cn.nodeID)}
-            onNodeTitleClick={() => {
-              onNodeTitleClick(cn.nodeID);
-            }}
-            onNodeArrowClick={() => {
-              onNodeArrowClick(cn.nodeID);
-            }}
+            onNodeTitleClick={onNodeTitleClick(bufferID)}
+            onNodeArrowClick={onNodeArrowClick(bufferID)}
           />
         ));
     const list = listItems
@@ -150,23 +147,28 @@ const NodeDetailScreen = ({
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const mapStateToProps = state => ({
-  nodes: state.orgNodes,
-  tree: state.orgTree
-});
+const mapStateToProps = (state, ownProps) => {
+  return {
+    buffers: state.orgBuffers
+  };
+};
 
 const mapDispatchToProps = dispatch => {
   return {
-    onNodeArrowClick: nodeID => {
-      dispatch(cycleNodeCollapse(nodeID));
+    onNodeArrowClick: bufferID => {
+      return nodeID => {
+        dispatch(cycleNodeCollapse(bufferID, nodeID));
+      };
     },
-    onNodeTitleClick: nodeID => {
-      dispatch(
-        NavigationActions.navigate({
-          routeName: 'NodeDetail',
-          params: { nodeID: nodeID }
-        })
-      );
+    onNodeTitleClick: bufferID => {
+      return nodeID => {
+        dispatch(
+          NavigationActions.navigate({
+            routeName: 'NodeDetail',
+            params: { bufferID, nodeID }
+          })
+        );
+      };
     },
     onHeadlineEndEditing: nodeID => text =>
       dispatch(updateNodeHeadlineContent(nodeID, text)),
