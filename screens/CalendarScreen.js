@@ -27,67 +27,73 @@ const CalendarScreen = ({ habits, habitData, onHabitPress }) => (
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const mapStateToProps = state => ({
-  habits: [],
-  // Object.values(state.orgNodes).filter(n => {
+const mapStateToProps = state => {
+  const nodes = Object.values(state.orgBuffers).reduce(
+    (m, v) => m.concat(Object.values(v.orgNodes)),
+    []
+  );
+  // const habits = nodes.filter(n => {
   //   const idx = orgDrawerUtils.indexOfKey(n.propDrawer, 'STYLE');
   //   if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
   //   return true;
-  // }),
-  habitData: []
-  // Object.values(state.orgNodes)
-  // .filter(n => {
-  //   const idx = orgDrawerUtils.indexOfKey(n.propDrawer, 'STYLE');
-  //   if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
-  //   return true;
-  // })
-  // .map(n => {
-  //   const now = orgTimestampUtils.now();
-  //   now.hour -= now.hour;
-  //   now.minute -= now.minute;
-  //   const past = orgTimestampUtils.sub(now, { days: 14 });
-  //   const fut = orgTimestampUtils.add(now, { days: 7 });
-  //   if (n.logbook) {
-  //     // don't know why there'd be no logbook if passed previous
-  //     // filter...maybe if completely new habit but not yet logged done
-  //     const logData = n.logbook.entries.filter(
-  //       le =>
-  //         le.type === 'state' &&
-  //         le.state === '"DONE"' &&
-  //         le.from === '"TODO"' &&
-  //         orgTimestampUtils.compare(le.timestamp, past) > 0 &&
-  //         orgTimestampUtils.compare(le.timestamp, fut) < 0
-  //       // don't know why there'd be no logbook if passed previous filter...maybe
-  //       // if completely new habit but not yet logged done
-  //     );
+  // });
+  // const habitData = nodes
+  //   .filter(n => {
+  //     const idx = orgDrawerUtils.indexOfKey(n.propDrawer, 'STYLE');
+  //     if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
+  //     return true;
+  //   })
+  //   .map(n => {
+  //     const now = orgTimestampUtils.now();
+  //     now.hour -= now.hour;
+  //     now.minute -= now.minute;
+  //     const past = orgTimestampUtils.sub(now, { days: 14 });
+  //     const fut = orgTimestampUtils.add(now, { days: 7 });
+  //     if (n.logbook) {
+  //       // don't know why there'd be no logbook if passed previous
+  //       // filter...maybe if completely new habit but not yet logged done
+  //       const logData = n.logbook.entries.filter(
+  //         le =>
+  //           le.type === 'state' &&
+  //           le.state === '"DONE"' &&
+  //           le.from === '"TODO"' &&
+  //           orgTimestampUtils.compare(le.timestamp, past) > 0 &&
+  //           orgTimestampUtils.compare(le.timestamp, fut) < 0
+  //         // don't know why there'd be no logbook if passed previous filter...maybe
+  //         // if completely new habit but not yet logged done
+  //       );
 
-  //     logData = logData.sort((a, b) =>
-  //       orgTimestampUtils.compare(a.timestamp, b.timestamp)
-  //     );
+  //       logData = logData.sort((a, b) =>
+  //         orgTimestampUtils.compare(a.timestamp, b.timestamp)
+  //       );
 
-  //     let ret = [];
-  //     if (logData.length > 0) {
-  //       for (let i = 0; i < 21; i++) {
-  //         const curr = orgTimestampUtils.add(past, { days: 1 * i });
-  //         const next = orgTimestampUtils.add(curr, { days: 1 });
-  //         const ts = logData.length > 0 ? logData[0].timestamp : null;
-  //         if (
-  //           ts !== null &&
-  //           orgTimestampUtils.compare(ts, curr) > 0 &&
-  //           orgTimestampUtils.compare(ts, next) < 0
-  //         ) {
-  //           logData.shift();
-  //           ret.push('x');
-  //         } else {
-  //           ret.push('-');
+  //       let ret = [];
+  //       if (logData.length > 0) {
+  //         for (let i = 0; i < 21; i++) {
+  //           const curr = orgTimestampUtils.add(past, { days: 1 * i });
+  //           const next = orgTimestampUtils.add(curr, { days: 1 });
+  //           const ts = logData.length > 0 ? logData[0].timestamp : null;
+  //           if (
+  //             ts !== null &&
+  //             orgTimestampUtils.compare(ts, curr) > 0 &&
+  //             orgTimestampUtils.compare(ts, next) < 0
+  //           ) {
+  //             logData.shift();
+  //             ret.push('x');
+  //           } else {
+  //             ret.push('-');
+  //           }
   //         }
   //       }
+  //       return ret;
   //     }
-  //     return ret;
-  //   }
-  //   return [];
-  // })
-});
+  //     return [];
+  //   });
+  return {
+    habits: [],
+    habitData: []
+  };
+};
 
 const mapDispatchToProps = dispatch => {
   return {
