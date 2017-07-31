@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import {
   cycleNodeCollapse,
   updateNodeHeadlineContent,
+  updateNodeTimestamp,
+  updateNodeTodoKeyword,
   deleteNode
 } from '../actions';
 
@@ -14,11 +16,12 @@ import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { OrgTree } from '../components/OrgTree';
 
 import EditOrgHeadline from '../components/EditOrgHeadline';
-import OrgHeadline from '../components/OrgHeadline';
+import OrgTimestamp from '../components/OrgTimestamp.js';
 import OrgDrawer from '../components/OrgDrawer.js';
 import OrgLogbook from '../components/OrgLogbook.js';
 
 const OrgTreeUtil = require('org-parse').OrgTree;
+const OrgTimestampUtil = require('org-parse').OrgTimestamp;
 
 const styles = StyleSheet.create({
   container: {
@@ -31,13 +34,17 @@ const styles = StyleSheet.create({
   }
 });
 
+const timestampTypes = ['OPENED', 'SCHEDULED', 'DEADLINE', 'CLOSED'];
+
 const NodeDetailScreen = ({
   navigation,
   buffers,
   onNodeTitleClick,
   onNodeArrowClick,
   onHeadlineEndEditing,
-  onPressDeleteNode
+  onPressDeleteNode,
+  onNodeTodoKeywordUpdate,
+  onTimestampUpdate
 }) => {
   const params = navigation.state.params;
   if (params && params.bufferID && params.nodeID) {
@@ -46,63 +53,15 @@ const NodeDetailScreen = ({
     const tree = buffers[bufferID].orgTree;
     const node = nodes[nodeID];
     if (node) {
-      // headlineContent
-      const headlineContent = node.headline.content;
-      // todo keyword
-      const todoKeyword = node.headline.todoKeyword
-        ? <Text
-            style={{
-              backgroundColor: node.headline.todoKeywordColor
-            }}>
-            {node.headline.todoKeyword}
-          </Text>
-        : null;
-      // tags
-      const tags = node.headline.tags && node.headline.tags.length > 0
-        ? node.headline.tags.map((tag, idx) => {
-            return (
-              <Text
-                key={idx}
-                style={{
-                  fontFamily: 'space-mono',
-                  backgroundColor: '#cccccc',
-                  fontSize: 10
-                }}>
-                {tag}
-              </Text>
-            );
-          })
-        : null;
-      // scheduled
-      const scheduled = node.scheduled
-        ? <Text
-            style={{
-              fontFamily: 'space-mono',
-              fontSize: 12
-            }}>
-            {`SCHEDULED: ${node.scheduled.year}-${node.scheduled.month}-${node.scheduled.date} ${node.scheduled.day} ${node.scheduled.hour}:${node.scheduled.minute} ${node.scheduled.repInt}${node.scheduled.repMin}${node.scheduled.repMax !== null ? '/' + node.scheduled.repMax : ''}`}
-          </Text>
-        : null;
-      // deadline
-      const deadline = node.deadline
-        ? <Text
-            style={{
-              fontFamily: 'space-mono',
-              fontSize: 12
-            }}>
-            {`DEADLINE: ${node.deadline.year}-${node.deadline.month}-${node.deadline.date} ${node.deadline.day} ${node.deadline.hour}:${node.deadline.minute} ${node.deadline.repInt}${node.deadline.repMin}${node.deadline.repMax !== null ? '/' + node.deadline.repMax : ''}`}
-          </Text>
-        : null;
-      // closed
-      const closed = node.closed
-        ? <Text
-            style={{
-              fontFamily: 'space-mono',
-              fontSize: 12
-            }}>
-            {'CLOSED: ' + node.closed.srcStr}
-          </Text>
-        : null;
+      // timings
+      const timings = timestampTypes.map(t => (
+        <OrgTimestamp
+          key={t}
+          timestamp={node[t.toLowerCase()]}
+          label={t}
+          onTimestampUpdate={onTimestampUpdate(bufferID, nodeID, t)}
+        />
+      ));
       // body
       const body = node.body ? <Text>{node.body}</Text> : null;
       // childNodes
@@ -134,12 +93,14 @@ const NodeDetailScreen = ({
               <EditOrgHeadline
                 headline={node.headline}
                 onEndEditing={onHeadlineEndEditing(bufferID, nodeID)}
+                onNodeTodoKeywordUpdate={onNodeTodoKeywordUpdate(
+                  bufferID,
+                  nodeID
+                )}
               />
             </View>
             <View style={[styles.container, styles.border]}>
-              {deadline}
-              {scheduled}
-              {closed}
+              {timings}
             </View>
             <View style={[styles.container, styles.border]}>
               <OrgDrawer drawer={node.propDrawer} isCollapsed={false} />
@@ -191,6 +152,14 @@ const mapDispatchToProps = dispatch => {
       dispatch(updateNodeHeadlineContent(bufferID, nodeID, text)),
     onPressDeleteNode: (bufferID, nodeID) => {
       dispatch(deleteNode(bufferID, nodeID));
+    },
+    onNodeTodoKeywordUpdate: (bufferID, nodeID) => todoKeyword =>
+      dispatch(updateNodeTodoKeyword(bufferID, nodeID, todoKeyword)),
+    onTimestampUpdate: (bufferID, nodeID, timestampType) => date => {
+      console.log(bufferID, nodeID, timestampType, date);
+      const timestamp = OrgTimestampUtil.parseDate(date);
+      timestamp.type = 'active';
+      dispatch(updateNodeTimestamp(bufferID, nodeID, timestampType, timestamp));
     }
   };
 };

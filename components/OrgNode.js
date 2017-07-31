@@ -1,11 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, TouchableHighlight } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
-import OrgDrawer from './OrgDrawer.js';
-import OrgLogbook from './OrgLogbook.js';
-
 const OrgDrawerUtil = require('org-parse').OrgDrawer;
+const orgHeadlineUtil = require('org-parse').OrgHeadline;
 
 const styles = StyleSheet.create({
   nodeHeader: {
@@ -20,7 +18,6 @@ const styles = StyleSheet.create({
 });
 
 const OrgNode = ({ id, headline, propDrawer, onTitleClick }) => {
-  let collapseStatusText;
   const collapseStatusIdx = OrgDrawerUtil.indexOfKey(
     propDrawer,
     'collapseStatus'
@@ -35,7 +32,7 @@ const OrgNode = ({ id, headline, propDrawer, onTitleClick }) => {
   const todoKeyword = headline.todoKeyword
     ? <Text
         style={{
-          backgroundColor: headline.todoKeywordColor
+          backgroundColor: orgHeadlineUtil.colorForKeyword(headline.todoKeyword)
         }}>
         {headline.todoKeyword}
       </Text>

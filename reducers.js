@@ -9,7 +9,9 @@ import {
   DELETE_NODE,
   ADD_NEW_NODE,
   CYCLE_NODE_COLLAPSE,
-  UPDATE_NODE_HEADLINE_CONTENT
+  UPDATE_NODE_TODO_KEYWORD,
+  UPDATE_NODE_HEADLINE_CONTENT,
+  UPDATE_NODE_TIMESTAMP
 } from './actions';
 
 const OrgDrawerUtils = require('org-parse').OrgDrawer;
@@ -45,6 +47,18 @@ function headline(
   action
 ) {
   switch (action.type) {
+    case UPDATE_NODE_TODO_KEYWORD:
+      if (action.todoKeyword === 'none') {
+        return Object.assign({}, state, {
+          todoKeyword: undefined
+          // todoKeywordColor: undefined,
+        });
+      }
+      return Object.assign({}, state, {
+        todoKeyword: action.todoKeyword
+        // todoKeywordColor: action.todoKeywordColor,
+      });
+      break;
     case UPDATE_NODE_HEADLINE_CONTENT:
       return Object.assign({}, state, { content: action.text });
       break;
@@ -54,9 +68,23 @@ function headline(
   }
 }
 
+// SCHEDULING
+function opened(state = null, action) {
+  let nextState;
+  switch (action.type) {
+    case UPDATE_NODE_TIMESTAMP:
+      if (action.timestampType === 'OPENED') nextState = action.timestamp;
+      break;
+  }
+  return nextState || state;
+}
+
 function scheduled(state = null, action) {
   let nextState;
   switch (action.type) {
+    case UPDATE_NODE_TIMESTAMP:
+      if (action.timestampType === 'SCHEDULED') nextState = action.timestamp;
+      break;
     case COMPLETE_HABIT:
       nextState = OrgTimestampUtils.calcNextRepeat(state, action.timestampStr);
       break;
@@ -66,17 +94,24 @@ function scheduled(state = null, action) {
 
 function deadline(state = null, action) {
   let nextState;
-  // switch (action.type) {
-  //   case COMPLETE_HABIT:
-  //     nextState = OrgTimestampUtils.calcNextRepeat(state, action.timestampStr);
-  //     break;
-  // }
+  switch (action.type) {
+    case UPDATE_NODE_TIMESTAMP:
+      if (action.timestampType === 'DEADLINE') nextState = action.timestamp;
+      break;
+  }
   return nextState || state;
 }
 
 function closed(state = null, action) {
-  return state;
+  let nextState;
+  switch (action.type) {
+    case UPDATE_NODE_TIMESTAMP:
+      if (action.timestampType === 'CLOSED') nextState = action.timestamp;
+      break;
+  }
+  return nextState || state;
 }
+// END SCHEDULING
 
 function propDrawer(state = { name: 'properties', properties: [] }, action) {
   switch (action.type) {
@@ -123,10 +158,6 @@ function logbook(state = { entries: [] }, action) {
   return nextState || state;
 }
 
-function opened(state = {}, action) {
-  return state;
-}
-
 function body(state = '', action) {
   return state;
 }
@@ -134,12 +165,12 @@ function body(state = '', action) {
 const orgNode = combineReducers({
   id,
   headline,
+  opened,
   scheduled,
   deadline,
   closed,
   propDrawer,
   logbook,
-  opened,
   body
 });
 
@@ -154,7 +185,9 @@ function orgNodes(state = {}, action) {
     case RESET_HABIT:
     case ADD_NEW_NODE:
     case CYCLE_NODE_COLLAPSE:
+    case UPDATE_NODE_TODO_KEYWORD:
     case UPDATE_NODE_HEADLINE_CONTENT:
+    case UPDATE_NODE_TIMESTAMP:
       const nodeID = action.nodeID;
       let newNodeObj = {};
       const newNode = orgNode(state[nodeID], action);
@@ -208,7 +241,9 @@ function orgBuffers(state = {}, action) {
         action
       );
     // break; is missing on purpose
+    case UPDATE_NODE_TODO_KEYWORD:
     case UPDATE_NODE_HEADLINE_CONTENT:
+    case UPDATE_NODE_TIMESTAMP:
     case COMPLETE_HABIT:
     case RESET_HABIT:
     case CYCLE_NODE_COLLAPSE:
@@ -280,9 +315,6 @@ function settings(
 /////////////////////////////////////////////////////////////////  MOBILE ORG TOO
 
 const mobileOrgTooApp = combineReducers({
-  // orgText,
-  // orgTree,
-  // orgNodes,
   orgBuffers,
   nav,
   settings
