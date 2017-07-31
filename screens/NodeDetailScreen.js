@@ -168,10 +168,8 @@ const mapDispatchToProps = dispatch => {
     },
     onTimestampRepIntUpdate: (bufferID, nodeID, timestampType) => (
       repInt,
-      repMaxVal,
-      repMaxU,
-      repMinVal,
-      repMinU
+      repMin,
+      repMax
     ) => {
       dispatch(
         updateNodeTimestampRepInt(
@@ -179,8 +177,8 @@ const mapDispatchToProps = dispatch => {
           nodeID,
           timestampType,
           repInt,
-          repMaxVal + repMaxU,
-          repMinVal + repMinU
+          repMin,
+          repMax
         )
       );
     },

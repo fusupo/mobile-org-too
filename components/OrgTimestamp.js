@@ -138,15 +138,32 @@ class OrgTimestamp extends Component {
                   repMaxVal !== '-' &&
                   repMaxU !== '-' &&
                   repMinVal !== '-' &&
-                  repMinU !== '-'
+                  repMinU !== '-' &&
+                  parseInt(repMinVal) < parseInt(repMaxVal)
+                  // you would also want to make sure the repMaxU is >= repMinU
                 ) {
+                  // case has min and max repeat rates defined
                   this.props.onTimestampRepIntUpdate(
                     repInt,
-                    repMaxVal,
-                    repMaxU,
-                    repMinVal,
-                    repMinU
+                    repMinVal + repMinU,
+                    repMaxVal + repMaxU
                   );
+                } else if (repMinVal !== '-' && repMinU !== '-') {
+                  // case has only min repeat rate defined
+                  this.props.onTimestampRepIntUpdate(
+                    repInt,
+                    repMinVal + repMinU,
+                    null
+                  );
+                }
+              } else {
+                if (
+                  repMaxVal === '-' &&
+                  repMaxU === '-' &&
+                  repMinVal === '-' &&
+                  repMinU === '-'
+                ) {
+                  this.props.onTimestampRepIntUpdate(null, null, null);
                 }
               }
               this.setState({ showRepIntPicker: !this.state.showRepIntPicker });
