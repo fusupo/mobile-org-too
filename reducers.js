@@ -64,6 +64,16 @@ function scheduled(state = null, action) {
   return nextState || state;
 }
 
+function deadline(state = null, action) {
+  let nextState;
+  // switch (action.type) {
+  //   case COMPLETE_HABIT:
+  //     nextState = OrgTimestampUtils.calcNextRepeat(state, action.timestampStr);
+  //     break;
+  // }
+  return nextState || state;
+}
+
 function closed(state = null, action) {
   return state;
 }
@@ -125,6 +135,7 @@ const orgNode = combineReducers({
   id,
   headline,
   scheduled,
+  deadline,
   closed,
   propDrawer,
   logbook,
@@ -160,6 +171,7 @@ function orgNodes(state = {}, action) {
 
 function orgTree(state = {}, action) {
   let nextState, clonedKids;
+  console.log('WHAT THWE FUCK!!!??', action);
   switch (action.type) {
     case ADD_NEW_NODE:
       clonedKids = state.children.slice(0);
@@ -167,6 +179,7 @@ function orgTree(state = {}, action) {
       nextState = Object.assign({}, state, { children: clonedKids });
       break;
     case DELETE_NODE:
+      console.log('orgTree:Delet_Node');
       clonedKids = state.children.slice(0);
       clonedKids = clonedKids.filter(n => n.nodeID !== action.nodeID);
       nextState = Object.assign({}, state, { children: clonedKids });
@@ -181,16 +194,24 @@ function orgTree(state = {}, action) {
 
 function orgBuffers(state = {}, action) {
   let nextState;
+  nextState = Object.assign({}, state);
   switch (action.type) {
     case 'addOrgBuffer':
       console.log('addOrgBuffer');
       nextState = Object.assign({}, state);
       nextState[action.path] = action.data;
       break;
+    case DELETE_NODE:
+      console.log('orgBuffers:Delet_Node');
+      nextState[action.bufferID].orgTree = orgTree(
+        nextState[action.bufferID].orgTree,
+        action
+      );
+    // break; is missing on purpose
+    case UPDATE_NODE_HEADLINE_CONTENT:
     case COMPLETE_HABIT:
     case RESET_HABIT:
     case CYCLE_NODE_COLLAPSE:
-      nextState = Object.assign({}, state);
       nextState[action.bufferID].orgNodes = orgNodes(
         nextState[action.bufferID].orgNodes,
         action
@@ -215,6 +236,7 @@ function nav(state, action) {
       );
       break;
     case DELETE_NODE:
+      console.log('nav:Delet_Node');
       nextState = StacksOverTabs.router.getStateForAction(
         NavigationActions.back(),
         state

@@ -7,6 +7,7 @@ const OrgNodeUtil = require('org-parse').OrgNode;
 export const CYCLE_NODE_COLLAPSE = 'CYCLE_NODE_COLLAPSE';
 export const UPDATE_NODE_HEADLINE_CONTENT = 'UPDATE_NODE_HEADLINE_CONTENT';
 export const ADD_NEW_NODE = 'ADD_NEW_NODE';
+export const DELETE_NODE = 'DELETE_NODE';
 export const COMPLETE_HABIT = 'COMPLETE_HABIT';
 export const RESET_HABIT = 'RESET_HABIT';
 
@@ -28,16 +29,16 @@ export function cycleNodeCollapse(bufferID, nodeID) {
   return { type: CYCLE_NODE_COLLAPSE, bufferID, nodeID };
 }
 
-export function updateNodeHeadlineContent(nodeID, text) {
-  return { type: UPDATE_NODE_HEADLINE_CONTENT, nodeID, text };
+export function updateNodeHeadlineContent(bufferID, nodeID, text) {
+  return { type: UPDATE_NODE_HEADLINE_CONTENT, bufferID, nodeID, text };
 }
 
 export function addNewNode() {
   return { type: ADD_NEW_NODE, nodeID: OrgNodeUtil.newNodeID() };
 }
 
-export function deleteNode(nodeID) {
-  return { type: DELETE_NODE, nodeID };
+export function deleteNode(bufferID, nodeID) {
+  return { type: DELETE_NODE, bufferID, nodeID };
 }
 
 export function completeHabit(bufferID, nodeID, timestampStr) {
