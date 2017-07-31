@@ -8,6 +8,8 @@ export const CYCLE_NODE_COLLAPSE = 'CYCLE_NODE_COLLAPSE';
 export const UPDATE_NODE_TODO_KEYWORD = 'UPDATE_NODE_TODO_KEYWORD';
 export const UPDATE_NODE_HEADLINE_CONTENT = 'UPDATE_NODE_HEADLINE_CONTENT';
 export const UPDATE_NODE_TIMESTAMP = 'UPDATE_NODE_TIMESTAMP';
+export const UPDATE_NODE_TIMESTAMP_REP_INT = 'UPDATE_NODE_TIMESTAMP_REP_INT';
+export const CLEAR_NODE_TIMESTAMP = 'CLEAR_NODE_TIMESTAMP';
 export const ADD_NEW_NODE = 'ADD_NEW_NODE';
 export const DELETE_NODE = 'DELETE_NODE';
 export const COMPLETE_HABIT = 'COMPLETE_HABIT';
@@ -39,6 +41,25 @@ export function updateNodeHeadlineContent(bufferID, nodeID, text) {
   return { type: UPDATE_NODE_HEADLINE_CONTENT, bufferID, nodeID, text };
 }
 
+export function updateNodeTimestampRepInt(
+  bufferID,
+  nodeID,
+  timestampType,
+  repInt,
+  repMin,
+  repMax
+) {
+  return {
+    type: UPDATE_NODE_TIMESTAMP_REP_INT,
+    bufferID,
+    nodeID,
+    timestampType,
+    repInt,
+    repMin,
+    repMax
+  };
+}
+
 export function updateNodeTimestamp(
   bufferID,
   nodeID,
@@ -54,6 +75,14 @@ export function updateNodeTimestamp(
   };
 }
 
+export function clearNodeTimestamp(bufferID, nodeID, timestampType) {
+  return {
+    type: CLEAR_NODE_TIMESTAMP,
+    bufferID,
+    nodeID,
+    timestampType
+  };
+}
 export function addNewNode() {
   return { type: ADD_NEW_NODE, nodeID: OrgNodeUtil.newNodeID() };
 }

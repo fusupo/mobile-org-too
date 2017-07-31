@@ -5,6 +5,8 @@ import {
   cycleNodeCollapse,
   updateNodeHeadlineContent,
   updateNodeTimestamp,
+  updateNodeTimestampRepInt,
+  clearNodeTimestamp,
   updateNodeTodoKeyword,
   deleteNode
 } from '../actions';
@@ -44,7 +46,9 @@ const NodeDetailScreen = ({
   onHeadlineEndEditing,
   onPressDeleteNode,
   onNodeTodoKeywordUpdate,
-  onTimestampUpdate
+  onTimestampUpdate,
+  onTimestampRepIntUpdate,
+  onTimestampClear
 }) => {
   const params = navigation.state.params;
   if (params && params.bufferID && params.nodeID) {
@@ -60,6 +64,8 @@ const NodeDetailScreen = ({
           timestamp={node[t.toLowerCase()]}
           label={t}
           onTimestampUpdate={onTimestampUpdate(bufferID, nodeID, t)}
+          onTimestampRepIntUpdate={onTimestampRepIntUpdate(bufferID, nodeID, t)}
+          onTimestampClear={onTimestampClear(bufferID, nodeID, t)}
         />
       ));
       // body
@@ -156,10 +162,30 @@ const mapDispatchToProps = dispatch => {
     onNodeTodoKeywordUpdate: (bufferID, nodeID) => todoKeyword =>
       dispatch(updateNodeTodoKeyword(bufferID, nodeID, todoKeyword)),
     onTimestampUpdate: (bufferID, nodeID, timestampType) => date => {
-      console.log(bufferID, nodeID, timestampType, date);
       const timestamp = OrgTimestampUtil.parseDate(date);
       timestamp.type = 'active';
       dispatch(updateNodeTimestamp(bufferID, nodeID, timestampType, timestamp));
+    },
+    onTimestampRepIntUpdate: (bufferID, nodeID, timestampType) => (
+      repInt,
+      repMaxVal,
+      repMaxU,
+      repMinVal,
+      repMinU
+    ) => {
+      dispatch(
+        updateNodeTimestampRepInt(
+          bufferID,
+          nodeID,
+          timestampType,
+          repInt,
+          repMaxVal + repMaxU,
+          repMinVal + repMinU
+        )
+      );
+    },
+    onTimestampClear: (bufferID, nodeID, timestampType) => () => {
+      dispatch(clearNodeTimestamp(bufferID, nodeID, timestampType));
     }
   };
 };

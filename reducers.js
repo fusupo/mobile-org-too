@@ -11,7 +11,9 @@ import {
   CYCLE_NODE_COLLAPSE,
   UPDATE_NODE_TODO_KEYWORD,
   UPDATE_NODE_HEADLINE_CONTENT,
-  UPDATE_NODE_TIMESTAMP
+  UPDATE_NODE_TIMESTAMP,
+  UPDATE_NODE_TIMESTAMP_REP_INT,
+  CLEAR_NODE_TIMESTAMP
 } from './actions';
 
 const OrgDrawerUtils = require('org-parse').OrgDrawer;
@@ -71,43 +73,101 @@ function headline(
 // SCHEDULING
 function opened(state = null, action) {
   let nextState;
-  switch (action.type) {
-    case UPDATE_NODE_TIMESTAMP:
-      if (action.timestampType === 'OPENED') nextState = action.timestamp;
-      break;
+  if (action.timestampType === 'OPENED') {
+    switch (action.type) {
+      case UPDATE_NODE_TIMESTAMP:
+        nextState = action.timestamp;
+        break;
+      case UPDATE_NODE_TIMESTAMP_REP_INT:
+        nextState = Object.assign({}, state, {
+          repInt: action.repInt,
+          repMin: action.repMin,
+          repMax: action.repMax
+        });
+        break;
+      case CLEAR_NODE_TIMESTAMP:
+        nextState = null;
+        //short circuit the null check bellow
+        return nextState;
+        break;
+    }
   }
   return nextState || state;
 }
 
 function scheduled(state = null, action) {
   let nextState;
-  switch (action.type) {
-    case UPDATE_NODE_TIMESTAMP:
-      if (action.timestampType === 'SCHEDULED') nextState = action.timestamp;
-      break;
-    case COMPLETE_HABIT:
-      nextState = OrgTimestampUtils.calcNextRepeat(state, action.timestampStr);
-      break;
+  if (action.type === COMPLETE_HABIT) {
+    nextState = OrgTimestampUtils.calcNextRepeat(state, action.timestampStr);
+  } else {
+    if (action.timestampType === 'SCHEDULED') {
+      switch (action.type) {
+        case UPDATE_NODE_TIMESTAMP:
+          nextState = action.timestamp;
+          break;
+        case UPDATE_NODE_TIMESTAMP_REP_INT:
+          nextState = Object.assign({}, state, {
+            repInt: action.repInt,
+            repMin: action.repMin,
+            repMax: action.repMax
+          });
+          console.log(nextState);
+          break;
+        case CLEAR_NODE_TIMESTAMP:
+          nextState = null;
+          //short circuit the null check bellow
+          return nextState;
+          break;
+      }
+    }
   }
   return nextState || state;
 }
 
 function deadline(state = null, action) {
   let nextState;
-  switch (action.type) {
-    case UPDATE_NODE_TIMESTAMP:
-      if (action.timestampType === 'DEADLINE') nextState = action.timestamp;
-      break;
+  if (action.timestampType === 'DEADLINE') {
+    switch (action.type) {
+      case UPDATE_NODE_TIMESTAMP:
+        nextState = action.timestamp;
+        break;
+      case UPDATE_NODE_TIMESTAMP_REP_INT:
+        nextState = Object.assign({}, state, {
+          repInt: action.repInt,
+          repMin: action.repMin,
+          repMax: action.repMax
+        });
+        break;
+      case CLEAR_NODE_TIMESTAMP:
+        nextState = null;
+        //short circuit the null check bellow
+        return nextState;
+        break;
+    }
   }
   return nextState || state;
 }
 
 function closed(state = null, action) {
   let nextState;
-  switch (action.type) {
-    case UPDATE_NODE_TIMESTAMP:
-      if (action.timestampType === 'CLOSED') nextState = action.timestamp;
-      break;
+  if (action.timestampType === 'CLOSED') {
+    switch (action.type) {
+      case UPDATE_NODE_TIMESTAMP:
+        nextState = action.timestamp;
+        break;
+      case UPDATE_NODE_TIMESTAMP_REP_INT:
+        nextState = Object.assign({}, state, {
+          repInt: action.repInt,
+          repMin: action.repMin,
+          repMax: action.repMax
+        });
+        break;
+      case CLEAR_NODE_TIMESTAMP:
+        nextState = null;
+        //short circuit the null check bellow
+        return nextState;
+        break;
+    }
   }
   return nextState || state;
 }
@@ -188,6 +248,8 @@ function orgNodes(state = {}, action) {
     case UPDATE_NODE_TODO_KEYWORD:
     case UPDATE_NODE_HEADLINE_CONTENT:
     case UPDATE_NODE_TIMESTAMP:
+    case UPDATE_NODE_TIMESTAMP_REP_INT:
+    case CLEAR_NODE_TIMESTAMP:
       const nodeID = action.nodeID;
       let newNodeObj = {};
       const newNode = orgNode(state[nodeID], action);
@@ -244,6 +306,8 @@ function orgBuffers(state = {}, action) {
     case UPDATE_NODE_TODO_KEYWORD:
     case UPDATE_NODE_HEADLINE_CONTENT:
     case UPDATE_NODE_TIMESTAMP:
+    case UPDATE_NODE_TIMESTAMP_REP_INT:
+    case CLEAR_NODE_TIMESTAMP:
     case COMPLETE_HABIT:
     case RESET_HABIT:
     case CYCLE_NODE_COLLAPSE:
