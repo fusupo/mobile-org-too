@@ -187,6 +187,8 @@ function orgBuffers(state = {}, action) {
       nextState = Object.assign({}, state);
       nextState[action.path] = action.data;
       break;
+    case COMPLETE_HABIT:
+    case RESET_HABIT:
     case CYCLE_NODE_COLLAPSE:
       nextState = Object.assign({}, state);
       nextState[action.bufferID].orgNodes = orgNodes(
@@ -201,7 +203,6 @@ function orgBuffers(state = {}, action) {
 ////////////////////////////////////////////////////////////////////////////  NAV
 
 function nav(state, action) {
-  console.log('nav');
   let nextState;
   switch (action.type) {
     case ADD_NEW_NODE:

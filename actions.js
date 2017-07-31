@@ -40,10 +40,10 @@ export function deleteNode(nodeID) {
   return { type: DELETE_NODE, nodeID };
 }
 
-export function completeHabit(nodeID, timestampStr) {
-  return { type: COMPLETE_HABIT, nodeID, timestampStr };
+export function completeHabit(bufferID, nodeID, timestampStr) {
+  return { type: COMPLETE_HABIT, bufferID, nodeID, timestampStr };
 }
 
-export function resetHabit(nodeID, timestampStr) {
-  return { type: RESET_HABIT, nodeID, timestampStr };
+export function resetHabit(bufferID, nodeID, timestampStr) {
+  return { type: RESET_HABIT, bufferID, nodeID, timestampStr };
 }
