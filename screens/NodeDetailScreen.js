@@ -8,7 +8,13 @@ import {
   updateNodeTimestampRepInt,
   clearNodeTimestamp,
   updateNodeTodoKeyword,
-  deleteNode
+  deleteNode,
+  insertNewNodeProp,
+  updateNodeProp,
+  removeNodeProp,
+  insertNewNodeLogNote,
+  updateNodeLogNote,
+  removeNodeLogNote
 } from '../actions';
 
 import { NavigationActions } from 'react-navigation';
@@ -48,7 +54,13 @@ const NodeDetailScreen = ({
   onNodeTodoKeywordUpdate,
   onTimestampUpdate,
   onTimestampRepIntUpdate,
-  onTimestampClear
+  onTimestampClear,
+  onAddProp,
+  onUpdateProp,
+  onRemoveProp,
+  onAddLogNote,
+  onUpdateLogNote,
+  onRemoveLogNote
 }) => {
   const params = navigation.state.params;
   if (params && params.bufferID && params.nodeID) {
@@ -109,10 +121,22 @@ const NodeDetailScreen = ({
               {timings}
             </View>
             <View style={[styles.container, styles.border]}>
-              <OrgDrawer drawer={node.propDrawer} isCollapsed={false} />
+              <OrgDrawer
+                drawer={node.propDrawer}
+                isCollapsed={false}
+                onAddProp={onAddProp(bufferID, nodeID)}
+                onUpdateProp={onUpdateProp(bufferID, nodeID)}
+                onRemoveProp={onRemoveProp(bufferID, nodeID)}
+              />
             </View>
             <View style={[styles.container, styles.border]}>
-              <OrgLogbook log={node.logbook} isCollapsed={false} />
+              <OrgLogbook
+                log={node.logbook}
+                isCollapsed={false}
+                onAddLogNote={onAddLogNote(bufferID, nodeID)}
+                onUpdateLogNote={onUpdateLogNote(bufferID, nodeID)}
+                onRemoveLogNote={onRemoveLogNote(bufferID, nodeID)}
+              />
             </View>
             <View style={[styles.container, styles.border]}>
               {body}
@@ -184,6 +208,25 @@ const mapDispatchToProps = dispatch => {
     },
     onTimestampClear: (bufferID, nodeID, timestampType) => () => {
       dispatch(clearNodeTimestamp(bufferID, nodeID, timestampType));
+    },
+    onAddProp: (bufferID, nodeID) => () => {
+      dispatch(insertNewNodeProp(bufferID, nodeID));
+    },
+    onUpdateProp: (bufferID, nodeID) => (idx, propKey, propVal) => {
+      dispatch(updateNodeProp(bufferID, nodeID, idx, propKey, propVal));
+    },
+    onRemoveProp: (bufferID, nodeID) => propKey => {
+      dispatch(removeNodeProp(bufferID, nodeID, propKey));
+    },
+    onAddLogNote: (bufferID, nodeID) => () => {
+      const nowStr = OrgTimestampUtil.serialize(OrgTimestampUtil.now());
+      dispatch(insertNewNodeLogNote(bufferID, nodeID, nowStr));
+    },
+    onUpdateLogNote: (bufferID, nodeID) => (idx, text) => {
+      dispatch(updateNodeLogNote(bufferID, nodeID, idx, text));
+    },
+    onRemoveLogNote: (bufferID, nodeID) => idx => {
+      dispatch(removeNodeLogNote(bufferID, nodeID, idx));
     }
   };
 };

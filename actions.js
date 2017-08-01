@@ -14,6 +14,12 @@ export const ADD_NEW_NODE = 'ADD_NEW_NODE';
 export const DELETE_NODE = 'DELETE_NODE';
 export const COMPLETE_HABIT = 'COMPLETE_HABIT';
 export const RESET_HABIT = 'RESET_HABIT';
+export const INSERT_NEW_NODE_PROP = 'INSERT_NEW_NODE_PROP';
+export const UPDATE_NODE_PROP = 'UPDATE_NODE_PROP';
+export const REMOVE_NODE_PROP = 'REMOVE_NODE_PROP';
+export const INSERT_NEW_NODE_LOG_NOTE = 'INSERT_NEW_NODE_LOG_NOTE';
+export const UPDATE_NODE_LOG_NOTE = 'UPDATE_NODE_LOG_NOTE';
+export const REMOVE_NODE_LOG_NOTE = 'REMOVE_NODE_LOG_NOTE';
 
 /*
  * other constants
@@ -97,4 +103,34 @@ export function completeHabit(bufferID, nodeID, timestampStr) {
 
 export function resetHabit(bufferID, nodeID, timestampStr) {
   return { type: RESET_HABIT, bufferID, nodeID, timestampStr };
+}
+
+export function insertNewNodeProp(bufferID, nodeID) {
+  return { type: INSERT_NEW_NODE_PROP, bufferID, nodeID };
+}
+
+export function updateNodeProp(bufferID, nodeID, idx, propKey, propVal) {
+  return { type: UPDATE_NODE_PROP, bufferID, nodeID, idx, propKey, propVal };
+}
+
+export function removeNodeProp(bufferID, nodeID, propKey) {
+  return { type: REMOVE_NODE_PROP, bufferID, nodeID, propKey };
+}
+
+export function insertNewNodeLogNote(bufferID, nodeID, timestampStr) {
+  return { type: INSERT_NEW_NODE_LOG_NOTE, bufferID, nodeID, timestampStr };
+}
+
+export function updateNodeLogNote(bufferID, nodeID, idx, text) {
+  return {
+    type: UPDATE_NODE_LOG_NOTE,
+    bufferID,
+    nodeID,
+    idx,
+    text
+  };
+}
+
+export function removeNodeLogNote(bufferID, nodeID, idx) {
+  return { type: REMOVE_NODE_LOG_NOTE, bufferID, nodeID, idx };
 }

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { TouchableHighlight, ScrollView, Text, View } from 'react-native';
+
+import OrgLogbookItem from './OrgLogbookItem';
 
 export default class OrgLogbook extends Component {
   constructor(props) {
@@ -32,71 +34,46 @@ export default class OrgLogbook extends Component {
         this.props.log &&
         this.props.log.entries &&
         this.props.log.entries.map((le, idx) => {
-          let ret;
-          text = le.text ? <Text>{le.text}</Text> : null;
-          switch (le.type) {
-            case 'state':
-              ret = (
-                <View key={idx}>
-                  <Text>{`State ${le.state} from ${le.from} ${le.timestamp}`}</Text>
-                  {text}
-                </View>
-              );
-              break;
-            case 'note':
-              ret = (
-                <View key={idx}>
-                  <Text>{`Note taken on ${le.timestamp}`}</Text>
-                  {text}
-                </View>
-              );
-              break;
-            default:
-              ret = (
-                <View key={idx}>
-                  <Text>{`DONT KNOW WHAT TO DO HERE!!`}</Text>
-                  {text}
-                </View>
-              );
-              break;
-          }
-          // return (
-          //   <View key={idx}>
-          //     {l.map((x, idx2) => (
-          //       <Text
-          //         key={idx2}
-          //         style={{
-          //           fontFamily: 'space-mono',
-          //           backgroundColor: '#cccccc',
-          //           fontSize: 10
-          //         }}>
-          //         {x}
-          //       </Text>
-          //     ))}
-          //   </View>
-          // );
-          return ret;
+          return (
+            <OrgLogbookItem
+              key={idx}
+              idx={idx}
+              type={le.type}
+              logItem={le}
+              onRemoveLogNote={this.props.onRemoveLogNote}
+            />
+          );
         });
 
       return (
-        <View className="OrgLogbook" style={{ flex: 1 }}>
-          <Text
-            className="OrgDrawerName"
-            style={{
-              fontFamily: 'space-mono',
-              backgroundColor: '#cccccc',
-              fontSize: 12
-            }}
-            onPress={this._toggleCollapse.bind(this)}>
-            LOGBOOK
-          </Text>
-          <ScrollView
-            className="OrgLogbookItems"
-            style={{
-              backgroundColor: '#cccccc'
-            }}>
+        <View className="OrgLogbook">
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ flex: 1 }}>
+              <TouchableHighlight onPress={this.props.onAddLogNote}>
+                <Text
+                  className="OrgDrawerName"
+                  style={{
+                    fontFamily: 'space-mono',
+                    fontSize: 12
+                  }}>
+                  {'+'}
+                </Text>
+              </TouchableHighlight>
+            </View>
+            <View style={{ flex: 16 }}>
+              <Text
+                style={{
+                  fontFamily: 'space-mono',
+                  fontSize: 12
+                }}
+                onPress={this._toggleCollapse.bind(this)}>
+                {'LOGBOOK'}
+              </Text>
+            </View>
+          </View>
+          <View>
             {listItems}
-          </ScrollView>
+          </View>
         </View>
       );
     }

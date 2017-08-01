@@ -13,7 +13,13 @@ import {
   UPDATE_NODE_HEADLINE_CONTENT,
   UPDATE_NODE_TIMESTAMP,
   UPDATE_NODE_TIMESTAMP_REP_INT,
-  CLEAR_NODE_TIMESTAMP
+  CLEAR_NODE_TIMESTAMP,
+  INSERT_NEW_NODE_PROP,
+  UPDATE_NODE_PROP,
+  REMOVE_NODE_PROP,
+  INSERT_NEW_NODE_LOG_NOTE,
+  UPDATE_NODE_LOG_NOTE,
+  REMOVE_NODE_LOG_NOTE
 } from './actions';
 
 const OrgDrawerUtils = require('org-parse').OrgDrawer;
@@ -174,21 +180,33 @@ function closed(state = null, action) {
 // END SCHEDULING
 
 function propDrawer(state = { name: 'properties', properties: [] }, action) {
+  let nextState;
   switch (action.type) {
     case CYCLE_NODE_COLLAPSE:
       const key = 'collapseStatus';
       let idx = OrgDrawerUtils.indexOfKey(state, key);
       if (idx === -1 || state.properties[idx][1] === 'collapsed') {
-        return OrgDrawerUtils.insertOrUpdate(state, [key, 'expanded']);
+        nextState = OrgDrawerUtils.insertOrUpdate(state, [key, 'expanded']);
       } else if (state.properties[idx][1] === 'expanded') {
-        return OrgDrawerUtils.insertOrUpdate(state, [key, 'collapsed']);
+        nextState = OrgDrawerUtils.insertOrUpdate(state, [key, 'collapsed']);
       }
       // else if (state.properties[idx][1] === 'maximized') {
       //     return OrgDrawerUtils.insertOrUpdate(state, [key, 'collapsed']);
       //   }
       break;
+    case UPDATE_NODE_PROP:
+      const clonedProps = state.properties.slice(0);
+      clonedProps.splice(action.idx, 1, [action.propKey, action.propVal]);
+      nextState = Object.assign({}, state, { properties: clonedProps });
+      break;
+    case INSERT_NEW_NODE_PROP:
+      nextState = OrgDrawerUtils.insertOrUpdate(state, ['', '']);
+      break;
+    case REMOVE_NODE_PROP:
+      nextState = OrgDrawerUtils.remove(state, [action.propKey]);
+      break;
     case COMPLETE_HABIT:
-      return OrgDrawerUtils.insertOrUpdate(state, [
+      nextState = OrgDrawerUtils.insertOrUpdate(state, [
         'LAST_REPEAT',
         action.timestampStr
       ]);
@@ -197,15 +215,39 @@ function propDrawer(state = { name: 'properties', properties: [] }, action) {
       return state;
       break;
   }
-  return state;
+  return nextState || state;
 }
 
 function logbook(state = { entries: [] }, action) {
-  let nextState;
+  let nextState, clonedEntries;
   switch (action.type) {
+    case INSERT_NEW_NODE_LOG_NOTE:
+      clonedEntries = state && state.entries && state.entries.length > 0
+        ? state.entries.slice(0)
+        : [];
+      clonedEntries.unshift({
+        type: 'note',
+        timestamp: action.timestampStr,
+        text: 'foo'
+      });
+      nextState = Object.assign({}, state, { entries: clonedEntries });
+      break;
+    case UPDATE_NODE_LOG_NOTE:
+      clonedEntries = state.entries.slice(0);
+      let updatedEntry = Object.assign({}, state.entries[action.idx], {
+        text: action.text
+      });
+      clonedEntries.splice(action.idx, 1, updatedEntry);
+      nextState = Object.assign({}, state, { entries: clonedEntries });
+      break;
+    case REMOVE_NODE_LOG_NOTE:
+      clonedEntries = state.entries.slice(0);
+      clonedEntries.splice(action.idx, 1);
+      nextState = Object.assign({}, state, { entries: clonedEntries });
+      break;
     case COMPLETE_HABIT:
       // i think I may need to deep copy this stuff
-      const clonedEntries = state.entries.slice(0);
+      clonedEntries = state.entries.slice(0);
       clonedEntries.unshift({
         type: 'state',
         state: '"DONE"',
@@ -250,6 +292,12 @@ function orgNodes(state = {}, action) {
     case UPDATE_NODE_TIMESTAMP:
     case UPDATE_NODE_TIMESTAMP_REP_INT:
     case CLEAR_NODE_TIMESTAMP:
+    case INSERT_NEW_NODE_PROP:
+    case UPDATE_NODE_PROP:
+    case REMOVE_NODE_PROP:
+    case INSERT_NEW_NODE_LOG_NOTE:
+    case UPDATE_NODE_LOG_NOTE:
+    case REMOVE_NODE_LOG_NOTE:
       const nodeID = action.nodeID;
       let newNodeObj = {};
       const newNode = orgNode(state[nodeID], action);
@@ -311,6 +359,12 @@ function orgBuffers(state = {}, action) {
     case COMPLETE_HABIT:
     case RESET_HABIT:
     case CYCLE_NODE_COLLAPSE:
+    case INSERT_NEW_NODE_PROP:
+    case UPDATE_NODE_PROP:
+    case REMOVE_NODE_PROP:
+    case INSERT_NEW_NODE_LOG_NOTE:
+    case UPDATE_NODE_LOG_NOTE:
+    case REMOVE_NODE_LOG_NOTE:
       nextState[action.bufferID].orgNodes = orgNodes(
         nextState[action.bufferID].orgNodes,
         action

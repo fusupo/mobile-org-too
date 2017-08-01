@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Text, View, TouchableHighlight } from 'react-native';
+
+import OrgDrawerItem from './OrgDrawerItem';
 
 class OrgDrawer extends Component {
   constructor(props) {
@@ -31,28 +33,44 @@ class OrgDrawer extends Component {
         const key = keyval[0];
         const val = keyval[1];
         return (
-          <Text
-            style={{
-              fontFamily: 'space-mono',
-              fontSize: 10
-            }}
-            key={idx}>
-            {key}:{val}
-          </Text>
+          <OrgDrawerItem
+            key={idx}
+            idx={idx}
+            propKey={key}
+            propVal={val}
+            onRemoveProp={this.props.onRemoveProp}
+            onUpdateProp={this.props.onUpdateProp}
+          />
         );
       });
 
       return (
         <View className="OrgDrawer">
-          <Text
-            className="OrgDrawerName"
-            style={{
-              fontFamily: 'space-mono',
-              fontSize: 12
-            }}
-            onPress={this._toggleCollapse.bind(this)}>
-            {this.props.drawer.name}
-          </Text>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ flex: 1 }}>
+              <TouchableHighlight onPress={this.props.onAddProp}>
+                <Text
+                  className="OrgDrawerName"
+                  style={{
+                    fontFamily: 'space-mono',
+                    fontSize: 12
+                  }}>
+                  {'+'}
+                </Text>
+              </TouchableHighlight>
+            </View>
+            <View style={{ flex: 16 }}>
+              <Text
+                className="OrgDrawerName"
+                style={{
+                  fontFamily: 'space-mono',
+                  fontSize: 12
+                }}
+                onPress={this._toggleCollapse.bind(this)}>
+                {this.props.drawer.name}
+              </Text>
+            </View>
+          </View>
           <View className="OrgDrawerProperties">
             {listItems}
           </View>
