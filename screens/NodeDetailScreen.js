@@ -14,7 +14,8 @@ import {
   removeNodeProp,
   insertNewNodeLogNote,
   updateNodeLogNote,
-  removeNodeLogNote
+  removeNodeLogNote,
+  updateNodeBody
 } from '../actions';
 
 import { NavigationActions } from 'react-navigation';
@@ -24,9 +25,10 @@ import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { OrgTree } from '../components/OrgTree';
 
 import EditOrgHeadline from '../components/EditOrgHeadline';
-import OrgTimestamp from '../components/OrgTimestamp.js';
-import OrgDrawer from '../components/OrgDrawer.js';
-import OrgLogbook from '../components/OrgLogbook.js';
+import OrgTimestamp from '../components/OrgTimestamp';
+import OrgDrawer from '../components/OrgDrawer';
+import OrgLogbook from '../components/OrgLogbook';
+import OrgBody from '../components/OrgBody';
 
 const OrgTreeUtil = require('org-parse').OrgTree;
 const OrgTimestampUtil = require('org-parse').OrgTimestamp;
@@ -60,7 +62,8 @@ const NodeDetailScreen = ({
   onRemoveProp,
   onAddLogNote,
   onUpdateLogNote,
-  onRemoveLogNote
+  onRemoveLogNote,
+  onUpdateNodeBody
 }) => {
   const params = navigation.state.params;
   if (params && params.bufferID && params.nodeID) {
@@ -80,8 +83,6 @@ const NodeDetailScreen = ({
           onTimestampClear={onTimestampClear(bufferID, nodeID, t)}
         />
       ));
-      // body
-      const body = node.body ? <Text>{node.body}</Text> : null;
       // childNodes
       const childIDs = OrgTreeUtil.findBranch(tree, nodeID).children;
       const listItems = childIDs.length === 0
@@ -138,9 +139,10 @@ const NodeDetailScreen = ({
                 onRemoveLogNote={onRemoveLogNote(bufferID, nodeID)}
               />
             </View>
-            <View style={[styles.container, styles.border]}>
-              {body}
-            </View>
+            <OrgBody
+              onUpdateNodeBody={onUpdateNodeBody(bufferID, nodeID)}
+              bodyText={node.body}
+            />
           </ScrollView>
           {list}
         </View>
@@ -227,6 +229,9 @@ const mapDispatchToProps = dispatch => {
     },
     onRemoveLogNote: (bufferID, nodeID) => idx => {
       dispatch(removeNodeLogNote(bufferID, nodeID, idx));
+    },
+    onUpdateNodeBody: (bufferID, nodeID) => text => {
+      dispatch(updateNodeBody(bufferID, nodeID, text));
     }
   };
 };

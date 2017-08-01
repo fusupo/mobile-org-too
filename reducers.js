@@ -19,7 +19,8 @@ import {
   REMOVE_NODE_PROP,
   INSERT_NEW_NODE_LOG_NOTE,
   UPDATE_NODE_LOG_NOTE,
-  REMOVE_NODE_LOG_NOTE
+  REMOVE_NODE_LOG_NOTE,
+  UPDATE_NODE_BODY
 } from './actions';
 
 const OrgDrawerUtils = require('org-parse').OrgDrawer;
@@ -261,7 +262,14 @@ function logbook(state = { entries: [] }, action) {
 }
 
 function body(state = '', action) {
-  return state;
+  let nextState;
+  switch (action.type) {
+    case UPDATE_NODE_BODY:
+      nextState = action.text;
+      return nextState;
+      break;
+  }
+  return nextState || state;
 }
 
 const orgNode = combineReducers({
@@ -298,6 +306,7 @@ function orgNodes(state = {}, action) {
     case INSERT_NEW_NODE_LOG_NOTE:
     case UPDATE_NODE_LOG_NOTE:
     case REMOVE_NODE_LOG_NOTE:
+    case UPDATE_NODE_BODY:
       const nodeID = action.nodeID;
       let newNodeObj = {};
       const newNode = orgNode(state[nodeID], action);
@@ -365,6 +374,7 @@ function orgBuffers(state = {}, action) {
     case INSERT_NEW_NODE_LOG_NOTE:
     case UPDATE_NODE_LOG_NOTE:
     case REMOVE_NODE_LOG_NOTE:
+    case UPDATE_NODE_BODY:
       nextState[action.bufferID].orgNodes = orgNodes(
         nextState[action.bufferID].orgNodes,
         action

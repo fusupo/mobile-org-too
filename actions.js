@@ -20,6 +20,7 @@ export const REMOVE_NODE_PROP = 'REMOVE_NODE_PROP';
 export const INSERT_NEW_NODE_LOG_NOTE = 'INSERT_NEW_NODE_LOG_NOTE';
 export const UPDATE_NODE_LOG_NOTE = 'UPDATE_NODE_LOG_NOTE';
 export const REMOVE_NODE_LOG_NOTE = 'REMOVE_NODE_LOG_NOTE';
+export const UPDATE_NODE_BODY = 'UPDATE_NODE_BODY';
 
 /*
  * other constants
@@ -133,4 +134,13 @@ export function updateNodeLogNote(bufferID, nodeID, idx, text) {
 
 export function removeNodeLogNote(bufferID, nodeID, idx) {
   return { type: REMOVE_NODE_LOG_NOTE, bufferID, nodeID, idx };
+}
+
+export function updateNodeBody(bufferID, nodeID, text) {
+  return {
+    type: UPDATE_NODE_BODY,
+    bufferID,
+    nodeID,
+    text
+  };
 }
