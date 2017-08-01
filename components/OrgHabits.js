@@ -27,14 +27,29 @@ const OrgHabits = ({ habits, habitData, onHabitPress }) => (
       <View key={h.id} style={{ flexDirection: 'row' }}>
         <TouchableHighlight
           underlayColor="#00ff00"
-          style={{ flex: 2 }}
+          style={{ flex: 1 }}
           onPress={() => onHabitPress(h.id)}>
           <Text style={{ textAlign: 'right', fontSize: 12 }}>
             {h.headline.content}
           </Text>
         </TouchableHighlight>
-        <Text style={{ flex: 1 }}>
-          {habitData[idx]}
+        <Text
+          style={{
+            flex: 1,
+            fontFamily: 'space-mono',
+            fontSize: 12
+          }}>
+          {habitData[idx].map((c, idx) => {
+            const color = {
+              '-': 'red',
+              b: 'blue',
+              g: 'green',
+              y: 'yellow'
+            }[c];
+            return (
+              <Text key={idx} style={{ backgroundColor: color }}>{c}</Text>
+            );
+          })}
         </Text>
       </View>
     ))}
@@ -66,6 +81,15 @@ const mapStateToProps = state => {
       const past = orgTimestampUtils.sub(now, { days: 14 });
       const fut = orgTimestampUtils.add(now, { days: 7 });
       if (n.logbook) {
+        const scheduled = n.scheduled;
+        const { repInt, repMin, repMax } = scheduled;
+        const repMinVal = parseInt(repMin.substr(0, repMin.length - 1));
+        const repMinU = repMin[repMin.length - 1];
+        const repMaxVal = repMax
+          ? parseInt(repMax.substr(0, repMax.length - 1))
+          : null;
+        const repMaxU = repMax ? repMax[repMax.length - 1] : null;
+
         // don't know why there'd be no logbook if passed previous
         // filter...maybe if completely new habit but not yet logged done
         const logData = n.logbook.entries.filter(
@@ -84,6 +108,8 @@ const mapStateToProps = state => {
         );
 
         let ret = [];
+        let rngMin = 0;
+        let rngMax = 0;
         if (logData.length > 0) {
           for (let i = 0; i < 21; i++) {
             const curr = orgTimestampUtils.add(past, { days: 1 * i });
@@ -96,8 +122,35 @@ const mapStateToProps = state => {
             ) {
               logData.shift();
               ret.push('x');
+
+              rngMin = repMinVal * { d: 1, w: 7 }[repMinU];
+              rngMax = repMaxVal ? repMaxVal * { d: 1, w: 7 }[repMaxU] : 0;
+              if (rngMax > 0) rngMin--;
+            } else if (orgTimestampUtils.compare(now, curr) === 0) {
+              ret.push('!');
             } else {
-              ret.push('-');
+              if (rngMax && rngMax > 0) {
+                if (rngMin > 0) {
+                  ret.push('b');
+                  rngMin--;
+                } else {
+                  if (rngMax === 1) {
+                    ret.push('y');
+                  } else {
+                    ret.push('g');
+                  }
+                }
+                rngMax--;
+              } else if (rngMin > 0) {
+                if (rngMin === 1) {
+                  ret.push('y');
+                } else {
+                  ret.push('b');
+                }
+                rngMin--;
+              } else {
+                ret.push('-');
+              }
             }
           }
         }
