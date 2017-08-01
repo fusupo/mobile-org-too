@@ -41,6 +41,7 @@ export default class OrgLogbook extends Component {
               type={le.type}
               logItem={le}
               onRemoveLogNote={this.props.onRemoveLogNote}
+              onUpdateLogNote={this.props.onUpdateLogNote}
             />
           );
         });
