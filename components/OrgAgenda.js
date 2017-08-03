@@ -1,12 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { Text, ScrollView, StyleSheet, View } from 'react-native';
+import { Text, ScrollView, StyleSheet } from 'react-native';
 
-const orgDrawerUtils = require('org-parse').OrgDrawer;
 const orgTimestampUtils = require('org-parse').OrgTimestamp;
-
-import { completeHabit, resetHabit } from '../actions';
 
 const styles = StyleSheet.create({
   container: {
@@ -52,6 +49,7 @@ const mapStateToProps = state => {
   let agendaYesterday = [];
   let agendaToday = [];
   let agendaTomorrow = [];
+  let candidates;
 
   const nodes = Object.values(state.orgBuffers).reduce(
     (m, v) => m.concat(Object.values(v.orgNodes)),
@@ -116,7 +114,7 @@ const mapStateToProps = state => {
   const tomorrow = orgTimestampUtils.add(today, { days: 1 });
   const dayAfterTomorrow = orgTimestampUtils.add(today, { days: 2 });
 
-  var candidates = filterRange(nodes, yesterday, dayAfterTomorrow);
+  candidates = filterRange(nodes, yesterday, dayAfterTomorrow);
   candidates.sort((a, b) => {
     return orgTimestampUtils.compare(a.scheduled, b.scheduled);
   });
@@ -142,13 +140,7 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => {
-  return {
-    // onHabitPress: nodeID => {
-    //   const nowStr = orgTimestampUtils.serialize(orgTimestampUtils.now());
-    //   dispatch(completeHabit(nodeID, nowStr));
-    //   dispatch(resetHabit(nodeID, nowStr));
-    // }
-  };
+  return {};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrgAgenda);
