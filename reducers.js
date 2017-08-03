@@ -119,7 +119,6 @@ function scheduled(state = null, action) {
             repMin: action.repMin,
             repMax: action.repMax
           });
-          console.log(nextState);
           break;
         case CLEAR_NODE_TIMESTAMP:
           nextState = null;
@@ -324,7 +323,6 @@ function orgNodes(state = {}, action) {
 
 function orgTree(state = {}, action) {
   let nextState, clonedKids;
-  console.log('WHAT THWE FUCK!!!??', action);
   switch (action.type) {
     case ADD_NEW_NODE:
       clonedKids = state.children.slice(0);
@@ -332,7 +330,6 @@ function orgTree(state = {}, action) {
       nextState = Object.assign({}, state, { children: clonedKids });
       break;
     case DELETE_NODE:
-      console.log('orgTree:Delet_Node');
       clonedKids = state.children.slice(0);
       clonedKids = clonedKids.filter(n => n.nodeID !== action.nodeID);
       nextState = Object.assign({}, state, { children: clonedKids });
@@ -350,12 +347,10 @@ function orgBuffers(state = {}, action) {
   nextState = Object.assign({}, state);
   switch (action.type) {
     case 'addOrgBuffer':
-      console.log('addOrgBuffer');
       nextState = Object.assign({}, state);
       nextState[action.path] = action.data;
       break;
     case DELETE_NODE:
-      console.log('orgBuffers:Delet_Node');
       nextState[action.bufferID].orgTree = orgTree(
         nextState[action.bufferID].orgTree,
         action
@@ -431,7 +426,6 @@ function settings(
   },
   action
 ) {
-  console.log('settings');
   let nextState;
   switch (action.type) {
     case 'settings:inboxFile:ok':
@@ -455,7 +449,6 @@ function settings(
 function dbxAccessToken(state = null, action) {
   switch (action.type) {
     case REGISTER_DBX_ACCESS_TOKEN:
-      console.log('eat shit');
       return action.token;
       break;
     default:
