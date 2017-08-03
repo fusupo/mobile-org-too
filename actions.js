@@ -97,8 +97,8 @@ export function clearNodeTimestamp(bufferID, nodeID, timestampType) {
   };
 }
 
-export function addNewNode() {
-  return { type: ADD_NEW_NODE, nodeID: OrgNodeUtil.newNodeID() };
+export function addNewNode(bufferID) {
+  return { type: ADD_NEW_NODE, bufferID, nodeID: OrgNodeUtil.newNodeID() };
 }
 
 export function deleteNode(bufferID, nodeID) {

@@ -18,38 +18,48 @@ const styles = StyleSheet.create({
   }
 });
 
-const CalendarScreen = ({ habits, habitData, onHabitPress }) => (
-  <View style={styles.container}>
-    <ScrollView>
-      <OrgAgenda />
-    </ScrollView>
-    <ScrollView>
-      <OrgHabits />
-    </ScrollView>
-  </View>
-);
+class CalendarScreen extends React.Component {
+  static navigationOptions = () => ({
+    title: 'someshit other shit'
+  });
+  render() {
+    return (
+      <View style={styles.container}>
+        <ScrollView>
+          <OrgAgenda />
+        </ScrollView>
+        <ScrollView>
+          <OrgHabits />
+        </ScrollView>
+      </View>
+    );
+  }
+}
+
+// const CalendarScreen = ({ habits, habitData, onHabitPress }) => (
+// );
 
 ////////////////////////////////////////////////////////////////////////////////
 
 const mapStateToProps = state => {
-  const nodes = Object.values(state.orgBuffers).reduce(
-    (m, v) => m.concat(Object.values(v.orgNodes)),
-    []
-  );
+  // const nodes = Object.values(state.orgBuffers).reduce(
+  //   (m, v) => m.concat(Object.values(v.orgNodes)),
+  //   []
+  // );
 
   return {
-    habits: [],
-    habitData: []
+    // habits: [],
+    // habitData: []
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onHabitPress: nodeID => {
-      const nowStr = orgTimestampUtils.serialize(orgTimestampUtils.now());
-      dispatch(completeHabit(nodeID, nowStr));
-      dispatch(resetHabit(nodeID, nowStr));
-    }
+    // onHabitPress: nodeID => {
+    //   const nowStr = orgTimestampUtils.serialize(orgTimestampUtils.now());
+    //   dispatch(completeHabit(nodeID, nowStr));
+    //   dispatch(resetHabit(nodeID, nowStr));
+    // }
   };
 };
 

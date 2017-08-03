@@ -26,46 +26,46 @@ const TabNav = TabNavigator(
   {
     MainTab: {
       screen: HomeScreen,
-      path: '/',
-      navigationOptions: {
-        title: 'Home',
-        tabBarLabel: 'Home',
-        tabBarIcon: ({ tintColor, focused }) => (
-          <Ionicons
-            name={focused ? 'ios-home' : 'ios-home-outline'}
-            size={26}
-            style={{ color: tintColor }}
-          />
-        )
-      }
+      path: '/'
+      // navigationOptions: {
+      //   title: 'Home',
+      //   tabBarLabel: 'Home',
+      //   tabBarIcon: ({ tintColor, focused }) => (
+      //     <Ionicons
+      //       name={focused ? 'ios-home' : 'ios-home-outline'}
+      //       size={26}
+      //       style={{ color: tintColor }}
+      //     />
+      //   )
+      // }
     },
     AgendaTab: {
       screen: CalendarScreen,
-      path: '/agenda',
-      navigationOptions: {
-        title: 'Agenda',
-        tabBarIcon: ({ tintColor, focused }) => (
-          <Ionicons
-            name={focused ? 'ios-calendar' : 'ios-calendar-outline'}
-            size={26}
-            style={{ color: tintColor }}
-          />
-        )
-      }
+      path: '/agenda'
+      // navigationOptions: {
+      //   title: 'Agenda',
+      //   tabBarIcon: ({ tintColor, focused }) => (
+      //     <Ionicons
+      //       name={focused ? 'ios-calendar' : 'ios-calendar-outline'}
+      //       size={26}
+      //       style={{ color: tintColor }}
+      //     />
+      //   )
+      // }
     },
     SettingsTab: {
       screen: SettingsScreen,
-      path: '/settings',
-      navigationOptions: {
-        title: 'Settings',
-        tabBarIcon: ({ tintColor, focused }) => (
-          <Ionicons
-            name={focused ? 'ios-settings' : 'ios-settings-outline'}
-            size={26}
-            style={{ color: tintColor }}
-          />
-        )
-      }
+      path: '/settings'
+      // navigationOptions: {
+      //   title: 'Settings',
+      //   tabBarIcon: ({ tintColor, focused }) => (
+      //     <Ionicons
+      //       name={focused ? 'ios-settings' : 'ios-settings-outline'}
+      //       size={26}
+      //       style={{ color: tintColor }}
+      //     />
+      //   )
+      // }
     }
   },
   {
@@ -76,21 +76,8 @@ const TabNav = TabNavigator(
   }
 );
 
-//export default TabNav;
-
 class AppWithState extends React.Component {
-  // state = {
-  //   buffersLoaded: false,
-  //   inboxFileIsOk: false
-  // };
-
-  // componentDidMount() {
-  //   // console.log(this.props.navigation.navigate('/settings'));
-  //   // this.props.initApp();
-  // }
-
   render() {
-    console.log('inbox:  ', this.props.inboxFileOk);
     if (this.props.inboxFileOk) {
       return <TabNav />;
     } else {
@@ -101,21 +88,10 @@ class AppWithState extends React.Component {
 
 const mapStateToProps = state => ({
   inboxFileOk: state.settings.inboxFile.isOk
-  // buffers: state.orgBuffers,
-  // settings: state.settings
 });
 
 const mapDispatchToProps = dispatch => {
-  return {
-    // initApp: () => {
-    //   console.log('initApp');
-    //   dispatch(
-    //     NavigationActions.navigate({
-    //       routeName: 'SettingsTab'
-    //     })
-    //   );
-    // }
-  };
+  return {};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppWithState);

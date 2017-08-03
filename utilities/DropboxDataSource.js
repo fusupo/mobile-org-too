@@ -7,9 +7,6 @@ import { gitHubAccessToken } from '../secrets';
 export default class DropboxDataSource {
   constructor(config = {}) {
     this.dbx = new Dropbox(config);
-    // {
-    //   accessToken: gitHubAccessToken
-    // }
   }
 
   loadParseOrgFilesAsync(filePath) {

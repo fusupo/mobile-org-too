@@ -292,9 +292,9 @@ function orgNodes(state = {}, action) {
       nextState = Object.assign({}, state);
       delete nextState[action.nodeID];
       break;
+    case ADD_NEW_NODE:
     case COMPLETE_HABIT:
     case RESET_HABIT:
-    case ADD_NEW_NODE:
     case CYCLE_NODE_COLLAPSE:
     case UPDATE_NODE_TODO_KEYWORD:
     case UPDATE_NODE_HEADLINE_CONTENT:
@@ -381,6 +381,16 @@ function orgBuffers(state = {}, action) {
         action
       );
       break;
+    case ADD_NEW_NODE:
+      nextState[action.bufferID].orgNodes = orgNodes(
+        nextState[action.bufferID].orgNodes,
+        action
+      );
+      nextState[action.bufferID].orgTree = orgTree(
+        nextState[action.bufferID].orgTree,
+        action
+      );
+      break;
   }
   return nextState || state;
 }
@@ -394,13 +404,12 @@ function nav(state, action) {
       nextState = StacksOverTabs.router.getStateForAction(
         NavigationActions.navigate({
           routeName: 'NewNode',
-          params: { nodeID: action.nodeID }
+          params: { bufferID: action.bufferID, nodeID: action.nodeID }
         }),
         state
       );
       break;
     case DELETE_NODE:
-      console.log('nav:Delet_Node');
       nextState = StacksOverTabs.router.getStateForAction(
         NavigationActions.back(),
         state

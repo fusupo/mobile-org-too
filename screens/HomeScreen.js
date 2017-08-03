@@ -2,9 +2,9 @@ import Expo from 'expo';
 import React from 'react';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
-import { WebView, View, ScrollView } from 'react-native';
+import { Button, View, ScrollView } from 'react-native';
 
-import { registerDbxAccessToken } from '../actions';
+import { registerDbxAccessToken, addNewNode } from '../actions';
 
 import OrgBuffer from '../components/OrgBuffer';
 import DropboxDataSource from '../utilities/DropboxDataSource';
@@ -17,6 +17,10 @@ class HomeScreen extends React.Component {
     inboxFileIsOk: false
   };
 
+  static navigationOptions = () => ({
+    title: 'someshit'
+  });
+
   componentWillMount() {
     this.props.loadInboxFile();
   }
@@ -27,17 +31,16 @@ class HomeScreen extends React.Component {
 
   render() {
     let ui = null;
-
-    console.log(this.state);
-    console.log(
-      '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1'
-    );
-
     if (Object.entries(this.props.buffers).length > 0) {
-      console.log('show the ui');
       const list = Object.entries(this.props.buffers).map(e => (
         <View key={e[0]}>
           <OrgBuffer bufferID={e[0]} />
+          <Button
+            title={'add One'}
+            onPress={() => {
+              this.props.onAddOne(e[0]);
+            }}
+          />
         </View>
       ));
       return (
@@ -69,16 +72,16 @@ const mapDispatchToProps = dispatch => {
       dispatch(loadInboxFile());
     },
     onReceiveDbxAccessToken: token => {
-      console.log('onReceiveDbxAccessToken', token);
       dispatch(registerDbxAccessToken(token));
+    },
+    onAddOne: bufferID => {
+      dispatch(addNewNode(bufferID));
     }
   };
 };
 
-///// duplicated in settingscreen.js
 function loadInboxFile() {
   return async (dispatch, getState) => {
-    console.log('LOAD INBOX FILE');
     const foo = await loadParseOrgFilesAsync(
       getState().settings.inboxFile.path,
       getState().dbxAccessToken
@@ -94,9 +97,7 @@ function loadInboxFile() {
 async function loadParseOrgFilesAsync(filePath, token) {
   const ds = new DropboxDataSource({ accessToken: token });
   try {
-    console.log(filePath);
     let foo = await ds.loadParseOrgFilesAsync(filePath);
-    console.log('loadparse success:');
     return foo;
   } catch (e) {
     console.warn(
