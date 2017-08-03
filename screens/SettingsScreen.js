@@ -132,19 +132,16 @@ const mapDispatchToProps = dispatch => {
     tryUpdateInboxFile: path => {
       dispatch(someActionToo(path));
     }
-    // initDropboxFileList: () => {
-    //   dispatch(someAction(''));
-    // },
-    // toggleDropboxFolderExpand: path => {
-    //   dispatch(someAction(path));
-    // }
   };
 };
 
 function someActionToo(path) {
   return (dispatch, getState) => {
-    const ds = new DropboxDataSource();
+    const ds = new DropboxDataSource({
+      accessToken: getState().dbxAccessToken
+    });
     const success = (path, res) => {
+      console.log('success');
       dispatch({
         type: 'settings:inboxFile:ok',
         path: path,
@@ -153,6 +150,7 @@ function someActionToo(path) {
       dispatch(someActionThree());
     };
     const err = path => {
+      console.log('err');
       dispatch({
         type: 'settings:inboxFile:error',
         path: path,
@@ -179,7 +177,7 @@ function someActionThree() {
         '@mobile-org-too:settings',
         JSON.stringify(getState().settings)
       );
-      dispatch(loadInboxFile());
+      //dispatch(loadInboxFile());
     } catch (error) {
       console.log('err saving data:', error);
       // Error saving data
@@ -187,37 +185,37 @@ function someActionThree() {
   };
 }
 ///// duplicated in homescreen.js
-function loadInboxFile() {
-  return async (dispatch, getState) => {
-    console.log('LOAD INBOX FILE');
-    console.log(getState().settings.inboxFile.path);
-    const foo = await loadParseOrgFilesAsync(
-      getState().settings.inboxFile.path
-    );
-    console.log(foo);
-    dispatch({
-      type: 'addOrgBuffer',
-      path: getState().settings.inboxFile.path,
-      data: foo
-    });
-  };
-}
+// function loadInboxFile() {
+//   return async (dispatch, getState) => {
+//     console.log('LOAD INBOX FILE');
+//     console.log(getState().settings.inboxFile.path);
+//     const foo = await loadParseOrgFilesAsync(
+//       getState().settings.inboxFile.path
+//     );
+//     console.log(foo);
+//     dispatch({
+//       type: 'addOrgBuffer',
+//       path: getState().settings.inboxFile.path,
+//       data: foo
+//     });
+//   };
+// }
 
-async function loadParseOrgFilesAsync(filePath) {
-  const ds = new DropboxDataSource();
-  try {
-    console.log(filePath);
-    let foo = await ds.loadParseOrgFilesAsync(filePath);
-    console.log('loadparse success:');
-    return foo;
-  } catch (e) {
-    console.warn(
-      'There was an error retrieving files from drobbox on the home screen '
-    );
-    console.log(e);
-    return null;
-    throw e;
-  }
-}
+// async function loadParseOrgFilesAsync(filePath) {
+//   const ds = new DropboxDataSource();
+//   try {
+//     console.log(filePath);
+//     let foo = await ds.loadParseOrgFilesAsync(filePath);
+//     console.log('loadparse success:');
+//     return foo;
+//   } catch (e) {
+//     console.warn(
+//       'There was an error retrieving files from drobbox on the home screen '
+//     );
+//     console.log(e);
+//     return null;
+//     throw e;
+//   }
+// }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen);

@@ -1,6 +1,7 @@
 import React from 'react';
+import { NavigationActions } from 'react-navigation';
+import { connect } from 'react-redux';
 import { StyleSheet, View } from 'react-native';
-import { Notifications } from 'expo';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../constants/Colors';
@@ -75,68 +76,46 @@ const TabNav = TabNavigator(
   }
 );
 
-export default TabNav;
+//export default TabNav;
 
-// export default class RootNavigation extends React.Component {
-//   componentDidMount() {
-//     this._notificationSubscription = this._registerForPushNotifications();
-//   }
+class AppWithState extends React.Component {
+  // state = {
+  //   buffersLoaded: false,
+  //   inboxFileIsOk: false
+  // };
 
-//   componentWillUnmount() {
-//     this._notificationSubscription && this._notificationSubscription.remove();
-//   }
+  // componentDidMount() {
+  //   // console.log(this.props.navigation.navigate('/settings'));
+  //   // this.props.initApp();
+  // }
 
-//   render() {
-//     return (
-//       <TabNavigation tabBarHeight={56} initialTab="home">
-//         <TabNavigationItem
-//           id="home"
-//           renderIcon={isSelected => this._renderIcon('database', isSelected)}>
-//           <StackNavigation initialRoute="home" />
-//         </TabNavigationItem>
+  render() {
+    console.log('inbox:  ', this.props.inboxFileOk);
+    if (this.props.inboxFileOk) {
+      return <TabNav />;
+    } else {
+      return <SettingsScreen />;
+    }
+  }
+}
 
-//         <TabNavigationItem
-//           id="calendar"
-//           renderIcon={isSelected => this._renderIcon('calendar', isSelected)}>
-//           <StackNavigation initialRoute="calendar" />
-//         </TabNavigationItem>
+const mapStateToProps = state => ({
+  inboxFileOk: state.settings.inboxFile.isOk
+  // buffers: state.orgBuffers,
+  // settings: state.settings
+});
 
-//         <TabNavigationItem
-//           id="settings"
-//           renderIcon={isSelected => this._renderIcon('cog', isSelected)}>
-//           <StackNavigation initialRoute="settings" />
-//         </TabNavigationItem>
-//       </TabNavigation>
-//     );
-//   }
+const mapDispatchToProps = dispatch => {
+  return {
+    // initApp: () => {
+    //   console.log('initApp');
+    //   dispatch(
+    //     NavigationActions.navigate({
+    //       routeName: 'SettingsTab'
+    //     })
+    //   );
+    // }
+  };
+};
 
-//   _renderIcon(name, isSelected) {
-//     return (
-//       <FontAwesome
-//         name={name}
-//         size={32}
-//         color={isSelected ? Colors.tabIconSelected : Colors.tabIconDefault}
-//       />
-//     );
-//   }
-
-//   _registerForPushNotifications() {
-//     // Send our push token over to our backend so we can receive notifications
-//     // You can comment the following line out if you want to stop receiving
-//     // a notification every time you open the app. Check out the source
-//     // for this function in api/registerForPushNotificationsAsync.js
-//     registerForPushNotificationsAsync();
-
-//     // Watch for incoming notifications
-//     this._notificationSubscription = Notifications.addListener(
-//       this._handleNotification
-//     );
-//   }
-
-//   _handleNotification = ({ origin, data }) => {
-//     this.props.navigator.showLocalAlert(
-//       `Push notification ${origin} with data: ${JSON.stringify(data)}`,
-//       Alerts.notice
-//     );
-//   };
-// }
+export default connect(mapStateToProps, mapDispatchToProps)(AppWithState);

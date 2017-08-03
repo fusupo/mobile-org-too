@@ -1,54 +1,57 @@
+import Expo from 'expo';
 import React from 'react';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
-import { View, ScrollView, Text } from 'react-native';
+import { WebView, View, ScrollView } from 'react-native';
+
+import { registerDbxAccessToken } from '../actions';
 
 import OrgBuffer from '../components/OrgBuffer';
 import DropboxDataSource from '../utilities/DropboxDataSource';
 
+let count = 0;
+
 class HomeScreen extends React.Component {
+  state = {
+    buffersLoaded: false,
+    inboxFileIsOk: false
+  };
+
+  componentWillMount() {
+    this.props.loadInboxFile();
+  }
+
+  componentDidMount() {
+    // this.props.initApp();
+  }
+
   render() {
-    let ui;
-    if (Object.entries(this.props.buffers).length === 0) {
-      if (this.props.settings.inboxFile.isOk === true) {
-        console.log('load the inboxfile');
-        this.props.loadInboxFile();
-      } else {
-        this.props.initApp();
-      }
-      ui = (
-        <ScrollView>
-          <OrgBuffer />
-        </ScrollView>
-      );
-    } else {
+    let ui = null;
+
+    console.log(this.state);
+    console.log(
+      '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1'
+    );
+
+    if (Object.entries(this.props.buffers).length > 0) {
       console.log('show the ui');
       const list = Object.entries(this.props.buffers).map(e => (
         <View key={e[0]}>
           <OrgBuffer bufferID={e[0]} />
         </View>
       ));
-      ui = (
+      return (
         <ScrollView>
           {list}
         </ScrollView>
       );
+    } else {
+      return <Expo.AppLoading />;
     }
-    // if (this.state.viewIsReady) {
-    // orgTree={this.state.orgTree}
-    // navigation={this.props.screenProps.navigation}
-
-    //
-    return ui;
-    // } else {
-    //   return <View />;
-    // }
   }
 }
 
 const mapStateToProps = state => ({
-  // nodes: state.orgNodes,
-  // tree: state.orgTree,
   buffers: state.orgBuffers,
   settings: state.settings
 });
@@ -56,7 +59,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => {
   return {
     initApp: () => {
-      // dispatch(someAction());
       dispatch(
         NavigationActions.navigate({
           routeName: 'SettingsTab'
@@ -65,34 +67,21 @@ const mapDispatchToProps = dispatch => {
     },
     loadInboxFile: () => {
       dispatch(loadInboxFile());
+    },
+    onReceiveDbxAccessToken: token => {
+      console.log('onReceiveDbxAccessToken', token);
+      dispatch(registerDbxAccessToken(token));
     }
   };
 };
-
-function someAction() {
-  return (dispatch, getState) => {
-    const state = getState(); // get state from store here,
-    if (
-      state.settings.inboxFile &&
-      state.settings.inboxFile.isOK === false
-      //   ||
-      // state.settings.orgFiles.length === 0
-    ) {
-      dispatch(
-        NavigationActions.navigate({
-          routeName: 'SettingsTab'
-        })
-      );
-    }
-  };
-}
 
 ///// duplicated in settingscreen.js
 function loadInboxFile() {
   return async (dispatch, getState) => {
     console.log('LOAD INBOX FILE');
     const foo = await loadParseOrgFilesAsync(
-      getState().settings.inboxFile.path
+      getState().settings.inboxFile.path,
+      getState().dbxAccessToken
     );
     dispatch({
       type: 'addOrgBuffer',
@@ -102,8 +91,8 @@ function loadInboxFile() {
   };
 }
 
-async function loadParseOrgFilesAsync(filePath) {
-  const ds = new DropboxDataSource();
+async function loadParseOrgFilesAsync(filePath, token) {
+  const ds = new DropboxDataSource({ accessToken: token });
   try {
     console.log(filePath);
     let foo = await ds.loadParseOrgFilesAsync(filePath);

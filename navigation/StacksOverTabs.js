@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { addNavigationHelpers, StackNavigator } from 'react-navigation';
 
 import NodeDetailScreen from '../screens/NodeDetailScreen';
-import RootScreen from '../screens/RootScreen';
 import RootNav from '../navigation/RootNavigation';
 
 export const StacksOverTabs = StackNavigator({

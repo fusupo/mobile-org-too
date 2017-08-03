@@ -1,6 +1,6 @@
 import Expo from 'expo';
 import React from 'react';
-import { StyleSheet, AsyncStorage } from 'react-native';
+import { WebView, StyleSheet, AsyncStorage } from 'react-native';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 
 import { createStore, applyMiddleware } from 'redux';
@@ -11,6 +11,8 @@ import DropboxDataSource from './utilities/DropboxDataSource.js';
 import mobileOrgTooApp from './reducers';
 
 import StacksOverTabs from './navigation/StacksOverTabs';
+
+import { registerDbxAccessToken } from './actions';
 
 let store, settings;
 
@@ -25,9 +27,55 @@ const styles = StyleSheet.create({
   }
 });
 
+const Dropbox = require('dropbox');
+const parseQueryString = str => {
+  var ret = Object.create(null);
+
+  if (typeof str !== 'string') {
+    return ret;
+  }
+
+  str = str.trim().replace(/^(\?|#|&)/, '');
+
+  if (!str) {
+    return ret;
+  }
+
+  str.split('&').forEach(function(param) {
+    var parts = param.replace(/\+/g, ' ').split('=');
+    // Firefox (pre 40) decodes `%3D` to `=`
+    // https://github.com/sindresorhus/query-string/pull/37
+    var key = parts.shift();
+    var val = parts.length > 0 ? parts.join('=') : undefined;
+
+    key = decodeURIComponent(key);
+
+    // missing `=` should be `null`:
+    // http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+    val = val === undefined ? null : decodeURIComponent(val);
+
+    if (ret[key] === undefined) {
+      ret[key] = val;
+    } else if (Array.isArray(ret[key])) {
+      ret[key].push(val);
+    } else {
+      ret[key] = [ret[key], val];
+    }
+  });
+
+  return ret;
+};
+
+const CLIENT_ID = 'yf56u5iln5btig2';
+const dbx = new Dropbox({ clientId: CLIENT_ID });
+const authUrl = dbx.getAuthenticationUrl('https://google.com');
+let count = 0;
+let unsub;
+
 class AppContainer extends React.Component {
   state = {
-    appIsReady: false
+    appIsReady: false,
+    userIsLoggedIn: false
   };
 
   componentWillMount() {
@@ -97,11 +145,54 @@ class AppContainer extends React.Component {
 
   render() {
     if (this.state.appIsReady) {
-      return (
-        <Provider store={store}>
-          <StacksOverTabs />
-        </Provider>
-      );
+      const state = store.getState();
+
+      console.log('------------------------------------------');
+      console.log(state);
+      console.log(state.dbxAccessToken);
+      console.log(state.dbxAccessToken === null);
+      console.log(authUrl);
+
+      console.log(count === 0 && state.dbxAccessToken === null);
+
+      if (!this.state.userIsLoggedIn) {
+        count++;
+        console.log('-------------------------------------------');
+        /// AUTH
+        return (
+          <WebView
+            source={{ uri: authUrl }}
+            style={{ marginTop: 20 }}
+            onNavigationStateChange={(e => {
+              const url = e.url;
+              const idx = url.indexOf('access_token');
+              if (idx > 0) {
+                const token = parseQueryString(url.substr(idx)).access_token;
+                console.log('WHAT THE DUCK?????');
+                // console.log('login:', token);
+                console.log('----------------------------------');
+                //this.props.onReceiveDbxAccessToken(token);
+                unsub = store.subscribe(() => {
+                  const st = store.getState();
+                  if (st.dbxAccessToken !== null) {
+                    unsub();
+                    this.setState({ userIsLoggedIn: true });
+                  }
+                });
+                store.dispatch(registerDbxAccessToken(token));
+                console.log('----------------------------------');
+              }
+            }).bind(this)}
+          />
+        );
+        //// END AUTH
+      } else if (this.state.userIsLoggedIn) {
+        return (
+          <Provider store={store}>
+            <StacksOverTabs />
+          </Provider>
+        );
+      }
     } else {
       return <Expo.AppLoading />;
     }

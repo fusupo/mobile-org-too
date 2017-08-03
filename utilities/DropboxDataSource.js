@@ -5,10 +5,11 @@ const Dropbox = require('dropbox');
 import { gitHubAccessToken } from '../secrets';
 
 export default class DropboxDataSource {
-  constructor() {
-    this.dbx = new Dropbox({
-      accessToken: gitHubAccessToken
-    });
+  constructor(config = {}) {
+    this.dbx = new Dropbox(config);
+    // {
+    //   accessToken: gitHubAccessToken
+    // }
   }
 
   loadParseOrgFilesAsync(filePath) {

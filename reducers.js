@@ -4,6 +4,7 @@ import { NavigationActions } from 'react-navigation';
 import { StacksOverTabs } from './navigation/StacksOverTabs';
 
 import {
+  REGISTER_DBX_ACCESS_TOKEN,
   COMPLETE_HABIT,
   RESET_HABIT,
   DELETE_NODE,
@@ -440,12 +441,27 @@ function settings(
   return res;
 }
 
+///////////////////////////////////////////////////////////////  DBX ACCESS TOKEN
+
+function dbxAccessToken(state = null, action) {
+  switch (action.type) {
+    case REGISTER_DBX_ACCESS_TOKEN:
+      console.log('eat shit');
+      return action.token;
+      break;
+    default:
+      return state;
+      break;
+  }
+}
+
 /////////////////////////////////////////////////////////////////  MOBILE ORG TOO
 
 const mobileOrgTooApp = combineReducers({
   orgBuffers,
   nav,
-  settings
+  settings,
+  dbxAccessToken
 });
 
 export default mobileOrgTooApp;

@@ -4,6 +4,7 @@ const OrgNodeUtil = require('org-parse').OrgNode;
  * action types
  */
 
+export const REGISTER_DBX_ACCESS_TOKEN = 'REGISTER_DBX_ACCESS_TOKEN';
 export const CYCLE_NODE_COLLAPSE = 'CYCLE_NODE_COLLAPSE';
 export const UPDATE_NODE_TODO_KEYWORD = 'UPDATE_NODE_TODO_KEYWORD';
 export const UPDATE_NODE_HEADLINE_CONTENT = 'UPDATE_NODE_HEADLINE_CONTENT';
@@ -35,6 +36,11 @@ export const UPDATE_NODE_BODY = 'UPDATE_NODE_BODY';
 /*
  * action creators
  */
+
+export function registerDbxAccessToken(token) {
+  console.log('registerDbxAccessToken');
+  return { type: REGISTER_DBX_ACCESS_TOKEN, token };
+}
 
 export function cycleNodeCollapse(bufferID, nodeID) {
   return { type: CYCLE_NODE_COLLAPSE, bufferID, nodeID };
@@ -90,6 +96,7 @@ export function clearNodeTimestamp(bufferID, nodeID, timestampType) {
     timestampType
   };
 }
+
 export function addNewNode() {
   return { type: ADD_NEW_NODE, nodeID: OrgNodeUtil.newNodeID() };
 }
