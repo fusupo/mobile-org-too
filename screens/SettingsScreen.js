@@ -91,7 +91,7 @@ class FileNameInputList extends React.Component {
 
 class SettingsScreen extends React.Component {
   static navigationOptions = () => ({
-    title: 'calendar'
+    title: 'settings'
   });
 
   render() {
