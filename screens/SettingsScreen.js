@@ -90,11 +90,9 @@ class FileNameInputList extends React.Component {
 }
 
 class SettingsScreen extends React.Component {
-  static route = {
-    navigationBar: {
-      title: 'exp.json'
-    }
-  };
+  static navigationOptions = () => ({
+    title: 'calendar'
+  });
 
   render() {
     return (

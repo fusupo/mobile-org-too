@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
 
 class CalendarScreen extends React.Component {
   static navigationOptions = () => ({
-    title: 'someshit other shit'
+    title: 'calendar'
   });
   render() {
     return (

@@ -18,7 +18,7 @@ class HomeScreen extends React.Component {
   };
 
   static navigationOptions = () => ({
-    title: 'someshit'
+    title: 'home'
   });
 
   componentWillMount() {
