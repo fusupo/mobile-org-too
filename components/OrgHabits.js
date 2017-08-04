@@ -81,6 +81,10 @@ const mapStateToProps = state => {
       const past = orgTimestampUtils.sub(now, { days: 14 });
       const fut = orgTimestampUtils.add(now, { days: 7 });
       if (n.logbook) {
+        // don't know why there'd be no logbook if passed previous
+        // filter...maybe if completely new habit but not yet logged done in
+        // other words this needs to be caught much earlier...i.e. around the
+        // time the orgfile is parsed to begin with
         const scheduled = n.scheduled;
         const { repInt, repMin, repMax } = scheduled;
         const repMinVal = parseInt(repMin.substr(0, repMin.length - 1));
@@ -90,8 +94,6 @@ const mapStateToProps = state => {
           : null;
         const repMaxU = repMax ? repMax[repMax.length - 1] : null;
 
-        // don't know why there'd be no logbook if passed previous
-        // filter...maybe if completely new habit but not yet logged done
         const logData = n.logbook.entries.filter(
           le =>
             le.type === 'state' &&
@@ -99,8 +101,6 @@ const mapStateToProps = state => {
             le.from === '"TODO"' &&
             orgTimestampUtils.compare(le.timestamp, past) > 0 &&
             orgTimestampUtils.compare(le.timestamp, fut) < 0
-          // don't know why there'd be no logbook if passed previous filter...maybe
-          // if completely new habit but not yet logged done
         );
 
         logData = logData.sort((a, b) =>

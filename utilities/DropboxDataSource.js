@@ -60,7 +60,7 @@ export default class DropboxDataSource {
     });
   }
 
-  serialize(nodes, tree) {
+  serializeAndUpload(nodes, tree) {
     return new Promise((resolve, reject) => {
       this.dbx
         .filesUpload({

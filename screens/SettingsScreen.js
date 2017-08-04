@@ -12,6 +12,7 @@ import {
   AsyncStorage
 } from 'react-native';
 
+import { doCloudUpload } from '../main';
 import DropboxDataSource from '../utilities/DropboxDataSource';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -95,12 +96,6 @@ class SettingsScreen extends React.Component {
     }
   };
 
-  // componentDidMount = () => {
-  //   if (this.props.allFiles === null) {
-  //     this.props.initDropboxFileList();
-  //   }
-  // };
-
   render() {
     return (
       <View>
@@ -115,6 +110,7 @@ class SettingsScreen extends React.Component {
           onEndEditing={this.props.tryUpdateInboxFile}
         />
         <FileNameInputList files={this.props.orgFiles} />
+        <Button title={'sync w/ dropbox'} onPress={this.props.onSync} />
       </View>
     );
   }
@@ -131,6 +127,9 @@ const mapDispatchToProps = dispatch => {
   return {
     tryUpdateInboxFile: path => {
       dispatch(someActionToo(path));
+    },
+    onSync: () => {
+      dispatch(doCloudUpload());
     }
   };
 };
@@ -184,38 +183,5 @@ function someActionThree() {
     }
   };
 }
-///// duplicated in homescreen.js
-// function loadInboxFile() {
-//   return async (dispatch, getState) => {
-//     console.log('LOAD INBOX FILE');
-//     console.log(getState().settings.inboxFile.path);
-//     const foo = await loadParseOrgFilesAsync(
-//       getState().settings.inboxFile.path
-//     );
-//     console.log(foo);
-//     dispatch({
-//       type: 'addOrgBuffer',
-//       path: getState().settings.inboxFile.path,
-//       data: foo
-//     });
-//   };
-// }
-
-// async function loadParseOrgFilesAsync(filePath) {
-//   const ds = new DropboxDataSource();
-//   try {
-//     console.log(filePath);
-//     let foo = await ds.loadParseOrgFilesAsync(filePath);
-//     console.log('loadparse success:');
-//     return foo;
-//   } catch (e) {
-//     console.warn(
-//       'There was an error retrieving files from drobbox on the home screen '
-//     );
-//     console.log(e);
-//     return null;
-//     throw e;
-//   }
-// }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen);

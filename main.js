@@ -204,10 +204,13 @@ Expo.registerRootComponent(AppContainer);
 //
 export function doCloudUpload() {
   return dispatch => {
-    const ds = new DropboxDataSource();
     const state = store.getState();
+    const ds = new DropboxDataSource({ accessToken: state.dbxAccessToken });
     try {
-      let foo = ds.serialize(state.orgNodes, state.orgTree);
+      const firstBufferKey = Object.keys(state.orgBuffers)[0];
+      const orgNodes = state.orgBuffers[firstBufferKey].orgNodes;
+      const orgTree = state.orgBuffers[firstBufferKey].orgTree;
+      let foo = ds.serializeAndUpload(orgNodes, orgTree);
       console.log(foo);
     } catch (e) {
       console.warn(
