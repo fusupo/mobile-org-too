@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   }
 });
 
-class EditOrgHeadline extends Component {
+class OrgHeadlineEditable extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -74,4 +74,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(EditOrgHeadline);
+export default connect(mapStateToProps, mapDispatchToProps)(
+  OrgHeadlineEditable
+);

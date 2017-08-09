@@ -31,7 +31,7 @@ import {
 
 import { OrgTree } from '../components/OrgTree';
 
-import EditOrgHeadline from '../components/EditOrgHeadline';
+import OrgHeadlineEditable from '../components/OrgHeadlineEditable';
 import OrgTimestamp from '../components/OrgTimestamp';
 import OrgDrawer from '../components/OrgDrawer';
 import OrgLogbook from '../components/OrgLogbook';
@@ -110,7 +110,7 @@ const NodeDetailScreen = ({
         <View style={styles.container}>
           <ScrollView style={styles.container}>
             <View style={[styles.container, styles.border]}>
-              <EditOrgHeadline
+              <OrgHeadlineEditable
                 headline={node.headline}
                 onEndEditing={onHeadlineEndEditing(bufferID, nodeID)}
                 onNodeTodoKeywordUpdate={onNodeTodoKeywordUpdate(
