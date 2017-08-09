@@ -121,8 +121,6 @@ class AppContainer extends React.Component {
     try {
       const value = await AsyncStorage.getItem('@mobile-org-too:settings');
       if (value !== null) {
-        // We have data!!
-        console.log(value);
         settings = JSON.parse(value);
       } else {
         console.log('no value');
@@ -132,32 +130,13 @@ class AppContainer extends React.Component {
       // Error retrieving data
       console.warn('error loading settings from AsyncStorage');
     }
-
-    // try {
-    //   console.log('remove');
-    //   const value = await AsyncStorage.removeItem('@mobile-org-too:settings');
-    //   console.log('removed?');
-    // } catch (error) {
-    //   // Error retrieving data
-    //   console.warn('error removing settings from AsyncStorage');
-    // }
   }
 
   render() {
     if (this.state.appIsReady) {
       const state = store.getState();
-
-      console.log('------------------------------------------');
-      console.log(state);
-      console.log(state.dbxAccessToken);
-      console.log(state.dbxAccessToken === null);
-      console.log(authUrl);
-
-      console.log(count === 0 && state.dbxAccessToken === null);
-
       if (!this.state.userIsLoggedIn) {
         count++;
-        console.log('-------------------------------------------');
         /// AUTH
         return (
           <WebView
@@ -168,10 +147,6 @@ class AppContainer extends React.Component {
               const idx = url.indexOf('access_token');
               if (idx > 0) {
                 const token = parseQueryString(url.substr(idx)).access_token;
-                console.log('WHAT THE DUCK?????');
-                // console.log('login:', token);
-                console.log('----------------------------------');
-                //this.props.onReceiveDbxAccessToken(token);
                 unsub = store.subscribe(() => {
                   const st = store.getState();
                   if (st.dbxAccessToken !== null) {
@@ -180,7 +155,6 @@ class AppContainer extends React.Component {
                   }
                 });
                 store.dispatch(registerDbxAccessToken(token));
-                console.log('----------------------------------');
               }
             }).bind(this)}
           />
@@ -211,7 +185,6 @@ export function doCloudUpload() {
       const orgNodes = state.orgBuffers[firstBufferKey].orgNodes;
       const orgTree = state.orgBuffers[firstBufferKey].orgTree;
       let foo = ds.serializeAndUpload(orgNodes, orgTree);
-      console.log(foo);
     } catch (e) {
       console.warn(
         'There was an error serializing and/or uploading files to drobbox on the home screen'
