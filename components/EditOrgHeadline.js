@@ -1,15 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {
-  TouchableHighlight,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  ActionSheetIOS
-} from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 
-const orgHeadlineUtil = require('org-parse').OrgHeadline;
+import OrgTodoKeywordEditable from './OrgTodoKeywordEditable';
 
 const styles = StyleSheet.create({
   txt: {
@@ -28,52 +21,12 @@ const styles = StyleSheet.create({
 class EditOrgHeadline extends Component {
   constructor(props) {
     super(props);
-    let keywords = orgHeadlineUtil.keywords().slice(0);
-    keywords.push('none');
     this.state = {
-      content: props.headline.content,
-      keywords
+      content: props.headline.content
     };
   }
 
   render() {
-    const todoKeywordStr = this.props.headline.todoKeyword;
-    // todo keyword
-    const todoKeyword = todoKeywordStr
-      ? <TouchableHighlight
-          onPress={() => {
-            ActionSheetIOS.showActionSheetWithOptions(
-              {
-                options: this.state.keywords
-              },
-              idx => {
-                this.props.onNodeTodoKeywordUpdate(this.state.keywords[idx]);
-              }
-            );
-          }}>
-          <Text
-            style={{
-              backgroundColor: orgHeadlineUtil.colorForKeyword(todoKeywordStr)
-            }}>
-            {this.props.headline.todoKeyword}
-          </Text>
-        </TouchableHighlight>
-      : <TouchableHighlight
-          onPress={() => {
-            ActionSheetIOS.showActionSheetWithOptions(
-              {
-                options: this.state.keywords
-              },
-              idx => {
-                this.props.onNodeTodoKeywordUpdate(this.state.keywords[idx]);
-              }
-            );
-          }}>
-          <Text style={{}}>
-            {'none'}
-          </Text>
-        </TouchableHighlight>;
-
     // tags
     const tags = this.props.headline.tags && this.props.headline.tags.length > 0
       ? this.props.headline.tags.map((tag, idx) => {
@@ -95,7 +48,10 @@ class EditOrgHeadline extends Component {
 
     return (
       <View style={{ flex: 1, flexDirection: 'row' }}>
-        {todoKeyword}
+        <OrgTodoKeywordEditable
+          onNodeTodoKeywordUpdate={this.props.onNodeTodoKeywordUpdate}
+          headline={this.props.headline}
+        />
         <TextInput
           style={{ flex: 1, height: 40, borderColor: 'gray', borderWidth: 1 }}
           value={this.state.content}
@@ -115,11 +71,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    // onNodeTodoKeywordUpdate: todoKeyword => {
-    //   console.log('update node todo keyword:', todoKeyword);
-    // }
-  };
+  return {};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditOrgHeadline);
