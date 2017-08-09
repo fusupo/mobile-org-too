@@ -71,6 +71,7 @@ const NodeDetailScreen = ({
   const params = navigation.state.params;
   if (params && params.bufferID && params.nodeID) {
     const { bufferID, nodeID } = params;
+    console.log(bufferID);
     const nodes = buffers[bufferID].orgNodes;
     const tree = buffers[bufferID].orgTree;
     const node = nodes[nodeID];
@@ -92,6 +93,7 @@ const NodeDetailScreen = ({
         ? null
         : childIDs.map((cn, idx) => (
             <OrgTree
+              bufferID={bufferID}
               key={cn.nodeID}
               nodes={nodes}
               tree={OrgTreeUtil.findBranch(tree, cn.nodeID)}

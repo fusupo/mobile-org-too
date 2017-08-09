@@ -2,8 +2,9 @@ import React from 'react';
 import { StyleSheet, Text, View, TouchableHighlight } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
+import OrgTodoKeywordEditable from './OrgTodoKeywordEditable';
+
 const OrgDrawerUtil = require('org-parse').OrgDrawer;
-const orgHeadlineUtil = require('org-parse').OrgHeadline;
 
 const styles = StyleSheet.create({
   flexOne: {
@@ -20,26 +21,27 @@ const styles = StyleSheet.create({
   }
 });
 
-const OrgNode = ({ id, headline, propDrawer, onTitleClick }) => {
-  const collapseStatusIdx = OrgDrawerUtil.indexOfKey(
-    propDrawer,
-    'collapseStatus'
-  );
-  if (collapseStatusIdx === -1) {
-    collapseStatusText = 'undefined';
-  } else {
-    collapseStatusText = propDrawer.properties[collapseStatusIdx][1];
-  }
+const OrgNode = ({ bufferID, id, headline, propDrawer, onTitleClick }) => {
+  // const collapseStatusIdx = OrgDrawerUtil.indexOfKey(
+  //   propDrawer,
+  //   'collapseStatus'
+  // );
+  // if (collapseStatusIdx === -1) {
+  //   collapseStatusText = 'undefined';
+  // } else {
+  //   collapseStatusText = propDrawer.properties[collapseStatusIdx][1];
+  // }
 
   // todo keyword
-  const todoKeyword = headline.todoKeyword
-    ? <Text
-        style={{
-          backgroundColor: orgHeadlineUtil.colorForKeyword(headline.todoKeyword)
-        }}>
-        {headline.todoKeyword}
-      </Text>
-    : null;
+  // const todoKeyword = headline.todoKeyword
+  //   ? <Text
+  //       style={{
+  //         backgroundColor: orgHeadlineUtil.colorForKeyword(headline.todoKeyword)
+  //       }}>
+  //       {headline.todoKeyword}
+  //     </Text>
+  //   : null;
+  console.log(bufferID, '+++++++++++++++++++++');
 
   return (
     <TouchableHighlight
@@ -47,7 +49,7 @@ const OrgNode = ({ id, headline, propDrawer, onTitleClick }) => {
       style={styles.flexOne}
       onPress={onTitleClick}>
       <View style={styles.flexRow}>
-        <Text>{todoKeyword}</Text>
+        <OrgTodoKeywordEditable bufferID={bufferID} nodeID={id} />
         <Text style={styles.flexOne}>
           {headline.content}
         </Text>

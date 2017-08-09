@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
 });
 
 const makeHeadline = (
+  bufferID,
   nodes,
   node,
   isCollapsed,
@@ -50,6 +51,7 @@ const makeHeadline = (
         }
       ]}>
       <OrgNode
+        bufferID={bufferID}
         key={node.id}
         {...nodes[node.id]}
         onTitleClick={() => onNodeTitleClick(node.id)}
@@ -65,7 +67,9 @@ const makeHeadline = (
 
 export class OrgTree extends React.Component {
   render() {
+    console.log('render orgTree');
     const {
+      bufferID,
       nodes,
       tree,
       onNodeTitleClick,
@@ -79,6 +83,7 @@ export class OrgTree extends React.Component {
           {tree.children.map(t => {
             return (
               <OrgTree
+                bufferID={bufferID}
                 key={t.nodeID}
                 nodes={nodes}
                 tree={t}
@@ -99,7 +104,10 @@ export class OrgTree extends React.Component {
         : node.propDrawer.properties[idx][1];
       switch (collapseStatus) {
         case 'collapsed':
+          console.log('collapsed', bufferID);
+          console.log('collapsed', node.headline);
           return makeHeadline(
+            bufferID,
             nodes,
             node,
             true,
@@ -111,9 +119,11 @@ export class OrgTree extends React.Component {
           break;
         case 'expanded':
         case 'maximized':
+          console.log('maximized', bufferID);
           return (
             <View>
               {makeHeadline(
+                bufferID,
                 nodes,
                 node,
                 false,
@@ -126,6 +136,7 @@ export class OrgTree extends React.Component {
                 {tree.children.map(t => {
                   return (
                     <OrgTree
+                      bufferID={bufferID}
                       key={t.nodeID}
                       nodes={nodes}
                       tree={t}

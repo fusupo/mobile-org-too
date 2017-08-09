@@ -23,7 +23,6 @@ class OrgTodoKeywordEditable extends Component {
 
   render() {
     const todoKeywordStr = this.props.keyword;
-    console.log(this.props);
     const todoKeyword = todoKeywordStr
       ? <TouchableHighlight
           onPress={() => {
@@ -71,7 +70,11 @@ class OrgTodoKeywordEditable extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  return {};
+  const { bufferID, nodeID } = ownProps;
+  console.log(ownProps);
+  const keyword =
+    state.orgBuffers[bufferID].orgNodes[nodeID].headline.todoKeyword;
+  return { keyword };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
