@@ -26,52 +26,52 @@ const TabNav = TabNavigator(
   {
     MainTab: {
       screen: HomeScreen,
-      path: '/'
-      // navigationOptions: {
-      //   title: 'Home',
-      //   tabBarLabel: 'Home',
-      //   tabBarIcon: ({ tintColor, focused }) => (
-      //     <Ionicons
-      //       name={focused ? 'ios-home' : 'ios-home-outline'}
-      //       size={26}
-      //       style={{ color: tintColor }}
-      //     />
-      //   )
-      // }
+      path: '/',
+      navigationOptions: {
+        title: 'Home',
+        tabBarLabel: 'Home',
+        tabBarIcon: ({ tintColor, focused }) => (
+          <Ionicons
+            name={focused ? 'ios-home' : 'ios-home-outline'}
+            size={26}
+            style={{ color: tintColor }}
+          />
+        )
+      }
     },
     AgendaTab: {
       screen: CalendarScreen,
-      path: '/agenda'
-      // navigationOptions: {
-      //   title: 'Agenda',
-      //   tabBarIcon: ({ tintColor, focused }) => (
-      //     <Ionicons
-      //       name={focused ? 'ios-calendar' : 'ios-calendar-outline'}
-      //       size={26}
-      //       style={{ color: tintColor }}
-      //     />
-      //   )
-      // }
+      path: '/agenda',
+      navigationOptions: {
+        title: 'Agenda',
+        tabBarIcon: ({ tintColor, focused }) => (
+          <Ionicons
+            name={focused ? 'ios-calendar' : 'ios-calendar-outline'}
+            size={26}
+            style={{ color: tintColor }}
+          />
+        )
+      }
     },
     SettingsTab: {
       screen: SettingsScreen,
-      path: '/settings'
-      // navigationOptions: {
-      //   title: 'Settings',
-      //   tabBarIcon: ({ tintColor, focused }) => (
-      //     <Ionicons
-      //       name={focused ? 'ios-settings' : 'ios-settings-outline'}
-      //       size={26}
-      //       style={{ color: tintColor }}
-      //     />
-      //   )
-      // }
+      path: '/settings',
+      navigationOptions: {
+        title: 'Settings',
+        tabBarIcon: ({ tintColor, focused }) => (
+          <Ionicons
+            name={focused ? 'ios-settings' : 'ios-settings-outline'}
+            size={26}
+            style={{ color: tintColor }}
+          />
+        )
+      }
     }
   },
   {
     tabBarPosition: 'bottom',
     animationEnabled: true,
-    swipeEnabled: true,
+    swipeEnabled: false,
     initialRouteName: 'MainTab'
   }
 );
