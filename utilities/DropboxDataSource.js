@@ -25,6 +25,7 @@ export default class DropboxDataSource {
         .then(nodesAndTree => {
           obj['orgTree'] = nodesAndTree.tree;
           obj['orgNodes'] = nodesAndTree.nodes;
+          obj['orgSettings'] = nodesAndTree.settings;
           resolve(obj);
         })
         .catch(err => reject(err));
@@ -60,11 +61,12 @@ export default class DropboxDataSource {
     });
   }
 
-  serializeAndUpload(nodes, tree) {
+  serializeAndUpload(nodes, tree, settings) {
+    const contents = serialize(nodes, tree, settings);
     return new Promise((resolve, reject) => {
       this.dbx
         .filesUpload({
-          contents: serialize(nodes, tree),
+          contents,
           path: '/org/inboxDummyOut.org',
           mode: { '.tag': 'overwrite' }
         })

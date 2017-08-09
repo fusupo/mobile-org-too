@@ -184,7 +184,8 @@ export function doCloudUpload() {
       const firstBufferKey = Object.keys(state.orgBuffers)[0];
       const orgNodes = state.orgBuffers[firstBufferKey].orgNodes;
       const orgTree = state.orgBuffers[firstBufferKey].orgTree;
-      let foo = ds.serializeAndUpload(orgNodes, orgTree);
+      const orgSettings = state.orgBuffers[firstBufferKey].orgSettings;
+      let foo = ds.serializeAndUpload(orgNodes, orgTree, orgSettings);
     } catch (e) {
       console.warn(
         'There was an error serializing and/or uploading files to drobbox on the home screen'
