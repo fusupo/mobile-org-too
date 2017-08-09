@@ -3,11 +3,9 @@ import { connect } from 'react-redux';
 
 import {
   cycleNodeCollapse,
-  updateNodeHeadlineContent,
   updateNodeTimestamp,
   updateNodeTimestampRepInt,
   clearNodeTimestamp,
-  updateNodeTodoKeyword,
   deleteNode,
   insertNewNodeProp,
   updateNodeProp,
@@ -58,9 +56,7 @@ const NodeDetailScreen = ({
   buffers,
   onNodeTitleClick,
   onNodeArrowClick,
-  onHeadlineEndEditing,
   onPressDeleteNode,
-  onNodeTodoKeywordUpdate,
   onTimestampUpdate,
   onTimestampRepIntUpdate,
   onTimestampClear,
@@ -110,14 +106,7 @@ const NodeDetailScreen = ({
         <View style={styles.container}>
           <ScrollView style={styles.container}>
             <View style={[styles.container, styles.border]}>
-              <OrgHeadlineEditable
-                headline={node.headline}
-                onEndEditing={onHeadlineEndEditing(bufferID, nodeID)}
-                onNodeTodoKeywordUpdate={onNodeTodoKeywordUpdate(
-                  bufferID,
-                  nodeID
-                )}
-              />
+              <OrgHeadlineEditable bufferID={bufferID} node={node} />
             </View>
             <View style={[styles.container, styles.border]}>
               {timings}
@@ -198,13 +187,9 @@ const mapDispatchToProps = dispatch => {
         );
       };
     },
-    onHeadlineEndEditing: (bufferID, nodeID) => text =>
-      dispatch(updateNodeHeadlineContent(bufferID, nodeID, text)),
     onPressDeleteNode: (bufferID, nodeID) => {
       dispatch(deleteNode(bufferID, nodeID));
     },
-    onNodeTodoKeywordUpdate: (bufferID, nodeID) => todoKeyword =>
-      dispatch(updateNodeTodoKeyword(bufferID, nodeID, todoKeyword)),
     onTimestampUpdate: (bufferID, nodeID, timestampType) => date => {
       const timestamp = OrgTimestampUtil.parseDate(date);
       timestamp.type = 'active';

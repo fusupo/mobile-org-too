@@ -7,6 +7,8 @@ import {
   TouchableHighlight
 } from 'react-native';
 
+import { updateNodeTodoKeyword } from '../actions';
+
 const orgHeadlineUtil = require('org-parse').OrgHeadline;
 
 class OrgTodoKeywordEditable extends Component {
@@ -20,7 +22,8 @@ class OrgTodoKeywordEditable extends Component {
   }
 
   render() {
-    const todoKeywordStr = this.props.headline.todoKeyword;
+    const todoKeywordStr = this.props.keyword;
+    console.log(this.props);
     const todoKeyword = todoKeywordStr
       ? <TouchableHighlight
           onPress={() => {
@@ -29,7 +32,11 @@ class OrgTodoKeywordEditable extends Component {
                 options: this.state.keywords
               },
               idx => {
-                this.props.onNodeTodoKeywordUpdate(this.state.keywords[idx]);
+                this.props.onNodeTodoKeywordUpdate(
+                  this.props.bufferID,
+                  this.props.nodeID,
+                  this.state.keywords[idx]
+                );
               }
             );
           }}>
@@ -37,7 +44,7 @@ class OrgTodoKeywordEditable extends Component {
             style={{
               backgroundColor: orgHeadlineUtil.colorForKeyword(todoKeywordStr)
             }}>
-            {this.props.headline.todoKeyword}
+            {this.props.keyword}
           </Text>
         </TouchableHighlight>
       : <TouchableHighlight
@@ -47,7 +54,11 @@ class OrgTodoKeywordEditable extends Component {
                 options: this.state.keywords
               },
               idx => {
-                this.props.onNodeTodoKeywordUpdate(this.state.keywords[idx]);
+                this.props.onNodeTodoKeywordUpdate(
+                  this.props.bufferID,
+                  this.props.nodeID,
+                  this.state.keywords[idx]
+                );
               }
             );
           }}>
@@ -64,7 +75,11 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  return {};
+  return {
+    onNodeTodoKeywordUpdate: (bufferID, nodeID, keyword) => {
+      dispatch(updateNodeTodoKeyword(bufferID, nodeID, keyword));
+    }
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(

@@ -4,6 +4,8 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import OrgTodoKeywordEditable from './OrgTodoKeywordEditable';
 
+import { updateNodeHeadlineContent } from '../actions';
+
 const styles = StyleSheet.create({
   txt: {
     textAlign: 'left',
@@ -22,14 +24,16 @@ class OrgHeadlineEditable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      content: props.headline.content
+      content: props.node.headline.content
     };
   }
 
   render() {
+    const node = this.props.node;
     // tags
-    const tags = this.props.headline.tags && this.props.headline.tags.length > 0
-      ? this.props.headline.tags.map((tag, idx) => {
+
+    const tags = node.headline.tags && node.headline.tags.length > 0
+      ? node.headline.tags.map((tag, idx) => {
           return (
             <Text
               key={idx}
@@ -49,15 +53,20 @@ class OrgHeadlineEditable extends Component {
     return (
       <View style={{ flex: 1, flexDirection: 'row' }}>
         <OrgTodoKeywordEditable
-          onNodeTodoKeywordUpdate={this.props.onNodeTodoKeywordUpdate}
-          headline={this.props.headline}
+          keyword={node.headline.todoKeyword}
+          nodeID={node.id}
+          bufferID={this.props.bufferID}
         />
         <TextInput
           style={{ flex: 1, height: 40, borderColor: 'gray', borderWidth: 1 }}
           value={this.state.content}
           onChangeText={content => this.setState({ content })}
           onEndEditing={e => {
-            this.props.onEndEditing(this.state.content);
+            this.props.onHeadlineEndEditing(
+              this.props.bufferID,
+              node.id,
+              this.state.content
+            );
           }}
         />
         {tagList}
@@ -71,7 +80,11 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  return {};
+  return {
+    onHeadlineEndEditing: (bufferID, nodeID, text) => {
+      dispatch(updateNodeHeadlineContent(bufferID, nodeID, text));
+    }
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(
