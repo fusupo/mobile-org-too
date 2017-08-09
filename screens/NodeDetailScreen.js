@@ -20,7 +20,14 @@ import {
 
 import { NavigationActions } from 'react-navigation';
 
-import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  ActionSheetIOS,
+  Button,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
+} from 'react-native';
 
 import { OrgTree } from '../components/OrgTree';
 
@@ -101,12 +108,6 @@ const NodeDetailScreen = ({
         : null;
       return (
         <View style={styles.container}>
-          <Button
-            onPress={() => onPressDeleteNode(bufferID, nodeID)}
-            title="DeleteNode"
-            color="#841584"
-            accessibilityLabel="delete this node"
-          />
           <ScrollView style={styles.container}>
             <View style={[styles.container, styles.border]}>
               <EditOrgHeadline
@@ -145,6 +146,23 @@ const NodeDetailScreen = ({
             />
           </ScrollView>
           {list}
+          <Button
+            onPress={() => {
+              ActionSheetIOS.showActionSheetWithOptions(
+                {
+                  options: ['confirm', 'cancel']
+                },
+                idx => {
+                  if (idx === 0) {
+                    onPressDeleteNode(bufferID, nodeID);
+                  }
+                }
+              );
+            }}
+            title="DeleteNode"
+            color="#841584"
+            accessibilityLabel="delete this node"
+          />
         </View>
       );
     } else {
