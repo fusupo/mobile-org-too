@@ -138,7 +138,6 @@ function someActionToo(path) {
       accessToken: getState().dbxAccessToken
     });
     const success = (path, res) => {
-      console.log('success');
       dispatch({
         type: 'settings:inboxFile:ok',
         path: path,

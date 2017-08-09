@@ -86,7 +86,6 @@ function loadInboxFile() {
       getState().settings.inboxFile.path,
       getState().dbxAccessToken
     );
-    console.log(foo.orgSettings);
     dispatch({
       type: 'addOrgBuffer',
       path: getState().settings.inboxFile.path,

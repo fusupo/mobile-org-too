@@ -58,8 +58,8 @@ const mapStateToProps = (state, ownProps) => {
     };
   } else {
     return {
-      nodes: {}, //state.orgNodes,
-      tree: {} //state.orgTree
+      nodes: {},
+      tree: {}
     };
   }
 };

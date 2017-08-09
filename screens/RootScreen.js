@@ -18,11 +18,6 @@ const styles = StyleSheet.create({
 });
 
 class RootScreen extends Component {
-  componentDidMount() {
-    //console.log(this.props.initApp);
-    //    this.props.initApp();
-  }
-
   render() {
     return (
       <View style={styles.container}>
@@ -98,23 +93,8 @@ const mapDispatchToProps = dispatch => {
     },
     onCloudUploadPress: () => {
       dispatch(doCloudUpload());
-    },
-    initApp: () => {
-      dispatch(someAction());
     }
   };
 };
-function someAction() {
-  return (dispatch, getState) => {
-    const state = getState(); // get state from store here,
-    //console.log(navigator);
-    // dispatch(otherAction()).then(.....); //dispatch actions here
-    // dispatch(
-    //   NavigationActions.navigate({
-    //     routeName: 'SettingsTab'
-    //     // params: { nodeID: action.nodeID }
-    //   })
-    // );
-  };
-}
+
 export default connect(mapStateToProps, mapDispatchToProps)(RootScreen);
