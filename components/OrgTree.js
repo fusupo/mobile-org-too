@@ -1,8 +1,6 @@
 import React from 'react';
 import { Text, StyleSheet, View, TouchableHighlight } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { cycleNodeCollapse } from '../actions';
-import { NavigationActions } from 'react-navigation';
 
 import { connect } from 'react-redux';
 import OrgNode from './OrgNode';
@@ -10,20 +8,24 @@ import OrgNode from './OrgNode';
 const OrgDrawerUtil = require('org-parse').OrgDrawer;
 
 const styles = StyleSheet.create({
-  txt: {
-    textAlign: 'left',
-    fontSize: 14
-  },
-  border: {
-    borderTopWidth: 1,
-    borderStyle: 'solid',
-    paddingLeft: 5
-  },
-  padded: {
-    paddingLeft: 5
-  },
-  orgTree: {
-    flex: 1
+  // txt: {
+  //   textAlign: 'left',
+  //   fontSize: 14
+  // },
+  // border: {
+  //   borderTopWidth: 1,
+  //   borderStyle: 'solid',
+  //   paddingLeft: 5
+  // },
+  // padded: {
+  //   paddingLeft: 5
+  // },
+  // orgTree: {
+  //   flex: 1
+  // },
+  orgNodeWrapper: {
+    flexDirection: 'row',
+    height: 50
   }
 });
 
@@ -59,10 +61,12 @@ export const OrgTree = ({
       case 'collapsed':
         return (
           <View
-            style={{
-              flexDirection: 'row',
-              marginLeft: 10 * node.headline.level
-            }}>
+            style={[
+              styles.orgNodeWrapper,
+              {
+                marginLeft: 10 * node.headline.level
+              }
+            ]}>
             <OrgNode
               key={tree.nodeID}
               {...nodes[tree.nodeID]}
@@ -81,10 +85,12 @@ export const OrgTree = ({
         return (
           <View>
             <View
-              style={{
-                flexDirection: 'row',
-                marginLeft: 10 * node.headline.level
-              }}>
+              style={[
+                styles.orgNodeWrapper,
+                {
+                  marginLeft: 10 * node.headline.level
+                }
+              ]}>
               <OrgNode
                 key={tree.nodeID}
                 {...nodes[tree.nodeID]}
