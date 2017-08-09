@@ -38,7 +38,6 @@ export const UPDATE_NODE_BODY = 'UPDATE_NODE_BODY';
  */
 
 export function registerDbxAccessToken(token) {
-  console.log('registerDbxAccessToken');
   return { type: REGISTER_DBX_ACCESS_TOKEN, token };
 }
 

@@ -94,7 +94,6 @@ class AppContainer extends React.Component {
     } catch (e) {
       console.warn('error in "load everything"', e);
     } finally {
-      console.log('completed loading everything');
       this.setState({ appIsReady: true });
     }
   }

@@ -34,7 +34,6 @@ export const OrgBuffer = ({
   onAddOne,
   onDeleteNode
 }) => {
-  console.log('render orgBuffers');
   return (
     <View>
       <Text>{bufferID}</Text>

@@ -22,27 +22,6 @@ const styles = StyleSheet.create({
 });
 
 const OrgNode = ({ bufferID, id, headline, propDrawer, onTitleClick }) => {
-  // const collapseStatusIdx = OrgDrawerUtil.indexOfKey(
-  //   propDrawer,
-  //   'collapseStatus'
-  // );
-  // if (collapseStatusIdx === -1) {
-  //   collapseStatusText = 'undefined';
-  // } else {
-  //   collapseStatusText = propDrawer.properties[collapseStatusIdx][1];
-  // }
-
-  // todo keyword
-  // const todoKeyword = headline.todoKeyword
-  //   ? <Text
-  //       style={{
-  //         backgroundColor: orgHeadlineUtil.colorForKeyword(headline.todoKeyword)
-  //       }}>
-  //       {headline.todoKeyword}
-  //     </Text>
-  //   : null;
-  console.log(bufferID, '+++++++++++++++++++++');
-
   return (
     <TouchableHighlight
       underlayColor="#00ff00"

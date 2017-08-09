@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {
-  ActionSheetIOS,
-  StyleSheet,
-  Text,
-  TouchableHighlight
-} from 'react-native';
+import { StyleSheet, Text } from 'react-native';
+
+import ModalDropdown from 'react-native-modal-dropdown';
 
 import { updateNodeTodoKeyword } from '../actions';
 
@@ -23,61 +20,38 @@ class OrgTodoKeywordEditable extends Component {
 
   render() {
     const todoKeywordStr = this.props.keyword;
-    const todoKeyword = todoKeywordStr
-      ? <TouchableHighlight
-          onPress={() => {
-            ActionSheetIOS.showActionSheetWithOptions(
-              {
-                options: this.state.keywords
-              },
-              idx => {
-                this.props.onNodeTodoKeywordUpdate(
-                  this.props.bufferID,
-                  this.props.nodeID,
-                  this.state.keywords[idx]
-                );
-              }
-            );
+    const todoKeyword = (
+      <ModalDropdown
+        options={this.state.keywords}
+        onSelect={idx => {
+          this.props.onNodeTodoKeywordUpdate(
+            this.props.bufferID,
+            this.props.nodeID,
+            this.state.keywords[idx]
+          );
+        }}>
+        <Text
+          style={{
+            backgroundColor: todoKeywordStr
+              ? orgHeadlineUtil.colorForKeyword(todoKeywordStr)
+              : '#fff'
           }}>
-          <Text
-            style={{
-              backgroundColor: orgHeadlineUtil.colorForKeyword(todoKeywordStr)
-            }}>
-            {this.props.keyword}
-          </Text>
-        </TouchableHighlight>
-      : <TouchableHighlight
-          onPress={() => {
-            ActionSheetIOS.showActionSheetWithOptions(
-              {
-                options: this.state.keywords
-              },
-              idx => {
-                this.props.onNodeTodoKeywordUpdate(
-                  this.props.bufferID,
-                  this.props.nodeID,
-                  this.state.keywords[idx]
-                );
-              }
-            );
-          }}>
-          <Text style={{}}>
-            {'none'}
-          </Text>
-        </TouchableHighlight>;
+          {todoKeywordStr ? todoKeywordStr : 'none'}
+        </Text>
+      </ModalDropdown>
+    );
     return todoKeyword;
   }
 }
 
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
-  console.log(ownProps);
-  const keyword =
-    state.orgBuffers[bufferID].orgNodes[nodeID].headline.todoKeyword;
-  return { keyword };
+  return {
+    keyword: state.orgBuffers[bufferID].orgNodes[nodeID].headline.todoKeyword
+  };
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = dispatch => {
   return {
     onNodeTodoKeywordUpdate: (bufferID, nodeID, keyword) => {
       dispatch(updateNodeTodoKeyword(bufferID, nodeID, keyword));
