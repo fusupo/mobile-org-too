@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, StyleSheet, View, TouchableHighlight } from 'react-native';
+import Swipeout from 'react-native-swipeout';
 import { FontAwesome } from '@expo/vector-icons';
 
 import { connect } from 'react-redux';
@@ -8,125 +9,147 @@ import OrgNode from './OrgNode';
 const OrgDrawerUtil = require('org-parse').OrgDrawer;
 
 const styles = StyleSheet.create({
-  // txt: {
-  //   textAlign: 'left',
-  //   fontSize: 14
-  // },
-  // border: {
-  //   borderTopWidth: 1,
-  //   borderStyle: 'solid',
-  //   paddingLeft: 5
-  // },
-  // padded: {
-  //   paddingLeft: 5
-  // },
-  // orgTree: {
-  //   flex: 1
-  // },
   orgNodeWrapper: {
     flexDirection: 'row',
     height: 50
   }
 });
 
-export const OrgTree = ({
+const makeHeadline = (
   nodes,
-  tree,
+  node,
+  isCollapsed,
   onNodeTitleClick,
-  onNodeArrowClick
-}) => {
-  if (tree.nodeID === 'root') {
-    return (
-      <View>
-        {tree.children.map(t => {
-          return (
-            <OrgTree
-              key={t.nodeID}
-              nodes={nodes}
-              tree={t}
-              onNodeTitleClick={onNodeTitleClick}
-              onNodeArrowClick={onNodeArrowClick}
-            />
-          );
-        })}
-      </View>
-    );
-  } else if (Object.keys(tree).length > 0) {
-    const node = nodes[tree.nodeID];
-    const idx = OrgDrawerUtil.indexOfKey(node.propDrawer, 'collapseStatus');
-    const collapseStatus = idx === -1
-      ? 'collapsed'
-      : node.propDrawer.properties[idx][1];
-    switch (collapseStatus) {
-      case 'collapsed':
-        return (
-          <View
-            style={[
-              styles.orgNodeWrapper,
-              {
-                marginLeft: 10 * node.headline.level
-              }
-            ]}>
-            <OrgNode
-              key={tree.nodeID}
-              {...nodes[tree.nodeID]}
-              onTitleClick={() => onNodeTitleClick(tree.nodeID)}
-            />
-            <TouchableHighlight
-              style={{ width: 40 }}
-              onPress={() => onNodeArrowClick(tree.nodeID)}>
-              <FontAwesome name={'caret-down'} size={10} />
-            </TouchableHighlight>
-          </View>
-        );
-        break;
-      case 'expanded':
-      case 'maximized':
-        return (
-          <View>
-            <View
-              style={[
-                styles.orgNodeWrapper,
-                {
-                  marginLeft: 10 * node.headline.level
-                }
-              ]}>
-              <OrgNode
-                key={tree.nodeID}
-                {...nodes[tree.nodeID]}
-                onTitleClick={() => onNodeTitleClick(tree.nodeID)}
+  onNodeArrowClick,
+  onAddOnePress,
+  onDeleteNodePress
+) => (
+  <Swipeout
+    sensitiviy={1}
+    right={[
+      {
+        text: 'deleteNode',
+        onPress: () => {
+          onDeleteNodePress(node.id);
+        }
+      }
+    ]}
+    left={[
+      {
+        text: 'addOne',
+        onPress: () => {
+          onAddOnePress(node.id);
+        }
+      }
+    ]}>
+    <View
+      style={[
+        styles.orgNodeWrapper,
+        {
+          marginLeft: 10 * node.headline.level
+        }
+      ]}>
+      <OrgNode
+        key={node.id}
+        {...nodes[node.id]}
+        onTitleClick={() => onNodeTitleClick(node.id)}
+      />
+      <TouchableHighlight
+        style={{ width: 40 }}
+        onPress={() => onNodeArrowClick(node.id)}>
+        <FontAwesome name={isCollapsed ? 'caret-down' : 'caret-up'} size={25} />
+      </TouchableHighlight>
+    </View>
+  </Swipeout>
+);
+
+export class OrgTree extends React.Component {
+  render() {
+    const {
+      nodes,
+      tree,
+      onNodeTitleClick,
+      onNodeArrowClick,
+      onAddOnePress,
+      onDeleteNodePress
+    } = this.props;
+    if (tree.nodeID === 'root') {
+      return (
+        <View>
+          {tree.children.map(t => {
+            return (
+              <OrgTree
+                key={t.nodeID}
+                nodes={nodes}
+                tree={t}
+                onNodeTitleClick={onNodeTitleClick}
+                onNodeArrowClick={onNodeArrowClick}
+                onAddOnePress={onAddOnePress}
+                onDeleteNodePress={onDeleteNodePress}
               />
-              <TouchableHighlight
-                style={{ width: 40 }}
-                onPress={() => onNodeArrowClick(tree.nodeID)}>
-                <FontAwesome name={'caret-up'} size={10} />
-              </TouchableHighlight>
-            </View>
+            );
+          })}
+        </View>
+      );
+    } else if (Object.keys(tree).length > 0) {
+      const node = nodes[tree.nodeID];
+      const idx = OrgDrawerUtil.indexOfKey(node.propDrawer, 'collapseStatus');
+      const collapseStatus = idx === -1
+        ? 'collapsed'
+        : node.propDrawer.properties[idx][1];
+      switch (collapseStatus) {
+        case 'collapsed':
+          return makeHeadline(
+            nodes,
+            node,
+            true,
+            onNodeTitleClick,
+            onNodeArrowClick,
+            onAddOnePress,
+            onDeleteNodePress
+          );
+          break;
+        case 'expanded':
+        case 'maximized':
+          return (
             <View>
-              {tree.children.map(t => {
-                return (
-                  <OrgTree
-                    key={t.nodeID}
-                    nodes={nodes}
-                    tree={t}
-                    onNodeTitleClick={onNodeTitleClick}
-                    onNodeArrowClick={onNodeArrowClick}
-                  />
-                );
-              })}
+              {makeHeadline(
+                nodes,
+                node,
+                false,
+                onNodeTitleClick,
+                onNodeArrowClick,
+                onAddOnePress,
+                onDeleteNodePress
+              )}
+              <View>
+                {tree.children.map(t => {
+                  return (
+                    <OrgTree
+                      key={t.nodeID}
+                      nodes={nodes}
+                      tree={t}
+                      onNodeTitleClick={onNodeTitleClick}
+                      onNodeArrowClick={onNodeArrowClick}
+                      onAddOnePress={onAddOnePress}
+                      onDeleteNodePress={onDeleteNodePress}
+                    />
+                  );
+                })}
+              </View>
             </View>
-          </View>
-        );
-        break;
+          );
+          break;
+      }
+    } else {
+      return (
+        <View>
+          <Text>{'Empty'}</Text>
+        </View>
+      );
     }
-  } else {
-    return (
-      <View>
-        <Text>{'Empty'}</Text>
-      </View>
-    );
   }
-};
+}
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -141,6 +164,16 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     ? ownProps.onNodeTitleClick
     : nodeID => {
         console.log(nodeID);
+      };
+  ret.onAddOnePress = ownProps.onAddOnePress
+    ? ownProps.onAddOnePress
+    : nodeID => {
+        console.log('add One', nodeID);
+      };
+  ret.onDeleteNodePress = ownProps.onDeleteNodePress
+    ? ownProps.onDeleteNodePress
+    : nodeID => {
+        console.log('delete One', nodeID);
       };
   return ret;
 };

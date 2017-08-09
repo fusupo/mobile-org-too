@@ -2,16 +2,11 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const styles = StyleSheet.create({
-  txt: {
-    textAlign: 'left',
-    fontSize: 14
-  },
-  border: {
-    borderTopWidth: 1,
-    borderStyle: 'solid'
-  },
-  padded: {
-    paddingLeft: 5
+  rowContainer: { flex: 1, flexDirection: 'row' },
+  tag: {
+    fontFamily: 'space-mono',
+    backgroundColor: '#cccccc',
+    fontSize: 10
   }
 });
 
@@ -35,13 +30,7 @@ export default class OrgHeadline extends Component {
     const tags = this.props.headline.tags && this.props.headline.tags.length > 0
       ? this.props.headline.tags.map((tag, idx) => {
           return (
-            <Text
-              key={idx}
-              style={{
-                fontFamily: 'space-mono',
-                backgroundColor: '#cccccc',
-                fontSize: 10
-              }}>
+            <Text key={idx} style={styles.tag}>
               {tag}
             </Text>
           );
@@ -51,9 +40,9 @@ export default class OrgHeadline extends Component {
     const tagList = tags ? <Text>{tags}</Text> : null;
 
     return (
-      <View style={{ flex: 1, flexDirection: 'row' }}>
+      <View style={style.rowContainer}>
         {todoKeyword}
-        <Text>{this.props.headline.content}</Text>
+        <Text>{'foobarbax' + this.props.headline.content}</Text>
         {tagList}
       </View>
     );

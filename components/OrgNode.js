@@ -6,7 +6,10 @@ const OrgDrawerUtil = require('org-parse').OrgDrawer;
 const orgHeadlineUtil = require('org-parse').OrgHeadline;
 
 const styles = StyleSheet.create({
-  nodeHeader: {
+  flexOne: {
+    flex: 1
+  },
+  flexRow: {
     flexDirection: 'row'
   },
   nodeHeaderTitle: {
@@ -41,11 +44,11 @@ const OrgNode = ({ id, headline, propDrawer, onTitleClick }) => {
   return (
     <TouchableHighlight
       underlayColor="#00ff00"
-      style={{ flex: 1 }}
+      style={styles.flexOne}
       onPress={onTitleClick}>
-      <View style={{ flexDirection: 'row' }}>
+      <View style={styles.flexRow}>
         <Text>{todoKeyword}</Text>
-        <Text style={{ flex: 1 }}>
+        <Text style={styles.flexOne}>
           {headline.content}
         </Text>
       </View>

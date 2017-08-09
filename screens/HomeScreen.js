@@ -2,7 +2,7 @@ import Expo from 'expo';
 import React from 'react';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
-import { Button, View, ScrollView } from 'react-native';
+import { Button, ScrollView, Text, View } from 'react-native';
 
 import { registerDbxAccessToken, addNewNode } from '../actions';
 
@@ -17,16 +17,8 @@ class HomeScreen extends React.Component {
     inboxFileIsOk: false
   };
 
-  static navigationOptions = () => ({
-    title: 'home'
-  });
-
   componentWillMount() {
     this.props.loadInboxFile();
-  }
-
-  componentDidMount() {
-    // this.props.initApp();
   }
 
   render() {
@@ -44,9 +36,11 @@ class HomeScreen extends React.Component {
         </View>
       ));
       return (
-        <ScrollView>
-          {list}
-        </ScrollView>
+        <View>
+          <ScrollView>
+            {list}
+          </ScrollView>
+        </View>
       );
     } else {
       return <Expo.AppLoading />;

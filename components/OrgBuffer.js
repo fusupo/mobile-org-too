@@ -1,14 +1,11 @@
 import React from 'react';
 import { Text, StyleSheet, View, TouchableHighlight } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { cycleNodeCollapse } from '../actions';
+import { addNewNode, deleteNode, cycleNodeCollapse } from '../actions';
 import { NavigationActions } from 'react-navigation';
 
 import { connect } from 'react-redux';
-import OrgNode from './OrgNode';
 import OrgTree from './OrgTree';
-
-const OrgDrawerUtil = require('org-parse').OrgDrawer;
 
 const styles = StyleSheet.create({
   txt: {
@@ -33,7 +30,9 @@ export const OrgBuffer = ({
   nodes,
   tree,
   onNodeTitleClick,
-  onNodeArrowClick
+  onNodeArrowClick,
+  onAddOne,
+  onDeleteNode
 }) => {
   return (
     <View>
@@ -43,6 +42,8 @@ export const OrgBuffer = ({
         tree={tree}
         onNodeTitleClick={onNodeTitleClick(bufferID)}
         onNodeArrowClick={onNodeArrowClick(bufferID)}
+        onAddOnePress={onAddOne(bufferID)}
+        onDeleteNodePress={onDeleteNode(bufferID)}
       />
     </View>
   );
@@ -82,6 +83,16 @@ const mapDispatchToProps = dispatch => {
             }
           })
         );
+      };
+    },
+    onAddOne: bufferID => {
+      return nodeID => {
+        dispatch(addNewNode(bufferID));
+      };
+    },
+    onDeleteNode: bufferID => {
+      return nodeID => {
+        dispatch(deleteNode(bufferID, nodeID));
       };
     }
   };
