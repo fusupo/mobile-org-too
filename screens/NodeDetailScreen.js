@@ -55,9 +55,6 @@ const NodeDetailScreen = ({
   nodeID,
   node,
   onPressDeleteNode,
-  // onTimestampUpdate,
-  // onTimestampRepIntUpdate,
-  // onTimestampClear,
   onAddProp,
   onUpdateProp,
   onRemoveProp,
@@ -85,12 +82,16 @@ const NodeDetailScreen = ({
             <OrgHeadlineEditable bufferID={bufferID} node={node} />
           </View>
           <View style={[styles.container, styles.border]}>
-            <OrgScheduling bufferID={bufferID} nodeID={nodeID} />
+            <OrgScheduling
+              bufferID={bufferID}
+              nodeID={nodeID}
+              isCollapsed={true}
+            />
           </View>
           <View style={[styles.container, styles.border]}>
             <OrgDrawer
               drawer={node.propDrawer}
-              isCollapsed={false}
+              isCollapsed={true}
               onAddProp={onAddProp(bufferID, nodeID)}
               onUpdateProp={onUpdateProp(bufferID, nodeID)}
               onRemoveProp={onRemoveProp(bufferID, nodeID)}
@@ -99,7 +100,7 @@ const NodeDetailScreen = ({
           <View style={[styles.container, styles.border]}>
             <OrgLogbook
               log={node.logbook}
-              isCollapsed={false}
+              isCollapsed={true}
               onAddLogNote={onAddLogNote(bufferID, nodeID)}
               onUpdateLogNote={onUpdateLogNote(bufferID, nodeID)}
               onRemoveLogNote={onRemoveLogNote(bufferID, nodeID)}
