@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TouchableHighlight } from 'react-native';
+import { Text, TouchableHighlight, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Swipeout from 'react-native-swipeout';
 
@@ -18,25 +18,20 @@ class OrgDrawer extends Component {
   render() {
     if (this.state.isCollapsed) {
       return (
-        <View
-          className="OrgDrawer"
-          style={{
-            flexDirection: 'row',
-            backgroundColor: '#cccccc'
-          }}>
-          <Ionicons name={'ios-list-box'} size={20} />
-          <Text
-            className="OrgDrawerName"
+        <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
+          <View
+            className="OrgDrawer"
             style={{
-              fontFamily: 'space-mono',
-              fontSize: 12,
-              flex: 1,
-              paddingLeft: 10
-            }}
-            onPress={this._toggleCollapse.bind(this)}>
-            {this.props.drawer.name}
-          </Text>
-        </View>
+              flexDirection: 'row',
+              backgroundColor: '#cccccc'
+            }}>
+            <Ionicons
+              name={'ios-list-box'}
+              size={20}
+              style={{ marginLeft: 5 }}
+            />
+          </View>
+        </TouchableHighlight>
       );
     } else {
       const listItems = this.props.drawer.properties.map((keyval, idx) => {
@@ -57,6 +52,7 @@ class OrgDrawer extends Component {
       return (
         <View style={{ flexDirection: 'column', flex: 1 }}>
           <Swipeout
+            autoClose={true}
             left={[
               {
                 text: 'addOne',
@@ -65,25 +61,20 @@ class OrgDrawer extends Component {
                 }
               }
             ]}>
-            <View
-              className="OrgDrawer"
-              style={{
-                flexDirection: 'row',
-                backgroundColor: '#cccccc'
-              }}>
-              <Ionicons name={'ios-list-box-outline'} size={20} />
-              <Text
-                className="OrgDrawerName"
+            <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
+              <View
+                className="OrgDrawer"
                 style={{
-                  fontFamily: 'space-mono',
-                  fontSize: 12,
-                  flex: 1,
-                  paddingLeft: 10
-                }}
-                onPress={this._toggleCollapse.bind(this)}>
-                {this.props.drawer.name}
-              </Text>
-            </View>
+                  flexDirection: 'row',
+                  backgroundColor: '#cccccc'
+                }}>
+                <Ionicons
+                  name={'ios-list-box-outline'}
+                  size={20}
+                  style={{ marginLeft: 5 }}
+                />
+              </View>
+            </TouchableHighlight>
           </Swipeout>
           <View className="OrgDrawerProperties">
             {listItems}

@@ -18,26 +18,20 @@ export default class OrgLogbook extends Component {
   render() {
     if (this.state.isCollapsed) {
       return (
-        <View
-          className="OrgLogbook"
-          style={{
-            flexDirection: 'row',
-            backgroundColor: '#cccccc'
-          }}>
-          <Ionicons name={'ios-recording'} size={20} />
-          <Text
-            className="OrgDrawerName"
+        <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
+          <View
+            className="OrgLogbook"
             style={{
-              fontFamily: 'space-mono',
-              backgroundColor: '#cccccc',
-              fontSize: 12,
-              flex: 1,
-              paddingLeft: 10
-            }}
-            onPress={this._toggleCollapse.bind(this)}>
-            LOGBOOK
-          </Text>
-        </View>
+              flexDirection: 'row',
+              backgroundColor: '#cccccc'
+            }}>
+            <Ionicons
+              name={'ios-recording'}
+              size={20}
+              style={{ marginLeft: 5 }}
+            />
+          </View>
+        </TouchableHighlight>
       );
     } else {
       const listItems =
@@ -59,6 +53,7 @@ export default class OrgLogbook extends Component {
       return (
         <View style={{ flexDirection: 'column', flex: 1 }}>
           <Swipeout
+            autoClose={true}
             left={[
               {
                 text: 'addOne',
@@ -67,25 +62,21 @@ export default class OrgLogbook extends Component {
                 }
               }
             ]}>
-            <View
-              className="OrgLogbook"
-              style={{
-                flexDirection: 'row',
-                backgroundColor: '#cccccc'
-              }}>
-              <Ionicons name={'ios-list-box-outline'} size={20} />
-              <Text
-                className="OrgDrawerName"
+            <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
+              <View
+                className="OrgLogbook"
                 style={{
-                  fontFamily: 'space-mono',
-                  fontSize: 12,
-                  flex: 1,
-                  paddingLeft: 10
+                  flexDirection: 'row',
+                  backgroundColor: '#cccccc'
                 }}
                 onPress={this._toggleCollapse.bind(this)}>
-                {'LOGBOOK'}
-              </Text>
-            </View>
+                <Ionicons
+                  name={'ios-recording-outline'}
+                  size={20}
+                  style={{ marginLeft: 5 }}
+                />
+              </View>
+            </TouchableHighlight>
           </Swipeout>
           <View className="OrgDrawerProperties">
             {listItems}

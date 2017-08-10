@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableHighlight } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {
@@ -28,25 +28,16 @@ class OrgScheduling extends Component {
   render() {
     if (this.state.isCollapsed) {
       return (
-        <View
-          className="OrgScheduling"
-          style={{
-            flexDirection: 'row',
-            backgroundColor: '#cccccc'
-          }}>
-          <Ionicons name={'ios-alarm'} size={20} />
-          <Text
-            className="OrgDrawerName"
+        <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
+          <View
+            className="OrgScheduling"
             style={{
-              fontFamily: 'space-mono',
-              fontSize: 12,
-              flex: 1,
-              paddingLeft: 10
-            }}
-            onPress={this._toggleCollapse.bind(this)}>
-            SCHEDULING
-          </Text>
-        </View>
+              flexDirection: 'row',
+              backgroundColor: '#cccccc'
+            }}>
+            <Ionicons name={'ios-alarm'} size={20} style={{ marginLeft: 5 }} />
+          </View>
+        </TouchableHighlight>
       );
     } else {
       const {
@@ -70,25 +61,20 @@ class OrgScheduling extends Component {
 
       return (
         <View style={{ flex: 1 }}>
-          <View
-            className="OrgScheduling"
-            style={{
-              flexDirection: 'row',
-              backgroundColor: '#cccccc'
-            }}>
-            <Ionicons name={'ios-alarm-outline'} size={20} />
-            <Text
-              className="OrgDrawerName"
+          <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
+            <View
+              className="OrgScheduling"
               style={{
-                fontFamily: 'space-mono',
-                fontSize: 12,
-                flex: 1,
-                paddingLeft: 10
-              }}
-              onPress={this._toggleCollapse.bind(this)}>
-              SCHEDULING
-            </Text>
-          </View>
+                flexDirection: 'row',
+                backgroundColor: '#cccccc'
+              }}>
+              <Ionicons
+                name={'ios-alarm-outline'}
+                size={20}
+                style={{ marginLeft: 5 }}
+              />
+            </View>
+          </TouchableHighlight>
           <View>{timings}</View>
         </View>
       );
