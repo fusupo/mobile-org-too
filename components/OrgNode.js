@@ -1,10 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { StyleSheet, Text, View, TouchableHighlight } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
 
 import OrgTodoKeywordEditable from './OrgTodoKeywordEditable';
-
-const OrgDrawerUtil = require('org-parse').OrgDrawer;
 
 const styles = StyleSheet.create({
   flexOne: {
@@ -21,20 +19,32 @@ const styles = StyleSheet.create({
   }
 });
 
-const OrgNode = ({ bufferID, id, headline, propDrawer, onTitleClick }) => {
+const OrgNode = ({ bufferID, nodeID, headlineContent, onTitleClick }) => {
   return (
     <TouchableHighlight
       underlayColor="#00ff00"
       style={styles.flexOne}
       onPress={onTitleClick}>
       <View style={styles.flexRow}>
-        <OrgTodoKeywordEditable bufferID={bufferID} nodeID={id} />
+        <OrgTodoKeywordEditable bufferID={bufferID} nodeID={nodeID} />
         <Text style={styles.flexOne}>
-          {headline.content}
+          {headlineContent}
         </Text>
       </View>
     </TouchableHighlight>
   );
 };
 
-export default OrgNode;
+const mapStateToProps = (state, ownProps) => {
+  const { bufferID, nodeID } = ownProps;
+  return {
+    headlineContent: state.orgBuffers[bufferID].orgNodes[nodeID].headline
+      .content
+  };
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrgNode);

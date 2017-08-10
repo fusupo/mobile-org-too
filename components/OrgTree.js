@@ -1,10 +1,9 @@
 import React from 'react';
 import { Text, StyleSheet, View, TouchableHighlight } from 'react-native';
-import Swipeout from 'react-native-swipeout';
 import { FontAwesome } from '@expo/vector-icons';
 
 import { connect } from 'react-redux';
-import OrgNode from './OrgNode';
+import OrgHeadline from './OrgHeadline';
 
 const OrgDrawerUtil = require('org-parse').OrgDrawer;
 
@@ -15,132 +14,36 @@ const styles = StyleSheet.create({
   }
 });
 
-const makeHeadline = (
-  bufferID,
-  nodes,
-  node,
-  isCollapsed,
-  onNodeTitleClick,
-  onNodeArrowClick,
-  onAddOnePress,
-  onDeleteNodePress
-) => (
-  <Swipeout
-    sensitiviy={1}
-    right={[
-      {
-        text: 'deleteNode',
-        onPress: () => {
-          onDeleteNodePress(node.id);
-        }
-      }
-    ]}
-    left={[
-      {
-        text: 'addOne',
-        onPress: () => {
-          onAddOnePress(node.id);
-        }
-      }
-    ]}>
-    <View
-      style={[
-        styles.orgNodeWrapper,
-        {
-          marginLeft: 10 * node.headline.level
-        }
-      ]}>
-      <OrgNode
-        bufferID={bufferID}
-        key={node.id}
-        {...nodes[node.id]}
-        onTitleClick={() => onNodeTitleClick(node.id)}
-      />
-      <TouchableHighlight
-        style={{ width: 40 }}
-        onPress={() => onNodeArrowClick(node.id)}>
-        <FontAwesome name={isCollapsed ? 'caret-down' : 'caret-up'} size={25} />
-      </TouchableHighlight>
-    </View>
-  </Swipeout>
-);
-
 export class OrgTree extends React.Component {
   render() {
-    const {
-      bufferID,
-      nodes,
-      tree,
-      onNodeTitleClick,
-      onNodeArrowClick,
-      onAddOnePress,
-      onDeleteNodePress
-    } = this.props;
+    const { bufferID, tree, node } = this.props;
     if (tree.nodeID === 'root') {
       return (
         <View>
           {tree.children.map(t => {
-            return (
-              <OrgTree
-                bufferID={bufferID}
-                key={t.nodeID}
-                nodes={nodes}
-                tree={t}
-                onNodeTitleClick={onNodeTitleClick}
-                onNodeArrowClick={onNodeArrowClick}
-                onAddOnePress={onAddOnePress}
-                onDeleteNodePress={onDeleteNodePress}
-              />
-            );
+            return <OrgTree bufferID={bufferID} key={t.nodeID} tree={t} />;
           })}
         </View>
       );
     } else if (Object.keys(tree).length > 0) {
-      const node = nodes[tree.nodeID];
-      const idx = OrgDrawerUtil.indexOfKey(node.propDrawer, 'collapseStatus');
-      const collapseStatus = idx === -1
-        ? 'collapsed'
-        : node.propDrawer.properties[idx][1];
+      // const idx = OrgDrawerUtil.indexOfKey(node.propDrawer, 'collapseStatus');
+      // const collapseStatus = idx === -1
+      //   ? 'collapsed'
+      //   : node.propDrawer.properties[idx][1];
+      let collapseStatus = 'collapsed';
       switch (collapseStatus) {
         case 'collapsed':
-          return makeHeadline(
-            bufferID,
-            nodes,
-            node,
-            true,
-            onNodeTitleClick,
-            onNodeArrowClick,
-            onAddOnePress,
-            onDeleteNodePress
-          );
+          return <OrgHeadline bufferID={bufferID} nodeID={tree.nodeID} />;
           break;
         case 'expanded':
         case 'maximized':
           return (
             <View>
-              {makeHeadline(
-                bufferID,
-                nodes,
-                node,
-                false,
-                onNodeTitleClick,
-                onNodeArrowClick,
-                onAddOnePress,
-                onDeleteNodePress
-              )}
+              <OrgHeadline bufferID={bufferID} nodeID={tree.nodeID} />
               <View>
                 {tree.children.map(t => {
                   return (
-                    <OrgTree
-                      bufferID={bufferID}
-                      key={t.nodeID}
-                      nodes={nodes}
-                      tree={t}
-                      onNodeTitleClick={onNodeTitleClick}
-                      onNodeArrowClick={onNodeArrowClick}
-                      onAddOnePress={onAddOnePress}
-                      onDeleteNodePress={onDeleteNodePress}
-                    />
+                    <OrgTree bufferID={bufferID} key={t.nodeID} tree={t} />
                   );
                 })}
               </View>
@@ -159,30 +62,13 @@ export class OrgTree extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  return {
-    nodes: ownProps.nodes,
-    tree: ownProps.tree
-  };
+  const { bufferID, tree } = ownProps;
+  const node = state.orgBuffers[bufferID].orgNodes[tree.nodeID];
+  return { node };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  const ret = {};
-  ret.onNodeTitleClick = ownProps.onNodeTitleClick
-    ? ownProps.onNodeTitleClick
-    : nodeID => {
-        console.log(nodeID);
-      };
-  ret.onAddOnePress = ownProps.onAddOnePress
-    ? ownProps.onAddOnePress
-    : nodeID => {
-        console.log('add One', nodeID);
-      };
-  ret.onDeleteNodePress = ownProps.onDeleteNodePress
-    ? ownProps.onDeleteNodePress
-    : nodeID => {
-        console.log('delete One', nodeID);
-      };
-  return ret;
+  return {};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrgTree);

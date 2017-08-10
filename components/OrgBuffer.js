@@ -2,7 +2,6 @@ import React from 'react';
 import { Text, StyleSheet, View, TouchableHighlight } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { addNewNode, deleteNode, cycleNodeCollapse } from '../actions';
-import { NavigationActions } from 'react-navigation';
 
 import { connect } from 'react-redux';
 import OrgTree from './OrgTree';
@@ -25,27 +24,11 @@ const styles = StyleSheet.create({
   }
 });
 
-export const OrgBuffer = ({
-  bufferID,
-  nodes,
-  tree,
-  onNodeTitleClick,
-  onNodeArrowClick,
-  onAddOne,
-  onDeleteNode
-}) => {
+export const OrgBuffer = ({ bufferID, nodes, tree }) => {
   return (
     <View>
       <Text>{bufferID}</Text>
-      <OrgTree
-        bufferID={bufferID}
-        nodes={nodes}
-        tree={tree}
-        onNodeTitleClick={onNodeTitleClick(bufferID)}
-        onNodeArrowClick={onNodeArrowClick(bufferID)}
-        onAddOnePress={onAddOne(bufferID)}
-        onDeleteNodePress={onDeleteNode(bufferID)}
-      />
+      <OrgTree bufferID={bufferID} tree={tree} />
     </View>
   );
 };
@@ -68,34 +51,29 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onNodeArrowClick: bufferID => {
-      return nodeID => {
-        dispatch(cycleNodeCollapse(bufferID, nodeID));
-      };
-    },
-    onNodeTitleClick: bufferID => {
-      return nodeID => {
-        dispatch(
-          NavigationActions.navigate({
-            routeName: 'NodeDetail',
-            params: {
-              bufferID,
-              nodeID
-            }
-          })
-        );
-      };
-    },
-    onAddOne: bufferID => {
-      return nodeID => {
-        dispatch(addNewNode(bufferID));
-      };
-    },
-    onDeleteNode: bufferID => {
-      return nodeID => {
-        dispatch(deleteNode(bufferID, nodeID));
-      };
-    }
+    // onNodeArrowClick: bufferID => {
+    //   return nodeID => {
+    //     dispatch(cycleNodeCollapse(bufferID, nodeID));
+    //   };
+    // },
+    // onNodeTitleClick: bufferID => {
+    //   return nodeID => {
+    //     dispatch(
+    //       NavigationActions.navigate({
+    //         routeName: 'NodeDetail',
+    //         params: {
+    //           bufferID,
+    //           nodeID
+    //         }
+    //       })
+    //     );
+    //   };
+    // },
+    // onAddOne: bufferID => {
+    //   return nodeID => {
+    //     dispatch(addNewNode(bufferID));
+    //   };
+    // },
   };
 };
 

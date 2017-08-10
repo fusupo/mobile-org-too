@@ -330,9 +330,22 @@ function orgTree(state = {}, action) {
       nextState = Object.assign({}, state, { children: clonedKids });
       break;
     case DELETE_NODE:
-      clonedKids = state.children.slice(0);
-      clonedKids = clonedKids.filter(n => n.nodeID !== action.nodeID);
-      nextState = Object.assign({}, state, { children: clonedKids });
+      const findAndDelete = tree => {
+        if (tree.nodeID === action.nodeID) {
+          return null;
+        } else {
+          let newTree = { nodeID: tree.nodeID, children: [] };
+          tree.children.forEach(c => {
+            let newChild = findAndDelete(c);
+            if (newChild !== null) newTree.children.push(newChild);
+          });
+          return newTree;
+        }
+      };
+      // clonedKids = state.children.slice(0);
+      // clonedKids = clonedKids.filter(n => n.nodeID !== action.nodeID);
+      nextState = findAndDelete(state);
+      // Object.assign({}, state, { children: clonedKids });
       break;
     default:
       break;
@@ -404,12 +417,12 @@ function nav(state, action) {
         state
       );
       break;
-    case DELETE_NODE:
-      nextState = StacksOverTabs.router.getStateForAction(
-        NavigationActions.back(),
-        state
-      );
-      break;
+    // case DELETE_NODE:
+    // nextState = StacksOverTabs.router.getStateForAction(
+    //   NavigationActions.back(),
+    //   state
+    // );
+    // break;
     default:
       nextState = StacksOverTabs.router.getStateForAction(action, state);
       break;

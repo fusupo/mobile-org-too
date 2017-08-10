@@ -17,8 +17,6 @@ class OrgDrawerItem extends Component {
     };
   }
   componentWillReceiveProps(nextProps) {
-    console.log('WILL RECEIVE PROPS !!!!!!!!!');
-    console.log(nextProps);
     this.setState({
       propKey: nextProps.propKey,
       propVal: nextProps.propVal

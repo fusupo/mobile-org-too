@@ -1,5 +1,14 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { connect } from 'react-redux';
+import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import { NavigationActions } from 'react-navigation';
+import Swipeout from 'react-native-swipeout';
+
+import { addNewNode, deleteNode, cycleNodeCollapse } from '../actions';
+
+const OrgDrawerUtil = require('org-parse').OrgDrawer;
+import OrgNode from './OrgNode';
 
 const styles = StyleSheet.create({
   rowContainer: { flex: 1, flexDirection: 'row' },
@@ -7,44 +16,109 @@ const styles = StyleSheet.create({
     fontFamily: 'space-mono',
     backgroundColor: '#cccccc',
     fontSize: 10
+  },
+  orgNodeWrapper: {
+    flexDirection: 'row',
+    height: 50
   }
 });
 
-export default class OrgHeadline extends Component {
+class OrgHeadline extends Component {
   constructor(props) {
     super(props);
   }
-
   render() {
-    // todo keyword
-    const todoKeyword = this.props.headline.todoKeyword
-      ? <Text
-          style={{
-            backgroundColor: this.props.headline.todoKeywordColor
-          }}>
-          {this.props.headline.todoKeyword}
-        </Text>
-      : null;
-
-    // tags
-    const tags = this.props.headline.tags && this.props.headline.tags.length > 0
-      ? this.props.headline.tags.map((tag, idx) => {
-          return (
-            <Text key={idx} style={styles.tag}>
-              {tag}
-            </Text>
-          );
-        })
-      : null;
-
-    const tagList = tags ? <Text>{tags}</Text> : null;
-
+    const {
+      bufferID,
+      node,
+      isCollapsed,
+      onNodeTitlePress,
+      onDeleteNodePress
+    } = this.props;
     return (
-      <View style={style.rowContainer}>
-        {todoKeyword}
-        <Text>{'foobarbax' + this.props.headline.content}</Text>
-        {tagList}
-      </View>
+      <Swipeout
+        sensitiviy={1}
+        right={[
+          {
+            text: 'deleteNode',
+            onPress: () => {
+              onDeleteNodePress(bufferID, node.id);
+            }
+          }
+        ]}
+        left={[
+          {
+            text: 'addOne',
+            onPress: () => {
+              //onAddOnePress(bufferID, node.id);
+            }
+          }
+        ]}>
+        <View
+          style={[
+            styles.orgNodeWrapper,
+            {
+              marginLeft: 10 * node.headline.level
+            }
+          ]}>
+          <OrgNode
+            bufferID={bufferID}
+            nodeID={node.id}
+            onTitleClick={() => {
+              onNodeTitlePress(bufferID, node.id);
+            }}
+          />
+          <TouchableHighlight
+            style={{ width: 40 }}
+            onPress={() => {
+              //   onNodeArrowClick(bufferID, node.id)
+            }}>
+            <FontAwesome
+              name={isCollapsed ? 'caret-down' : 'caret-up'}
+              size={25}
+            />
+          </TouchableHighlight>
+        </View>
+      </Swipeout>
     );
   }
 }
+const mapStateToProps = (state, ownProps) => {
+  const { bufferID, nodeID } = ownProps;
+  const node = state.orgBuffers[bufferID].orgNodes[nodeID];
+  //const idx = OrgDrawerUtil.indexOfKey(node.propDrawer, 'collapseStatus');
+  // const collapseStatus = idx === -1
+  //   ? 'collapsed'
+  //   : node.propDrawer.properties[idx][1];
+  // let isCollapsed;
+  // if (collapseStatus === 'collapsed') {
+  //   isCollapsed = true;
+  // } else if (collapseStatus === 'expanded' || collapseStatus === 'maximized') {
+  //   isCollapsed = false;
+  // }
+  return {
+    node,
+    isCollapsed: true
+  };
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    onNodeTitlePress: (bufferID, nodeID) => {
+      dispatch(
+        NavigationActions.navigate({
+          routeName: 'NodeDetail',
+          params: {
+            bufferID,
+            nodeID
+          }
+        })
+      );
+    },
+    onDeleteNodePress: (bufferID, nodeID) => {
+      dispatch(deleteNode(bufferID, nodeID));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrgHeadline);
