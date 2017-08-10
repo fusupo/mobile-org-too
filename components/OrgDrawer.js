@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text, View, TouchableHighlight } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Swipeout from 'react-native-swipeout';
 
 import OrgDrawerItem from './OrgDrawerItem';
 
@@ -28,7 +29,9 @@ class OrgDrawer extends Component {
             className="OrgDrawerName"
             style={{
               fontFamily: 'space-mono',
-              fontSize: 12
+              fontSize: 12,
+              flex: 1,
+              paddingLeft: 10
             }}
             onPress={this._toggleCollapse.bind(this)}>
             {this.props.drawer.name}
@@ -52,37 +55,36 @@ class OrgDrawer extends Component {
       });
 
       return (
-        <View className="OrgDrawer">
-          <View
-            style={{
-              flexDirection: 'row',
-              backgroundColor: '#cccccc'
-            }}>
-            <Ionicons name={'ios-list-box-outline'} size={20} />
-            <View style={{ flex: 1 }}>
-              <TouchableHighlight onPress={this.props.onAddProp}>
-                <Text
-                  className="OrgDrawerName"
-                  style={{
-                    fontFamily: 'space-mono',
-                    fontSize: 12
-                  }}>
-                  {'+'}
-                </Text>
-              </TouchableHighlight>
-            </View>
-            <View style={{ flex: 16 }}>
+        <View style={{ flexDirection: 'column', flex: 1 }}>
+          <Swipeout
+            left={[
+              {
+                text: 'addOne',
+                onPress: () => {
+                  this.props.onAddProp();
+                }
+              }
+            ]}>
+            <View
+              className="OrgDrawer"
+              style={{
+                flexDirection: 'row',
+                backgroundColor: '#cccccc'
+              }}>
+              <Ionicons name={'ios-list-box-outline'} size={20} />
               <Text
                 className="OrgDrawerName"
                 style={{
                   fontFamily: 'space-mono',
-                  fontSize: 12
+                  fontSize: 12,
+                  flex: 1,
+                  paddingLeft: 10
                 }}
                 onPress={this._toggleCollapse.bind(this)}>
                 {this.props.drawer.name}
               </Text>
             </View>
-          </View>
+          </Swipeout>
           <View className="OrgDrawerProperties">
             {listItems}
           </View>

@@ -24,7 +24,13 @@ class OrgDrawerItem extends Component {
   }
   render() {
     const showKeyEditor = this.props.propKey
-      ? <Text style={{ flex: 1, borderColor: 'gray', borderWidth: 1 }}>
+      ? <Text
+          style={{
+            flex: 1,
+            borderColor: 'gray',
+            backgroundColor: '#dedede',
+            borderWidth: 1
+          }}>
           {this.props.propKey}
         </Text>
       : <TextInput
@@ -37,17 +43,7 @@ class OrgDrawerItem extends Component {
           onChangeText={propKey => this.setState({ propKey })}
         />;
     const showEditor = this.state.isEditing
-      ? <View style={{ flex: 16, flexDirection: 'row' }}>
-          {showKeyEditor}
-          <TextInput
-            style={{ flex: 1, borderColor: 'gray', borderWidth: 1 }}
-            value={
-              this.state.propVal === undefined
-                ? this.props.propVal
-                : this.state.propVal
-            }
-            onChangeText={propVal => this.setState({ propVal })}
-          />
+      ? <View style={{ flex: 1, flexDirection: 'row' }}>
           <Button
             onPress={() => {
               const key = this.state.propKey === undefined
@@ -65,6 +61,25 @@ class OrgDrawerItem extends Component {
             }}
             title="cancel"
             color="#aa3333"
+          />
+          {showKeyEditor}
+          <TextInput
+            style={{ flex: 1, borderColor: 'gray', borderWidth: 1 }}
+            value={
+              this.state.propVal === undefined
+                ? this.props.propVal
+                : this.state.propVal
+            }
+            onChangeText={propVal => this.setState({ propVal })}
+          />
+          <Button
+            onPress={() => {
+              this.setState({ isEditing: false });
+              this.props.onRemoveProp(this.props.propKey);
+            }}
+            title="delete"
+            color="#33aa33"
+            overrides={{ backgroundColor: '#ff0000' }}
           />
         </View>
       : <TouchableHighlight
@@ -94,23 +109,21 @@ class OrgDrawerItem extends Component {
 
     return (
       <View style={{ flexDirection: 'row' }}>
-        <View style={{ flex: 1 }}>
-          <TouchableHighlight
-            onPress={() => this.props.onRemoveProp(this.props.propKey)}>
-            <Text
-              className="OrgDrawerName"
-              style={{
-                fontFamily: 'space-mono',
-                fontSize: 12
-              }}>
-              {'X'}
-            </Text>
-          </TouchableHighlight>
-        </View>
         {showEditor}
       </View>
     );
   }
 }
 
+//   <TouchableHighlight
+// onPress={() => this.props.onRemoveProp(this.props.propKey)}>
+//   <Text
+// className="OrgDrawerName"
+// style={{
+//   fontFamily: 'space-mono',
+//   fontSize: 12
+// }}>
+//   {'X'}
+// </Text>
+//   </TouchableHighlight>
 export default OrgDrawerItem;

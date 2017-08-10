@@ -42,7 +42,6 @@ class OrgHeadline extends Component {
     return (
       <View style={{ flexDirection: 'column', flex: 1 }}>
         <Swipeout
-          sensitiviy={1}
           right={[
             {
               text: 'deleteNode',
