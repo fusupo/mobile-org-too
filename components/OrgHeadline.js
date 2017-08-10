@@ -9,6 +9,7 @@ import { addNewNode, deleteNode, cycleNodeCollapse } from '../actions';
 
 const OrgDrawerUtil = require('org-parse').OrgDrawer;
 import OrgNode from './OrgNode';
+import OrgTree from './OrgTree';
 
 const styles = StyleSheet.create({
   rowContainer: { flex: 1, flexDirection: 'row' },
@@ -31,75 +32,83 @@ class OrgHeadline extends Component {
     const {
       bufferID,
       node,
+      nodeID,
       isCollapsed,
       onNodeTitlePress,
       onDeleteNodePress,
-      onAddOnePress
+      onAddOnePress,
+      onNodeArrowPress
     } = this.props;
     return (
-      <Swipeout
-        sensitiviy={1}
-        right={[
-          {
-            text: 'deleteNode',
-            onPress: () => {
-              onDeleteNodePress(bufferID, node.id);
-            }
-          }
-        ]}
-        left={[
-          {
-            text: 'addOne',
-            onPress: () => {
-              onAddOnePress(bufferID, node.id);
-            }
-          }
-        ]}>
-        <View
-          style={[
-            styles.orgNodeWrapper,
+      <View style={{ flexDirection: 'column', flex: 1 }}>
+        <Swipeout
+          sensitiviy={1}
+          right={[
             {
-              marginLeft: 10 * node.headline.level
+              text: 'deleteNode',
+              onPress: () => {
+                onDeleteNodePress(bufferID, nodeID);
+              }
+            }
+          ]}
+          left={[
+            {
+              text: 'addOne',
+              onPress: () => {
+                onAddOnePress(bufferID, nodeID, node);
+              }
             }
           ]}>
-          <OrgNode
-            bufferID={bufferID}
-            nodeID={node.id}
-            onTitleClick={() => {
-              onNodeTitlePress(bufferID, node.id);
-            }}
-          />
-          <TouchableHighlight
-            style={{ width: 40 }}
-            onPress={() => {
-              //   onNodeArrowClick(bufferID, node.id)
-            }}>
-            <FontAwesome
-              name={isCollapsed ? 'caret-down' : 'caret-up'}
-              size={25}
+          <View
+            style={[
+              styles.orgNodeWrapper,
+              {
+                marginLeft: 10 * node.headline.level
+              }
+            ]}>
+            <OrgNode
+              bufferID={bufferID}
+              nodeID={nodeID}
+              onTitleClick={() => {
+                onNodeTitlePress(bufferID, nodeID);
+              }}
             />
-          </TouchableHighlight>
-        </View>
-      </Swipeout>
+            <TouchableHighlight
+              style={{ width: 40 }}
+              onPress={() => {
+                onNodeArrowPress(bufferID, nodeID);
+              }}>
+              <FontAwesome
+                name={isCollapsed ? 'caret-down' : 'caret-up'}
+                size={25}
+              />
+            </TouchableHighlight>
+          </View>
+        </Swipeout>
+        {isCollapsed ? null : <OrgTree bufferID={bufferID} nodeID={nodeID} />}
+      </View>
     );
   }
 }
+
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
   const node = state.orgBuffers[bufferID].orgNodes[nodeID];
-  //const idx = OrgDrawerUtil.indexOfKey(node.propDrawer, 'collapseStatus');
-  // const collapseStatus = idx === -1
-  //   ? 'collapsed'
-  //   : node.propDrawer.properties[idx][1];
-  // let isCollapsed;
-  // if (collapseStatus === 'collapsed') {
-  //   isCollapsed = true;
-  // } else if (collapseStatus === 'expanded' || collapseStatus === 'maximized') {
-  //   isCollapsed = false;
-  // }
+  //
+  const idx = OrgDrawerUtil.indexOfKey(node.propDrawer, 'collapseStatus');
+  const collapseStatus = idx === -1
+    ? 'collapsed'
+    : node.propDrawer.properties[idx][1];
+  let isCollapsed;
+  if (collapseStatus === 'collapsed') {
+    isCollapsed = true;
+  } else if (collapseStatus === 'expanded' || collapseStatus === 'maximized') {
+    isCollapsed = false;
+  }
+  //
   return {
     node,
-    isCollapsed: true
+    isCollapsed
   };
 };
 
@@ -119,8 +128,11 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     onDeleteNodePress: (bufferID, nodeID) => {
       dispatch(deleteNode(bufferID, nodeID));
     },
-    onAddOnePress: (bufferID, nodeID) => {
-      dispatch(addNewNode(bufferID, nodeID));
+    onAddOnePress: (bufferID, nodeID, node) => {
+      dispatch(addNewNode(bufferID, nodeID, node.headline.level + 1));
+    },
+    onNodeArrowPress: (bufferID, nodeID) => {
+      dispatch(cycleNodeCollapse(bufferID, nodeID));
     }
   };
 };

@@ -4,7 +4,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import { addNewNode, deleteNode, cycleNodeCollapse } from '../actions';
 
 import { connect } from 'react-redux';
-import OrgTree from './OrgTree';
+
+import OrgHeadline from './OrgHeadline';
 
 const styles = StyleSheet.create({
   txt: {
@@ -25,10 +26,13 @@ const styles = StyleSheet.create({
 });
 
 export const OrgBuffer = ({ bufferID, nodes, tree }) => {
+  const list = tree.children.map(c => {
+    return <OrgHeadline key={c.nodeID} bufferID={bufferID} nodeID={c.nodeID} />;
+  });
   return (
     <View>
       <Text>{bufferID}</Text>
-      <OrgTree bufferID={bufferID} tree={tree} />
+      {list}
     </View>
   );
 };

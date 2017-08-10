@@ -186,7 +186,6 @@ const mapDispatchToProps = dispatch => {
       };
     },
     onPressDeleteNode: (bufferID, nodeID) => {
-      // dispatch(actionA(bufferID, nodeID));
       dispatch(deleteNode(bufferID, nodeID));
     },
     onTimestampUpdate: (bufferID, nodeID, timestampType) => date => {

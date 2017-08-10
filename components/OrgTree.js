@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import OrgHeadline from './OrgHeadline';
 
 const OrgDrawerUtil = require('org-parse').OrgDrawer;
+const OrgTreeUtil = require('org-parse').OrgTree;
 
 const styles = StyleSheet.create({
   orgNodeWrapper: {
@@ -16,40 +17,27 @@ const styles = StyleSheet.create({
 
 export class OrgTree extends React.Component {
   render() {
-    const { bufferID, tree, node } = this.props;
-    if (tree.nodeID === 'root') {
-      return (
-        <View>
-          {tree.children.map(t => {
-            return <OrgTree bufferID={bufferID} key={t.nodeID} tree={t} />;
-          })}
-        </View>
-      );
-    } else if (Object.keys(tree).length > 0) {
-      // const idx = OrgDrawerUtil.indexOfKey(node.propDrawer, 'collapseStatus');
-      // const collapseStatus = idx === -1
-      //   ? 'collapsed'
-      //   : node.propDrawer.properties[idx][1];
-      let collapseStatus = 'collapsed';
+    const { bufferID, tree, collapseStatus } = this.props;
+    if (Object.keys(tree).length > 0) {
       switch (collapseStatus) {
-        case 'collapsed':
-          return <OrgHeadline bufferID={bufferID} nodeID={tree.nodeID} />;
-          break;
         case 'expanded':
         case 'maximized':
           return (
             <View>
-              <OrgHeadline bufferID={bufferID} nodeID={tree.nodeID} />
-              <View>
-                {tree.children.map(t => {
-                  return (
-                    <OrgTree bufferID={bufferID} key={t.nodeID} tree={t} />
-                  );
-                })}
-              </View>
+              {tree.children.map((t, idx) => {
+                return (
+                  <OrgHeadline
+                    key={t.nodeID}
+                    bufferID={bufferID}
+                    nodeID={t.nodeID}
+                  />
+                );
+              })}
             </View>
           );
           break;
+        default:
+          return null;
       }
     } else {
       return (
@@ -62,13 +50,25 @@ export class OrgTree extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { bufferID, tree } = ownProps;
-  const node = state.orgBuffers[bufferID].orgNodes[tree.nodeID];
-  return { node };
+  const { bufferID, nodeID } = ownProps;
+  const root = state.orgBuffers[bufferID].orgTree;
+  const tree = OrgTreeUtil.findBranch(root, nodeID);
+  const node = state.orgBuffers[bufferID].orgNodes[nodeID];
+  //
+  let collapseStatus = 'collapsed';
+  if (node) {
+    const idx = OrgDrawerUtil.indexOfKey(node.propDrawer, 'collapseStatus');
+    collapseStatus = idx === -1
+      ? 'collapsed'
+      : node.propDrawer.properties[idx][1];
+  }
+  //
+  return { collapseStatus, tree };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrgTree);
+const foo = connect(mapStateToProps, mapDispatchToProps)(OrgTree);
+export default foo;

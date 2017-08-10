@@ -57,6 +57,9 @@ function headline(
   action
 ) {
   switch (action.type) {
+    case ADD_NEW_NODE:
+      return Object.assign({}, state, { level: action.level });
+      break;
     case UPDATE_NODE_TODO_KEYWORD:
       if (action.todoKeyword === 'none') {
         return Object.assign({}, state, {
@@ -330,9 +333,7 @@ function orgTree(state = {}, action) {
         if (tree.nodeID === action.parentID) {
           let clonedKids = tree.children.slice(0);
           clonedKids.push({ nodeID: action.nodeID, children: [] });
-          console.log(action.nodeID);
           newTree.children = clonedKids;
-          console.log(newTree);
           return newTree;
         } else {
           tree.children.forEach(c => {
@@ -343,9 +344,6 @@ function orgTree(state = {}, action) {
         }
       };
       nextState = findAndAdd(state);
-
-      console.log(nextState.children.length);
-      console.log(nextState.children[2]);
       break;
     case DELETE_NODE:
       const findAndDelete = tree => {
