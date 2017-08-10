@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { View, Text } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {
   updateNodeTimestamp,
@@ -27,13 +28,20 @@ class OrgScheduling extends Component {
   render() {
     if (this.state.isCollapsed) {
       return (
-        <View className="OrgScheduling">
+        <View
+          className="OrgScheduling"
+          style={{
+            flexDirection: 'row',
+            backgroundColor: '#cccccc'
+          }}>
+          <Ionicons name={'ios-alarm'} size={20} />
           <Text
             className="OrgDrawerName"
             style={{
               fontFamily: 'space-mono',
-              backgroundColor: '#cccccc',
-              fontSize: 12
+              fontSize: 12,
+              flex: 1,
+              paddingLeft: 10
             }}
             onPress={this._toggleCollapse.bind(this)}>
             SCHEDULING
@@ -61,14 +69,21 @@ class OrgScheduling extends Component {
       ));
 
       return (
-        <View>
-          <View className="OrgScheduling">
+        <View style={{ flex: 1 }}>
+          <View
+            className="OrgScheduling"
+            style={{
+              flexDirection: 'row',
+              backgroundColor: '#cccccc'
+            }}>
+            <Ionicons name={'ios-alarm-outline'} size={20} />
             <Text
               className="OrgDrawerName"
               style={{
                 fontFamily: 'space-mono',
-                backgroundColor: '#cccccc',
-                fontSize: 12
+                fontSize: 12,
+                flex: 1,
+                paddingLeft: 10
               }}
               onPress={this._toggleCollapse.bind(this)}>
               SCHEDULING

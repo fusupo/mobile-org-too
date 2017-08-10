@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { TouchableHighlight, ScrollView, Text, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import OrgLogbookItem from './OrgLogbookItem';
 
@@ -16,7 +17,13 @@ export default class OrgLogbook extends Component {
   render() {
     if (this.state.isCollapsed) {
       return (
-        <View className="OrgLogbook">
+        <View
+          className="OrgLogbook"
+          style={{
+            flexDirection: 'row',
+            backgroundColor: '#cccccc'
+          }}>
+          <Ionicons name={'ios-recording'} size={20} />
           <Text
             className="OrgDrawerName"
             style={{
@@ -48,7 +55,12 @@ export default class OrgLogbook extends Component {
 
       return (
         <View className="OrgLogbook">
-          <View style={{ flexDirection: 'row' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              backgroundColor: '#cccccc'
+            }}>
+            <Ionicons name={'ios-recording-outline'} size={20} />
             <View style={{ flex: 1 }}>
               <TouchableHighlight onPress={this.props.onAddLogNote}>
                 <Text

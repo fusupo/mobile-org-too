@@ -1,5 +1,4 @@
 import React from 'react';
-import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import { StyleSheet, View } from 'react-native';
 

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Text, View, TouchableHighlight } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import OrgDrawerItem from './OrgDrawerItem';
 
@@ -16,7 +17,13 @@ class OrgDrawer extends Component {
   render() {
     if (this.state.isCollapsed) {
       return (
-        <View className="OrgDrawer">
+        <View
+          className="OrgDrawer"
+          style={{
+            flexDirection: 'row',
+            backgroundColor: '#cccccc'
+          }}>
+          <Ionicons name={'ios-list-box'} size={20} />
           <Text
             className="OrgDrawerName"
             style={{
@@ -46,7 +53,12 @@ class OrgDrawer extends Component {
 
       return (
         <View className="OrgDrawer">
-          <View style={{ flexDirection: 'row' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              backgroundColor: '#cccccc'
+            }}>
+            <Ionicons name={'ios-list-box-outline'} size={20} />
             <View style={{ flex: 1 }}>
               <TouchableHighlight onPress={this.props.onAddProp}>
                 <Text
