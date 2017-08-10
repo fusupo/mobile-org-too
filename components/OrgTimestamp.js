@@ -46,29 +46,9 @@ class OrgTimestamp extends Component {
       );
     };
 
-    const showDatePicker = this.state.showDatePicker
-      ? <View>
-          <DatePickerIOS
-            style={{ height: 200 }}
-            date={this.state.date}
-            onDateChange={date => this.setState({ date })}
-            mode="datetime"
-          />
-          {okCancel(
-            () => {
-              this.setState({ showDatePicker: !this.state.showDatePicker });
-            },
-            () => {
-              this.props.onTimestampUpdate(this.state.date);
-              this.setState({ showDatePicker: !this.state.showDatePicker });
-            }
-          )}
-        </View>
-      : <View />;
-
     const repUnitsPicker = selectedVal => (
       <Picker
-        style={{ flex: 1 }}
+        style={{ flex: 1, height: 150 }}
         selectedValue={this.state[selectedVal]}
         onValueChange={(itemValue, itemIndex) => {
           const obj = {};
@@ -90,7 +70,7 @@ class OrgTimestamp extends Component {
       }
       return (
         <Picker
-          style={{ flex: 1 }}
+          style={{ flex: 1, height: 150 }}
           selectedValue={this.state[selectedVal]}
           onValueChange={(itemValue, itemIndex) => {
             const obj = {};
@@ -103,22 +83,6 @@ class OrgTimestamp extends Component {
     };
     var showRepIntPicker = this.state.showRepIntPicker
       ? <View>
-          <View style={{ flexDirection: 'row' }}>
-            <Picker
-              style={{ flex: 1 }}
-              selectedValue={this.state.repInt}
-              onValueChange={(itemValue, itemIndex) =>
-                this.setState({ repInt: itemValue })}>
-              <Picker.Item label="--" value="--" />
-              <Picker.Item label="+" value="+" />
-              <Picker.Item label="++" value="++" />
-              <Picker.Item label=".+" value=".+" />
-            </Picker>
-            {repValPicker('repMinVal')}
-            {repUnitsPicker('repMinU')}
-            {repValPicker('repMaxVal')}
-            {repUnitsPicker('repMaxU')}
-          </View>
           {okCancel(
             () => {
               this.setState({ showRepIntPicker: !this.state.showRepIntPicker });
@@ -167,6 +131,102 @@ class OrgTimestamp extends Component {
               this.setState({ showRepIntPicker: !this.state.showRepIntPicker });
             }
           )}
+          <View style={{ flexDirection: 'row' }}>
+            <Picker
+              style={{ flex: 1 }}
+              selectedValue={this.state.repInt}
+              onValueChange={(itemValue, itemIndex) =>
+                this.setState({ repInt: itemValue })}>
+              <Picker.Item label="--" value="--" />
+              <Picker.Item label="+" value="+" />
+              <Picker.Item label="++" value="++" />
+              <Picker.Item label=".+" value=".+" />
+            </Picker>
+            {repValPicker('repMinVal')}
+            {repUnitsPicker('repMinU')}
+            {repValPicker('repMaxVal')}
+            {repUnitsPicker('repMaxU')}
+          </View>
+        </View>
+      : <View />;
+
+    const showDatePicker = this.state.showDatePicker
+      ? <View>
+          {okCancel(
+            () => {
+              this.setState({ showDatePicker: !this.state.showDatePicker });
+            },
+            () => {
+              this.props.onTimestampUpdate(this.state.date);
+
+              //
+
+              const {
+                repInt,
+                repMaxVal,
+                repMaxU,
+                repMinVal,
+                repMinU
+              } = this.state;
+              if (repInt !== '--') {
+                if (
+                  repMaxVal !== '-' &&
+                  repMaxU !== '-' &&
+                  repMinVal !== '-' &&
+                  repMinU !== '-' &&
+                  parseInt(repMinVal) < parseInt(repMaxVal)
+                  // you would also want to make sure the repMaxU is >= repMinU
+                ) {
+                  // case has min and max repeat rates defined
+                  this.props.onTimestampRepIntUpdate(
+                    repInt,
+                    repMinVal + repMinU,
+                    repMaxVal + repMaxU
+                  );
+                } else if (repMinVal !== '-' && repMinU !== '-') {
+                  // case has only min repeat rate defined
+                  this.props.onTimestampRepIntUpdate(
+                    repInt,
+                    repMinVal + repMinU,
+                    null
+                  );
+                }
+              } else {
+                if (
+                  repMaxVal === '-' &&
+                  repMaxU === '-' &&
+                  repMinVal === '-' &&
+                  repMinU === '-'
+                ) {
+                  this.props.onTimestampRepIntUpdate(null, null, null);
+                }
+              }
+
+              this.setState({ showDatePicker: !this.state.showDatePicker });
+            }
+          )}
+          <View style={{ flexDirection: 'row' }}>
+            <DatePickerIOS
+              style={{ height: 150, flex: 12 }}
+              date={this.state.date}
+              onDateChange={date => this.setState({ date })}
+              mode="datetime"
+            />
+            <Picker
+              style={{ flex: 1 }}
+              selectedValue={this.state.repInt}
+              onValueChange={(itemValue, itemIndex) =>
+                this.setState({ repInt: itemValue })}>
+              <Picker.Item label="--" value="--" />
+              <Picker.Item label="+" value="+" />
+              <Picker.Item label="++" value="++" />
+              <Picker.Item label=".+" value=".+" />
+            </Picker>
+            {repValPicker('repMinVal')}
+            {repUnitsPicker('repMinU')}
+            {repValPicker('repMaxVal')}
+            {repUnitsPicker('repMaxU')}
+          </View>
         </View>
       : <View />;
 
@@ -202,46 +262,35 @@ class OrgTimestamp extends Component {
                 {labelStr}
               </Text>
             </View>
-            <View style={{ flex: 8 }}>
-              <TouchableHighlight
-                onPress={() => {
-                  this.setState({ showDatePicker: !this.state.showDatePicker });
-                }}>
-                <Text
-                  style={{
-                    fontFamily: 'space-mono',
-                    fontSize: 12
-                  }}>
-                  {timestampStr}
-                </Text>
-              </TouchableHighlight>
-            </View>
-            <View style={{ flex: 4 }}>
-              <TouchableHighlight
-                onPress={() => {
-                  if (timestamp) {
-                    this.setState({
-                      showRepIntPicker: !this.state.showRepIntPicker
-                    });
-                  } else {
-                    this.setState({
-                      showDatePicker: !this.state.showDatePicker
-                    });
-                  }
-                }}>
-                <Text
-                  style={{
-                    fontFamily: 'space-mono',
-                    fontSize: 12
-                  }}>
-                  {repIntStr}
-                </Text>
-              </TouchableHighlight>
-            </View>
+            <TouchableHighlight
+              onPress={() => {
+                this.setState({ showDatePicker: !this.state.showDatePicker });
+              }}
+              style={{ flex: 12, flexDirection: 'row' }}>
+              <View style={{ flex: 1, flexDirection: 'row' }}>
+                <View style={{ flex: 2 }}>
+                  <Text
+                    style={{
+                      fontFamily: 'space-mono',
+                      fontSize: 12
+                    }}>
+                    {timestampStr}
+                  </Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      fontFamily: 'space-mono',
+                      fontSize: 12
+                    }}>
+                    {repIntStr}
+                  </Text>
+                </View>
+              </View>
+            </TouchableHighlight>
           </View>
         </Swipeout>
         {showDatePicker}
-        {showRepIntPicker}
       </View>
     );
   }

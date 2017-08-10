@@ -65,13 +65,6 @@ class OrgHeadline extends Component {
                 marginLeft: 10 * node.headline.level
               }
             ]}>
-            <OrgNode
-              bufferID={bufferID}
-              nodeID={nodeID}
-              onTitleClick={() => {
-                onNodeTitlePress(bufferID, nodeID);
-              }}
-            />
             <TouchableHighlight
               style={{ width: 40 }}
               onPress={() => {
@@ -82,6 +75,13 @@ class OrgHeadline extends Component {
                 size={25}
               />
             </TouchableHighlight>
+            <OrgNode
+              bufferID={bufferID}
+              nodeID={nodeID}
+              onTitleClick={() => {
+                onNodeTitlePress(bufferID, nodeID);
+              }}
+            />
           </View>
         </Swipeout>
         {isCollapsed ? null : <OrgTree bufferID={bufferID} nodeID={nodeID} />}
