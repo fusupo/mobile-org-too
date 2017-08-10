@@ -6,6 +6,7 @@ import {
   Button,
   TouchableHighlight
 } from 'react-native';
+import Swipeout from 'react-native-swipeout';
 
 class OrgDrawerItem extends Component {
   constructor(props) {
@@ -22,6 +23,15 @@ class OrgDrawerItem extends Component {
       propVal: nextProps.propVal
     });
   }
+  //   <Button
+  // onPress={() => {
+  //   this.setState({ isEditing: false });
+  //   this.props.onRemoveProp(this.props.propKey);
+  // }}
+  // title="delete"
+  // color="#33aa33"
+  // overrides={{ backgroundColor: '#ff0000' }}
+  //   />
   render() {
     const showKeyEditor = this.props.propKey
       ? <Text
@@ -72,40 +82,43 @@ class OrgDrawerItem extends Component {
             }
             onChangeText={propVal => this.setState({ propVal })}
           />
-          <Button
-            onPress={() => {
-              this.setState({ isEditing: false });
-              this.props.onRemoveProp(this.props.propKey);
-            }}
-            title="delete"
-            color="#33aa33"
-            overrides={{ backgroundColor: '#ff0000' }}
-          />
         </View>
-      : <TouchableHighlight
-          style={{ flex: 16 }}
-          onPress={() => this.setState({ isEditing: true })}>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ flex: 4 }}>
-              <Text
-                style={{
-                  fontFamily: 'space-mono',
-                  fontSize: 10
-                }}>
-                {this.props.propKey}
-              </Text>
+      : <Swipeout
+          autoClose={true}
+          right={[
+            {
+              text: 'delete',
+              onPress: () => {
+                this.props.onRemoveProp(this.props.propKey);
+              }
+            }
+          ]}
+          style={{ flex: 16 }}>
+          <TouchableHighlight
+            style={{ flex: 16 }}
+            onPress={() => this.setState({ isEditing: true })}>
+            <View style={{ flexDirection: 'row', marginLeft: 5 }}>
+              <View style={{ flex: 4 }}>
+                <Text
+                  style={{
+                    fontFamily: 'space-mono',
+                    fontSize: 10
+                  }}>
+                  {this.props.propKey}
+                </Text>
+              </View>
+              <View style={{ flex: 12 }}>
+                <Text
+                  style={{
+                    fontFamily: 'space-mono',
+                    fontSize: 10
+                  }}>
+                  :{this.props.propVal}
+                </Text>
+              </View>
             </View>
-            <View style={{ flex: 12 }}>
-              <Text
-                style={{
-                  fontFamily: 'space-mono',
-                  fontSize: 10
-                }}>
-                :{this.props.propVal}
-              </Text>
-            </View>
-          </View>
-        </TouchableHighlight>;
+          </TouchableHighlight>
+        </Swipeout>;
 
     return (
       <View style={{ flexDirection: 'row' }}>
