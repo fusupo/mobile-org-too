@@ -26,7 +26,7 @@ export default class OrgLogbook extends Component {
               backgroundColor: '#cccccc'
             }}>
             <Ionicons
-              name={'ios-recording'}
+              name={'ios-recording-outline'}
               size={20}
               style={{ marginLeft: 5 }}
             />
@@ -72,7 +72,7 @@ export default class OrgLogbook extends Component {
                 }}
                 onPress={this._toggleCollapse.bind(this)}>
                 <Ionicons
-                  name={'ios-recording-outline'}
+                  name={'ios-recording'}
                   size={20}
                   style={{ marginLeft: 5 }}
                 />

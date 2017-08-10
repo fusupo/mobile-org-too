@@ -35,7 +35,11 @@ class OrgScheduling extends Component {
               flexDirection: 'row',
               backgroundColor: '#cccccc'
             }}>
-            <Ionicons name={'ios-alarm'} size={20} style={{ marginLeft: 5 }} />
+            <Ionicons
+              name={'ios-alarm-outline'}
+              size={20}
+              style={{ marginLeft: 5 }}
+            />
           </View>
         </TouchableHighlight>
       );
@@ -69,7 +73,7 @@ class OrgScheduling extends Component {
                 backgroundColor: '#cccccc'
               }}>
               <Ionicons
-                name={'ios-alarm-outline'}
+                name={'ios-alarm'}
                 size={20}
                 style={{ marginLeft: 5 }}
               />

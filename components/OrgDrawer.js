@@ -26,7 +26,7 @@ class OrgDrawer extends Component {
               backgroundColor: '#cccccc'
             }}>
             <Ionicons
-              name={'ios-list-box'}
+              name={'ios-list-box-outline'}
               size={20}
               style={{ marginLeft: 5 }}
             />
@@ -70,7 +70,7 @@ class OrgDrawer extends Component {
                   backgroundColor: '#cccccc'
                 }}>
                 <Ionicons
-                  name={'ios-list-box-outline'}
+                  name={'ios-list-box'}
                   size={20}
                   style={{ marginLeft: 5 }}
                 />
