@@ -30,7 +30,7 @@ import { OrgTree } from '../components/OrgTree';
 
 import OrgHeadline from '../components/OrgHeadline';
 import OrgHeadlineEditable from '../components/OrgHeadlineEditable';
-import OrgTimestamp from '../components/OrgTimestamp';
+import OrgScheduling from '../components/OrgScheduling';
 import OrgDrawer from '../components/OrgDrawer';
 import OrgLogbook from '../components/OrgLogbook';
 import OrgBody from '../components/OrgBody';
@@ -49,17 +49,15 @@ const styles = StyleSheet.create({
   }
 });
 
-const timestampTypes = ['OPENED', 'SCHEDULED', 'DEADLINE', 'CLOSED'];
-
 const NodeDetailScreen = ({
   tree,
   bufferID,
   nodeID,
   node,
   onPressDeleteNode,
-  onTimestampUpdate,
-  onTimestampRepIntUpdate,
-  onTimestampClear,
+  // onTimestampUpdate,
+  // onTimestampRepIntUpdate,
+  // onTimestampClear,
   onAddProp,
   onUpdateProp,
   onRemoveProp,
@@ -68,19 +66,7 @@ const NodeDetailScreen = ({
   onRemoveLogNote,
   onUpdateNodeBody
 }) => {
-  // timings
   if (node) {
-    const timings = timestampTypes.map(t => (
-      <OrgTimestamp
-        key={t}
-        timestamp={node[t.toLowerCase()]}
-        label={t}
-        onTimestampUpdate={onTimestampUpdate(bufferID, nodeID, t)}
-        onTimestampRepIntUpdate={onTimestampRepIntUpdate(bufferID, nodeID, t)}
-        onTimestampClear={onTimestampClear(bufferID, nodeID, t)}
-      />
-    ));
-
     // childNodes
     const childIDs = OrgTreeUtil.findBranch(tree, nodeID).children;
     const listItems = childIDs.length === 0
@@ -99,7 +85,7 @@ const NodeDetailScreen = ({
             <OrgHeadlineEditable bufferID={bufferID} node={node} />
           </View>
           <View style={[styles.container, styles.border]}>
-            {timings}
+            <OrgScheduling bufferID={bufferID} nodeID={nodeID} />
           </View>
           <View style={[styles.container, styles.border]}>
             <OrgDrawer
@@ -184,30 +170,6 @@ const mapDispatchToProps = dispatch => {
     },
     onPressDeleteNode: (bufferID, nodeID) => {
       dispatch(deleteNode(bufferID, nodeID));
-    },
-    onTimestampUpdate: (bufferID, nodeID, timestampType) => date => {
-      const timestamp = OrgTimestampUtil.parseDate(date);
-      timestamp.type = 'active';
-      dispatch(updateNodeTimestamp(bufferID, nodeID, timestampType, timestamp));
-    },
-    onTimestampRepIntUpdate: (bufferID, nodeID, timestampType) => (
-      repInt,
-      repMin,
-      repMax
-    ) => {
-      dispatch(
-        updateNodeTimestampRepInt(
-          bufferID,
-          nodeID,
-          timestampType,
-          repInt,
-          repMin,
-          repMax
-        )
-      );
-    },
-    onTimestampClear: (bufferID, nodeID, timestampType) => () => {
-      dispatch(clearNodeTimestamp(bufferID, nodeID, timestampType));
     },
     onAddProp: (bufferID, nodeID) => () => {
       dispatch(insertNewNodeProp(bufferID, nodeID));

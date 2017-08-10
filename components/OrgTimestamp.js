@@ -17,9 +17,6 @@ const orgHeadlineUtil = require('org-parse').OrgHeadline;
 class OrgTimestamp extends Component {
   constructor(props) {
     super(props);
-    // this.state = {
-    //   content: props.headline.content
-    // };
     this.state = {
       date: new Date(),
       showDatePicker: false,
