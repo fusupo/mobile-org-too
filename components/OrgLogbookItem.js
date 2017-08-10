@@ -7,6 +7,7 @@ import {
   Button,
   TouchableHighlight
 } from 'react-native';
+import Swipeout from 'react-native-swipeout';
 
 class OrgDrawerItem extends Component {
   constructor(props) {
@@ -16,14 +17,7 @@ class OrgDrawerItem extends Component {
       text: undefined
     };
   }
-  componentWillReceiveProps(nextProps) {
-    console.log('ORG LOGBOOK ITEM WILL RECEIVE PROPS !!!!!!!!!');
-    // console.log(nextProps);
-    // this.setState({
-    //   propKey: nextProps.propKey,
-    //   propVal: nextProps.propVal
-    // });
-  }
+
   render() {
     let showEditor = <View><Text>{'editor'}</Text></View>;
     let ret;
@@ -89,9 +83,6 @@ class OrgDrawerItem extends Component {
                 />
                 <Button
                   onPress={() => {
-                    // const key = this.state.propKey === undefined
-                    //   ? this.props.propKey
-                    //   : this.state.propKey;
                     this.props.onUpdateLogNote(this.props.idx, this.state.text);
                     this.setState({ isEditing: false });
                   }}
@@ -127,7 +118,7 @@ class OrgDrawerItem extends Component {
       default:
         ret = (
           <View style={{ flex: 16 }}>
-            <Text>{`DONT KNOW WHAT TO DO HERE!!`}</Text>
+            <Text>{`[unhandled log entry format]`}</Text>
             {text}
           </View>
         );
@@ -135,23 +126,20 @@ class OrgDrawerItem extends Component {
     }
 
     return (
-      <View style={{ flexDirection: 'row' }}>
-        <View style={{ flex: 1 }}>
-          <TouchableHighlight
-            onPress={() => {
+      <Swipeout
+        autoClose={true}
+        right={[
+          {
+            text: 'clear',
+            onPress: () => {
               this.props.onRemoveLogNote(this.props.idx);
-            }}>
-            <Text
-              style={{
-                fontFamily: 'space-mono',
-                fontSize: 12
-              }}>
-              {'X'}
-            </Text>
-          </TouchableHighlight>
+            }
+          }
+        ]}>
+        <View style={{ flexDirection: 'row', marginLeft: 5 }}>
+          {ret}
         </View>
-        {ret}
-      </View>
+      </Swipeout>
     );
   }
 }
