@@ -417,12 +417,12 @@ function nav(state, action) {
         state
       );
       break;
-    // case DELETE_NODE:
-    // nextState = StacksOverTabs.router.getStateForAction(
-    //   NavigationActions.back(),
-    //   state
-    // );
-    // break;
+    case DELETE_NODE:
+      nextState = StacksOverTabs.router.getStateForAction(
+        NavigationActions.back(),
+        state
+      );
+      break;
     default:
       nextState = StacksOverTabs.router.getStateForAction(action, state);
       break;

@@ -194,7 +194,8 @@ const mapDispatchToProps = dispatch => {
       };
     },
     onPressDeleteNode: (bufferID, nodeID) => {
-      dispatch(actionA(bufferID, nodeID));
+      // dispatch(actionA(bufferID, nodeID));
+      dispatch(deleteNode(bufferID, nodeID));
     },
     onTimestampUpdate: (bufferID, nodeID, timestampType) => date => {
       const timestamp = OrgTimestampUtil.parseDate(date);
@@ -245,26 +246,26 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export const actionA = (bufferID, nodeID) => (dispatch, getState) => {
-  console.log('foo');
-  const backAction = NavigationActions.back();
-  dispatch(backAction);
-  //Do someFunc first then this action, use getState() for currentState if you want
-  return dispatch(deleteNode(bufferID, nodeID));
+// export const actionA = (bufferID, nodeID) => (dispatch, getState) => {
+//   console.log('foo');
+//   const backAction = NavigationActions.back();
+//   dispatch(backAction);
+//   //Do someFunc first then this action, use getState() for currentState if you want
+//   return dispatch(deleteNode(bufferID, nodeID));
 
-  // dispatch(deleteNode(bufferID, nodeID));
-  // dispatch({
-  //   type: ACTION_A,
-  //   param1,
-  //   param2
-  // });
-  // // At this line of code first dispatch has been executed and the state has been updated
-  // const value = selectValue(getState(), param2);
-  // if (value === 'neededValue') {
-  //   dispatch({
-  //     type:   ACTION_B
-  //   })
-  // }
-};
+//   // dispatch(deleteNode(bufferID, nodeID));
+//   // dispatch({
+//   //   type: ACTION_A,
+//   //   param1,
+//   //   param2
+//   // });
+//   // // At this line of code first dispatch has been executed and the state has been updated
+//   // const value = selectValue(getState(), param2);
+//   // if (value === 'neededValue') {
+//   //   dispatch({
+//   //     type:   ACTION_B
+//   //   })
+//   // }
+// };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NodeDetailScreen);
