@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import Swipeout from 'react-native-swipeout';
 import {
   TouchableHighlight,
   StyleSheet,
@@ -178,70 +179,67 @@ class OrgTimestamp extends Component {
       timestampStr = '----------------------';
       repIntStr = '------';
     }
+
     return (
       <View>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={{ flex: 1 }}>
-            <TouchableHighlight
-              onPress={() => {
-                // this.setState({ showDatePicker: !this.state.showDatePicker });
+        <Swipeout
+          autoClose={true}
+          right={[
+            {
+              text: 'clear',
+              onPress: () => {
                 this.props.onTimestampClear();
-              }}>
+              }
+            }
+          ]}>
+          <View style={{ flexDirection: 'row', marginLeft: 5 }}>
+            <View style={{ flex: 4 }}>
               <Text
                 style={{
                   fontFamily: 'space-mono',
                   fontSize: 12
                 }}>
-                {'X'}
+                {labelStr}
               </Text>
-            </TouchableHighlight>
-          </View>
-          <View style={{ flex: 4 }}>
-            <Text
-              style={{
-                fontFamily: 'space-mono',
-                fontSize: 12
-              }}>
-              {labelStr}
-            </Text>
-          </View>
-          <View style={{ flex: 8 }}>
-            <TouchableHighlight
-              onPress={() => {
-                this.setState({ showDatePicker: !this.state.showDatePicker });
-              }}>
-              <Text
-                style={{
-                  fontFamily: 'space-mono',
-                  fontSize: 12
+            </View>
+            <View style={{ flex: 8 }}>
+              <TouchableHighlight
+                onPress={() => {
+                  this.setState({ showDatePicker: !this.state.showDatePicker });
                 }}>
-                {timestampStr}
-              </Text>
-            </TouchableHighlight>
-          </View>
-          <View style={{ flex: 4 }}>
-            <TouchableHighlight
-              onPress={() => {
-                if (timestamp) {
-                  this.setState({
-                    showRepIntPicker: !this.state.showRepIntPicker
-                  });
-                } else {
-                  this.setState({
-                    showDatePicker: !this.state.showDatePicker
-                  });
-                }
-              }}>
-              <Text
-                style={{
-                  fontFamily: 'space-mono',
-                  fontSize: 12
+                <Text
+                  style={{
+                    fontFamily: 'space-mono',
+                    fontSize: 12
+                  }}>
+                  {timestampStr}
+                </Text>
+              </TouchableHighlight>
+            </View>
+            <View style={{ flex: 4 }}>
+              <TouchableHighlight
+                onPress={() => {
+                  if (timestamp) {
+                    this.setState({
+                      showRepIntPicker: !this.state.showRepIntPicker
+                    });
+                  } else {
+                    this.setState({
+                      showDatePicker: !this.state.showDatePicker
+                    });
+                  }
                 }}>
-                {repIntStr}
-              </Text>
-            </TouchableHighlight>
+                <Text
+                  style={{
+                    fontFamily: 'space-mono',
+                    fontSize: 12
+                  }}>
+                  {repIntStr}
+                </Text>
+              </TouchableHighlight>
+            </View>
           </View>
-        </View>
+        </Swipeout>
         {showDatePicker}
         {showRepIntPicker}
       </View>
