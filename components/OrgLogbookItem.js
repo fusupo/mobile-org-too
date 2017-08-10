@@ -63,7 +63,33 @@ class OrgDrawerItem extends Component {
                   <Text>{`${le.timestamp}`}</Text>
                 </View>
               </View>
-              <View style={{}}>
+              <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, flexDirection: 'row' }}>
+                  <View style={{ flex: 1 }}>
+                    <Button
+                      style={{ flex: 1 }}
+                      onPress={() => {
+                        this.setState({ isEditing: false });
+                      }}
+                      title="cancel"
+                      color="#aa3333"
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Button
+                      style={{ flex: 1 }}
+                      onPress={() => {
+                        this.props.onUpdateLogNote(
+                          this.props.idx,
+                          this.state.text
+                        );
+                        this.setState({ isEditing: false });
+                      }}
+                      title="ok"
+                      color="#33aa33"
+                    />
+                  </View>
+                </View>
                 <TextInput
                   style={{
                     flex: 1,
@@ -80,21 +106,6 @@ class OrgDrawerItem extends Component {
                       : this.state.text
                   }
                   onChangeText={text => this.setState({ text })}
-                />
-                <Button
-                  onPress={() => {
-                    this.props.onUpdateLogNote(this.props.idx, this.state.text);
-                    this.setState({ isEditing: false });
-                  }}
-                  title="ok"
-                  color="#33aa33"
-                />
-                <Button
-                  onPress={() => {
-                    this.setState({ isEditing: false });
-                  }}
-                  title="cancel"
-                  color="#aa3333"
                 />
               </View>
             </View>
@@ -130,7 +141,8 @@ class OrgDrawerItem extends Component {
         autoClose={true}
         right={[
           {
-            text: 'clear',
+            text: 'delete',
+            backgroundColor: '#bb3333',
             onPress: () => {
               this.props.onRemoveLogNote(this.props.idx);
             }

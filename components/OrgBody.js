@@ -34,6 +34,27 @@ class OrgBody extends Component {
   render() {
     const showEditor = this.state.isEditing
       ? <View>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ flex: 1 }}>
+              <Button
+                onPress={() => {
+                  this.setState({ isEditing: false });
+                }}
+                title="cancel"
+                color="#aa3333"
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Button
+                onPress={() => {
+                  this.props.onUpdateNodeBody(this.state.text);
+                  this.setState({ isEditing: false });
+                }}
+                title="ok"
+                color="#33aa33"
+              />
+            </View>
+          </View>
           <TextInput
             style={[styles.textInput, styles.container, styles.border]}
             value={
@@ -46,21 +67,6 @@ class OrgBody extends Component {
             onChangeText={text => {
               this.setState({ text });
             }}
-          />
-          <Button
-            onPress={() => {
-              this.props.onUpdateNodeBody(this.state.text);
-              this.setState({ isEditing: false });
-            }}
-            title="ok"
-            color="#33aa33"
-          />
-          <Button
-            onPress={() => {
-              this.setState({ isEditing: false });
-            }}
-            title="cancel"
-            color="#aa3333"
           />
         </View>
       : <View style={[styles.container, styles.border]}>
