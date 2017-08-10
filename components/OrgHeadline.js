@@ -33,7 +33,8 @@ class OrgHeadline extends Component {
       node,
       isCollapsed,
       onNodeTitlePress,
-      onDeleteNodePress
+      onDeleteNodePress,
+      onAddOnePress
     } = this.props;
     return (
       <Swipeout
@@ -50,7 +51,7 @@ class OrgHeadline extends Component {
           {
             text: 'addOne',
             onPress: () => {
-              //onAddOnePress(bufferID, node.id);
+              onAddOnePress(bufferID, node.id);
             }
           }
         ]}>
@@ -117,6 +118,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     onDeleteNodePress: (bufferID, nodeID) => {
       dispatch(deleteNode(bufferID, nodeID));
+    },
+    onAddOnePress: (bufferID, nodeID) => {
+      dispatch(addNewNode(bufferID, nodeID));
     }
   };
 };

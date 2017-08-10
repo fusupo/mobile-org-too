@@ -325,9 +325,27 @@ function orgTree(state = {}, action) {
   let nextState, clonedKids;
   switch (action.type) {
     case ADD_NEW_NODE:
-      clonedKids = state.children.slice(0);
-      clonedKids.push({ nodeID: action.nodeID, children: [] });
-      nextState = Object.assign({}, state, { children: clonedKids });
+      const findAndAdd = tree => {
+        let newTree = { nodeID: tree.nodeID, children: [] };
+        if (tree.nodeID === action.parentID) {
+          let clonedKids = tree.children.slice(0);
+          clonedKids.push({ nodeID: action.nodeID, children: [] });
+          console.log(action.nodeID);
+          newTree.children = clonedKids;
+          console.log(newTree);
+          return newTree;
+        } else {
+          tree.children.forEach(c => {
+            let newChild = findAndAdd(c);
+            newTree.children.push(newChild);
+          });
+          return newTree;
+        }
+      };
+      nextState = findAndAdd(state);
+
+      console.log(nextState.children.length);
+      console.log(nextState.children[2]);
       break;
     case DELETE_NODE:
       const findAndDelete = tree => {
@@ -342,10 +360,7 @@ function orgTree(state = {}, action) {
           return newTree;
         }
       };
-      // clonedKids = state.children.slice(0);
-      // clonedKids = clonedKids.filter(n => n.nodeID !== action.nodeID);
       nextState = findAndDelete(state);
-      // Object.assign({}, state, { children: clonedKids });
       break;
     default:
       break;
