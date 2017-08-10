@@ -56,6 +56,7 @@ class OrgDrawer extends Component {
             left={[
               {
                 text: 'addOne',
+                backgroundColor: '#33bb33',
                 onPress: () => {
                   this.props.onAddProp();
                 }

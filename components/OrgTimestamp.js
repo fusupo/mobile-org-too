@@ -247,6 +247,7 @@ class OrgTimestamp extends Component {
           right={[
             {
               text: 'clear',
+              backgroundColor: '#bb3333',
               onPress: () => {
                 this.props.onTimestampClear();
               }

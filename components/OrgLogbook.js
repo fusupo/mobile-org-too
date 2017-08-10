@@ -57,6 +57,7 @@ export default class OrgLogbook extends Component {
             left={[
               {
                 text: 'addOne',
+                backgroundColor: '#33bb33',
                 onPress: () => {
                   this.props.onAddLogNote();
                 }

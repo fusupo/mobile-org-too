@@ -87,6 +87,7 @@ class OrgDrawerItem extends Component {
           autoClose={true}
           right={[
             {
+              backgroundColor: '#bb3333',
               text: 'delete',
               onPress: () => {
                 this.props.onRemoveProp(this.props.propKey);
