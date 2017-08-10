@@ -28,6 +28,7 @@ import {
 
 import { OrgTree } from '../components/OrgTree';
 
+import OrgHeadline from '../components/OrgHeadline';
 import OrgHeadlineEditable from '../components/OrgHeadlineEditable';
 import OrgTimestamp from '../components/OrgTimestamp';
 import OrgDrawer from '../components/OrgDrawer';
@@ -85,11 +86,7 @@ const NodeDetailScreen = ({
     const listItems = childIDs.length === 0
       ? null
       : childIDs.map(cn => (
-          <OrgTree
-            bufferID={bufferID}
-            key={cn.nodeID}
-            tree={OrgTreeUtil.findBranch(tree, cn.nodeID)}
-          />
+          <OrgHeadline key={cn.nodeID} bufferID={bufferID} nodeID={cn.nodeID} />
         ));
     const list = listItems
       ? <ScrollView style={{ flex: 1 }}>{listItems}</ScrollView>
