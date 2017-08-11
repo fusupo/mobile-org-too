@@ -6,7 +6,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
+  PanResponder
 } from 'react-native';
 
 const orgDrawerUtils = require('org-parse').OrgDrawer;
@@ -21,53 +22,130 @@ const styles = StyleSheet.create({
   }
 });
 
-const OrgHabits = ({ habits, habitData, onHabitPress }) => (
-  <ScrollView>
-    {habits.map((h, idx) => (
-      <View key={h.id} style={{ flexDirection: 'row' }}>
-        <TouchableHighlight
-          underlayColor="#00ff00"
-          style={{ flex: 1 }}
-          onPress={() => onHabitPress(h.id)}>
-          <Text style={{ textAlign: 'right', fontSize: 12 }}>
-            {h.headline.content}
-          </Text>
-        </TouchableHighlight>
-        <Text
-          style={{
-            flex: 1,
-            fontFamily: 'space-mono',
-            fontSize: 12
-          }}>
-          {habitData[idx].map((c, idx) => {
-            const color = {
-              '-': 'red',
-              b: 'blue',
-              g: 'green',
-              y: 'yellow'
-            }[c];
-            return (
-              <Text key={idx} style={{ backgroundColor: color }}>{c}</Text>
-            );
-          })}
-        </Text>
-      </View>
-    ))}
-  </ScrollView>
-);
+class OrgHabits extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { currX: 0, prevDX: 0 };
+  }
+
+  componentWillMount() {
+    this._panResponder = PanResponder.create({
+      // Ask to be the responder:
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onPanResponderGrant: (evt, gestureState) => {
+        // The gesture has started. Show visual feedback so the user knows
+        // what is happening!
+        // gestureState.d{x,y} will be set to zero now
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        // The most recent move distance is gestureState.move{X,Y}
+        // The accumulated gesture distance since becoming responder is
+        // gestureState.d{x,y}
+        const ddx = gestureState.dx - this.state.prevDX;
+        let nextX = this.state.currX + ddx;
+        const tick = 5;
+        if (nextX > tick) {
+          this.props.decrementDate();
+          nextX = 0;
+        } else if (nextX < -tick) {
+          this.props.incrementDate();
+          nextX = 0;
+        }
+        this.setState({ prevDX: gestureState.dx, currX: nextX });
+      },
+      onPanResponderTerminationRequest: (evt, gestureState) => true,
+      onPanResponderRelease: (evt, gestureState) => {
+        // The user has released all touches while this view is the
+        // responder. This typically means a gesture has succeeded
+        this.setState({ prevDX: 0, currX: 0 });
+      },
+      onPanResponderTerminate: (evt, gestureState) => {
+        // Another component has become the responder, so this gesture
+        // should be cancelled
+      },
+      onShouldBlockNativeResponder: (evt, gestureState) => {
+        // Returns whether this component should block native components from becoming the JS
+        // responder. Returns true by default. Is currently only supported on android.
+        return true;
+      }
+    });
+  }
+
+  render() {
+    const { date, habits, habitData, onHabitPress } = this.props;
+    return (
+      <ScrollView>
+        {habits.map((h, idx) => (
+          <View key={h.id} style={{ flexDirection: 'row' }}>
+            <TouchableHighlight
+              underlayColor="#00ff00"
+              style={{ flex: 1 }}
+              onPress={() => onHabitPress(h.id, date)}>
+              <Text style={{ textAlign: 'right', fontSize: 12 }}>
+                {h.headline.content}
+              </Text>
+            </TouchableHighlight>
+
+            <View {...this._panResponder.panHandlers} style={{ flex: 1 }}>
+              <Text
+                style={{
+                  flex: 1,
+                  fontFamily: 'space-mono',
+                  fontSize: 12
+                }}>
+                {habitData[idx].map((c, idx) => {
+                  const color = {
+                    '-': 'red',
+                    b: 'blue',
+                    g: 'green',
+                    y: 'yellow'
+                  }[c];
+                  return (
+                    <Text
+                      key={idx}
+                      style={{
+                        backgroundColor: color,
+                        opacity: idx < 14 ? 1 : 0.5
+                      }}>
+                      {c}
+                    </Text>
+                  );
+                })}
+              </Text>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    );
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
+  let date = ownProps.date;
+
   const nodes = Object.values(state.orgBuffers).reduce(
     (m, v) => m.concat(Object.values(v.orgNodes)),
     []
   );
+
   const habits = nodes.filter(n => {
     const idx = orgDrawerUtils.indexOfKey(n.propDrawer, 'STYLE');
     if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
     return true;
   });
+
+  const getRealNow = () => {
+    const now = orgTimestampUtils.now();
+    now.hour -= now.hour;
+    now.minute -= now.minute;
+    return now;
+  };
+
   const habitData = nodes
     .filter(n => {
       const idx = orgDrawerUtils.indexOfKey(n.propDrawer, 'STYLE');
@@ -75,7 +153,7 @@ const mapStateToProps = state => {
       return true;
     })
     .map(n => {
-      const now = orgTimestampUtils.now();
+      const now = date; //orgTimestampUtils.now();
       now.hour -= now.hour;
       now.minute -= now.minute;
       const past = orgTimestampUtils.sub(now, { days: 14 });
@@ -126,7 +204,7 @@ const mapStateToProps = state => {
               rngMin = repMinVal * { d: 1, w: 7 }[repMinU];
               rngMax = repMaxVal ? repMaxVal * { d: 1, w: 7 }[repMaxU] : 0;
               if (rngMax > 0) rngMin--;
-            } else if (orgTimestampUtils.compare(now, curr) === 0) {
+            } else if (orgTimestampUtils.compare(getRealNow(), curr) === 0) {
               ret.push('!');
             } else {
               if (rngMax && rngMax > 0) {
@@ -158,23 +236,26 @@ const mapStateToProps = state => {
       }
       return [];
     });
+
   return {
     habits,
-    habitData
+    habitData,
+    date
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onHabitPress: nodeID => dispatch(someAction(nodeID))
+    onHabitPress: (nodeID, date) => dispatch(someAction(nodeID, date))
   };
 };
 
-function someAction(nodeID) {
+function someAction(nodeID, date) {
   return (dispatch, getState) => {
     const state = getState();
-    const nowStr = orgTimestampUtils.serialize(orgTimestampUtils.now());
-
+    date.hour += orgTimestampUtils.now().hour;
+    date.minute += orgTimestampUtils.now().minute;
+    const nowStr = orgTimestampUtils.serialize(date); //;orgTimestampUtils.now());
     // super inefficient way of finding bufferID from nodeID !!!!
     let bufferID = Object.entries(state.orgBuffers).reduce((M, V) => {
       if (M === undefined) {

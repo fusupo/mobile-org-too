@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { Text, ScrollView, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 
 const orgTimestampUtils = require('org-parse').OrgTimestamp;
 
@@ -35,22 +35,24 @@ const OrgAgenda = ({ agendaYesterday, agendaToday, agendaTomorrow }) => {
   };
 
   return (
-    <ScrollView>
+    <View>
       {build('yesterday')}
       {build('today')}
       {build('tomorrow')}
-    </ScrollView>
+    </View>
   );
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   let agendaYesterday = [];
   let agendaToday = [];
   let agendaTomorrow = [];
   let candidates;
 
+  let date = ownProps.date;
+  console.log('agenda:', date);
   const nodes = Object.values(state.orgBuffers).reduce(
     (m, v) => m.concat(Object.values(v.orgNodes)),
     []
@@ -68,7 +70,8 @@ const mapStateToProps = state => {
   const hours = [0, 6, 9, 12, 13, 18, 24];
 
   const buildDay = (headerStr, start, end) => {
-    let now = orgTimestampUtils.now();
+    let now = date; //orgTimestampUtils.now();
+    let realNow = orgTimestampUtils.now();
     const nowStr = `${now.hour}:${now.minute}...... now - - - - - - - - - - - - - - - - - - - - - - - - - -`;
     const cand = filterRange(candidates, start, end);
     let agenda = [headerStr];
@@ -107,9 +110,18 @@ const mapStateToProps = state => {
   };
 
   // if (nodes.length > 0) {
-  let today = orgTimestampUtils.now();
+  let today = orgTimestampUtils.momentToObj(
+    orgTimestampUtils.momentFromObj(date)
+  );
   today.hour -= today.hour;
   today.minute -= today.minute;
+
+  let realToday = orgTimestampUtils.now();
+  realToday.hour -= realToday.hour;
+  realToday.minute -= realToday.minute;
+
+  let diff = orgTimestampUtils.diff(today, realToday, 'days');
+
   const yesterday = orgTimestampUtils.sub(today, { days: 1 });
   const tomorrow = orgTimestampUtils.add(today, { days: 1 });
   const dayAfterTomorrow = orgTimestampUtils.add(today, { days: 2 });
@@ -119,18 +131,54 @@ const mapStateToProps = state => {
     return orgTimestampUtils.compare(a.scheduled, b.scheduled);
   });
 
-  agendaYesterday = buildDay(
-    '-----++----YESTERDAY----------',
-    yesterday,
-    today
-  );
-  agendaToday = buildDay('-----++----TODAY--------------', today, tomorrow);
-  agendaTomorrow = buildDay(
-    '-----++----TOMORROW-----------',
-    tomorrow,
-    dayAfterTomorrow
-  );
-  // }
+  const padMaybe = n => {
+    n = '' + n;
+    n = n.length === 1 ? '0' + n : n;
+    return n;
+  };
+  const yesStr = '-----++----YESTERDAY----------';
+  const todStr = '-----++----TODAY--------------';
+  const tomStr = '-----++----TOMORROW-----------';
+  const dateStr = d =>
+    `-----++----[${d.year}-${padMaybe(d.month)}-${padMaybe(d.date)} ${d.day}]---`;
+  let targYesStr, targTodStr, targTomStr;
+
+  switch (diff) {
+    case -2:
+      targYesStr = dateStr(yesterday);
+      targTodStr = dateStr(today);
+      targTomStr = yesStr;
+      break;
+    case -1:
+      targYesStr = dateStr(yesterday);
+      targTodStr = yesStr;
+      targTomStr = todStr;
+      break;
+    case 0:
+      targYesStr = yesStr;
+      targTodStr = todStr;
+      targTomStr = tomStr;
+      break;
+    case 1:
+      targYesStr = todStr;
+      targTodStr = tomStr;
+      targTomStr = dateStr(tomorrow);
+      break;
+    case 2:
+      targYesStr = tomStr;
+      targTodStr = dateStr(today);
+      targTomStr = dateStr(tomorrow);
+      break;
+    default:
+      targYesStr = dateStr(yesterday);
+      targTodStr = dateStr(today);
+      targTomStr = dateStr(tomorrow);
+      break;
+  }
+
+  agendaYesterday = buildDay(targYesStr, yesterday, today);
+  agendaToday = buildDay(targTodStr, today, tomorrow);
+  agendaTomorrow = buildDay(targTomStr, tomorrow, dayAfterTomorrow);
 
   return {
     agendaYesterday: agendaYesterday,

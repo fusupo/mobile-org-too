@@ -72,14 +72,14 @@ const NodeDetailScreen = ({
           <OrgHeadline key={cn.nodeID} bufferID={bufferID} nodeID={cn.nodeID} />
         ));
     const list = listItems
-      ? <ScrollView style={{ flex: 1 }}>{listItems}</ScrollView>
+      ? <View style={{ flex: 1 }}>{listItems}</View>
       : null;
 
     return (
       <View style={styles.container}>
         <SplitPane
           viewA={
-            <ScrollView style={styles.container}>
+            <View style={styles.container}>
               <View
                 style={[styles.container, styles.border, { marginTop: 20 }]}>
                 <OrgHeadlineEditable bufferID={bufferID} node={node} />
@@ -113,7 +113,7 @@ const NodeDetailScreen = ({
                 onUpdateNodeBody={onUpdateNodeBody(bufferID, nodeID)}
                 bodyText={node.body}
               />
-            </ScrollView>
+            </View>
           }
           viewB={list}
         />

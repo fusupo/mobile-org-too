@@ -84,6 +84,7 @@ class SplitPane extends React.Component {
           });
         }}>
         <ScrollView
+          alwaysBounceVertical={false}
           style={[
             styles.viewA,
             { height: this.state.currTop + barHeight / 2 }
@@ -91,6 +92,7 @@ class SplitPane extends React.Component {
           {this.props.viewA}
         </ScrollView>
         <ScrollView
+          alwaysBounceVertical={false}
           style={[
             styles.viewB,
             {
@@ -127,14 +129,14 @@ class SplitPane extends React.Component {
   }
 }
 
-const barHeight = 20;
+const barHeight = 50;
 var styles = StyleSheet.create({
   bar: {
     height: barHeight,
     backgroundColor: '#ccc5'
   },
   barInner: {
-    backgroundColor: '#333',
+    backgroundColor: '#3333',
     //position: 'absolute',
     top: barHeight / 2 - 5,
     height: 10,

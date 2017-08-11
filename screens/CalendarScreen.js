@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import {
+  Button,
   ScrollView,
   Component,
   StyleSheet,
@@ -25,8 +26,45 @@ class CalendarScreen extends React.Component {
   static navigationOptions = () => ({
     title: 'calendar'
   });
+
+  constructor(props) {
+    super(props);
+    const foo = orgTimestampUtils.now();
+    this.state = {
+      date: foo
+    };
+  }
+
+  _clone(d) {
+    const ret = orgTimestampUtils.momentToObj(
+      orgTimestampUtils.momentFromObj(d)
+    );
+    return ret;
+  }
+
   render() {
-    return <SplitPane viewA={<OrgAgenda />} viewB={<OrgHabits />} />;
+    return (
+      <SplitPane
+        viewA={<OrgAgenda date={this._clone(this.state.date)} />}
+        viewB={
+          <OrgHabits
+            date={this._clone(this.state.date)}
+            incrementDate={() =>
+              this.setState({
+                date: orgTimestampUtils.add(this.state.date, {
+                  days: 1
+                })
+              })}
+            decrementDate={() =>
+              this.setState({
+                date: orgTimestampUtils.sub(this.state.date, {
+                  days: 1
+                })
+              })}
+          />
+        }
+      />
+    );
   }
 }
 
