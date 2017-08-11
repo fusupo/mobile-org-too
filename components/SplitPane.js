@@ -76,7 +76,12 @@ class SplitPane extends React.Component {
         style={styles.mainContainer}
         onLayout={event => {
           var { x, y, width, height } = event.nativeEvent.layout;
-          this.setState({ stageW: width, stageH: height });
+          this.setState({
+            stageW: width,
+            stageH: height,
+            currTop: (height - barHeight) / 2,
+            prevTop: (height - barHeight) / 2
+          });
         }}>
         <ScrollView
           style={[
@@ -122,7 +127,7 @@ class SplitPane extends React.Component {
   }
 }
 
-const barHeight = 50;
+const barHeight = 20;
 var styles = StyleSheet.create({
   bar: {
     height: barHeight,
@@ -130,7 +135,7 @@ var styles = StyleSheet.create({
   },
   barInner: {
     backgroundColor: '#333',
-    position: 'absolute',
+    //position: 'absolute',
     top: barHeight / 2 - 5,
     height: 10,
     width: '100%'

@@ -2,9 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {
   cycleNodeCollapse,
-  updateNodeTimestamp,
-  updateNodeTimestampRepInt,
-  clearNodeTimestamp,
   deleteNode,
   insertNewNodeProp,
   updateNodeProp,
@@ -34,6 +31,7 @@ import OrgScheduling from '../components/OrgScheduling';
 import OrgDrawer from '../components/OrgDrawer';
 import OrgLogbook from '../components/OrgLogbook';
 import OrgBody from '../components/OrgBody';
+import SplitPane from '../components/SplitPane';
 
 const OrgTreeUtil = require('org-parse').OrgTree;
 const OrgTimestampUtil = require('org-parse').OrgTimestamp;
@@ -79,41 +77,46 @@ const NodeDetailScreen = ({
 
     return (
       <View style={styles.container}>
-        <ScrollView style={styles.container}>
-          <View style={[styles.container, styles.border]}>
-            <OrgHeadlineEditable bufferID={bufferID} node={node} />
-          </View>
-          <View style={[styles.container, styles.border]}>
-            <OrgScheduling
-              bufferID={bufferID}
-              nodeID={nodeID}
-              isCollapsed={true}
-            />
-          </View>
-          <View style={[styles.container, styles.border]}>
-            <OrgDrawer
-              drawer={node.propDrawer}
-              isCollapsed={true}
-              onAddProp={onAddProp(bufferID, nodeID)}
-              onUpdateProp={onUpdateProp(bufferID, nodeID)}
-              onRemoveProp={onRemoveProp(bufferID, nodeID)}
-            />
-          </View>
-          <View style={[styles.container, styles.border]}>
-            <OrgLogbook
-              log={node.logbook}
-              isCollapsed={true}
-              onAddLogNote={onAddLogNote(bufferID, nodeID)}
-              onUpdateLogNote={onUpdateLogNote(bufferID, nodeID)}
-              onRemoveLogNote={onRemoveLogNote(bufferID, nodeID)}
-            />
-          </View>
-          <OrgBody
-            onUpdateNodeBody={onUpdateNodeBody(bufferID, nodeID)}
-            bodyText={node.body}
-          />
-        </ScrollView>
-        {list}
+        <SplitPane
+          viewA={
+            <ScrollView style={styles.container}>
+              <View
+                style={[styles.container, styles.border, { marginTop: 20 }]}>
+                <OrgHeadlineEditable bufferID={bufferID} node={node} />
+              </View>
+              <View style={[styles.container, styles.border]}>
+                <OrgScheduling
+                  bufferID={bufferID}
+                  nodeID={nodeID}
+                  isCollapsed={true}
+                />
+              </View>
+              <View style={[styles.container, styles.border]}>
+                <OrgDrawer
+                  drawer={node.propDrawer}
+                  isCollapsed={true}
+                  onAddProp={onAddProp(bufferID, nodeID)}
+                  onUpdateProp={onUpdateProp(bufferID, nodeID)}
+                  onRemoveProp={onRemoveProp(bufferID, nodeID)}
+                />
+              </View>
+              <View style={[styles.container, styles.border]}>
+                <OrgLogbook
+                  log={node.logbook}
+                  isCollapsed={true}
+                  onAddLogNote={onAddLogNote(bufferID, nodeID)}
+                  onUpdateLogNote={onUpdateLogNote(bufferID, nodeID)}
+                  onRemoveLogNote={onRemoveLogNote(bufferID, nodeID)}
+                />
+              </View>
+              <OrgBody
+                onUpdateNodeBody={onUpdateNodeBody(bufferID, nodeID)}
+                bodyText={node.body}
+              />
+            </ScrollView>
+          }
+          viewB={list}
+        />
         <Button
           onPress={() => {
             ActionSheetIOS.showActionSheetWithOptions(

@@ -49,7 +49,6 @@ class OrgHeadlineEditable extends Component {
       : null;
 
     const tagList = tags ? <Text>{tags}</Text> : null;
-
     return (
       <View style={{ flex: 1, flexDirection: 'row' }}>
         <OrgTodoKeywordEditable
