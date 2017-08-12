@@ -5,19 +5,9 @@ import {
   Animated,
   Dimensions,
   PanResponder,
-  ScrollView,
   StyleSheet,
-  Text,
   View
 } from 'react-native';
-
-import OrgHabits from '../components/OrgHabits';
-import OrgAgenda from '../components/OrgAgenda';
-
-const orgDrawerUtils = require('org-parse').OrgDrawer;
-const orgTimestampUtils = require('org-parse').OrgTimestamp;
-
-import { completeHabit, resetHabit } from '../actions';
 
 const barHeight = 30;
 class SplitPane extends React.Component {
@@ -85,8 +75,8 @@ class SplitPane extends React.Component {
           this.setState({
             stageW: width,
             stageH: height,
-            currTop: height / 2,
-            prevTop: height / 2
+            currTop: (height - barHeight) / 2,
+            prevTop: (height - barHeight) / 2
           });
         }}>
         <View

@@ -69,7 +69,7 @@ const TabNav = TabNavigator(
   },
   {
     tabBarPosition: 'bottom',
-    animationEnabled: true,
+    animationEnabled: false,
     swipeEnabled: false,
     initialRouteName: 'MainTab'
   }

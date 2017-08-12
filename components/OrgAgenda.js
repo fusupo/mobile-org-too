@@ -20,11 +20,13 @@ const styles = StyleSheet.create({
   }
 });
 
+const magic = 504;
+
 class OrgAgenda extends React.Component {
   state = {
     transXAnim: new Animated.Value(0), // Initial value for opacity: 0
     stageH: 0,
-    dayHeight: 140
+    dayHeight: magic / 2
   };
 
   componentWillMount() {
@@ -70,7 +72,6 @@ class OrgAgenda extends React.Component {
   componentWillReceiveProps(nextProps) {
     let dayHeight = this.state.dayHeight;
     if (nextProps.percH !== this.props.percH) {
-      const magic = 504;
       if (nextProps.percH <= 0.50) {
         dayHeight = magic / 2;
         this.state.transXAnim.setValue(-dayHeight * 2);
