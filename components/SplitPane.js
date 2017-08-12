@@ -41,7 +41,7 @@ class SplitPane extends React.Component {
         this.setState({ currTop });
       },
       onPanResponderRelease: (e, gesture) => {
-        let h = this.state.stageH; // - barHeight;
+        let h = this.state.stageH - barHeight;
         let fourth = h / 4;
         let half = h / 2;
         let flr = Math.floor(this.state.currTop / fourth);
@@ -52,20 +52,28 @@ class SplitPane extends React.Component {
             prevTop: 0,
             currTop: 0
           };
+          this._fireResize(0, 1);
         } else if (flr === 1 || flr === 2) {
           newState = {
             prevTop: half,
             currTop: half
           };
+          this._fireResize(0.5, 0.5);
         } else if (flr >= 3) {
           newState = {
             prevTop: h,
             currTop: h
           };
+          this._fireResize(1, 0);
         }
         this.setState(newState);
       }
     });
+  }
+
+  _fireResize(a, b) {
+    if (this.props.onResizeA) this.props.onResizeA(a);
+    if (this.props.onResizeB) this.props.onResizeB(b);
   }
 
   render() {
@@ -81,13 +89,13 @@ class SplitPane extends React.Component {
             prevTop: height / 2
           });
         }}>
-        <ScrollView
+        <View
           alwaysBounceVertical={false}
           style={[styles.viewA, { height: this.state.currTop }]}>
           {this.props.viewA}
-        </ScrollView>
+        </View>
         {this.renderDraggable()}
-        <ScrollView
+        <View
           alwaysBounceVertical={false}
           style={[
             styles.viewB,
@@ -96,7 +104,7 @@ class SplitPane extends React.Component {
             }
           ]}>
           {this.props.viewB}
-        </ScrollView>
+        </View>
       </View>
     );
   }

@@ -46,14 +46,14 @@ class OrgHabits extends React.Component {
         // gestureState.d{x,y}
         const ddx = gestureState.dx - this.state.prevDX;
         let nextX = this.state.currX + ddx;
-        const tick = 5;
-        if (nextX > tick) {
-          this.props.decrementDate();
-          nextX = 0;
-        } else if (nextX < -tick) {
-          this.props.incrementDate();
-          nextX = 0;
-        }
+        // const tick = 5;
+        // if (nextX > tick) {
+        //   this.props.decrementDate();
+        //   nextX = 0;
+        // } else if (nextX < -tick) {
+        //   this.props.incrementDate();
+        //   nextX = 0;
+        // }
         this.setState({ prevDX: gestureState.dx, currX: nextX });
       },
       onPanResponderTerminationRequest: (evt, gestureState) => true,
@@ -61,6 +61,11 @@ class OrgHabits extends React.Component {
         // The user has released all touches while this view is the
         // responder. This typically means a gesture has succeeded
         this.setState({ prevDX: 0, currX: 0 });
+        if (gestureState.dx > 1) {
+          this.props.decrementDate();
+        } else if (gestureState.dx < -1) {
+          this.props.incrementDate();
+        }
       },
       onPanResponderTerminate: (evt, gestureState) => {
         // Another component has become the responder, so this gesture
