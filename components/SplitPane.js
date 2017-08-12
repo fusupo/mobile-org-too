@@ -2,14 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import {
-  ScrollView,
-  Component,
-  StyleSheet,
-  View,
-  Text,
-  PanResponder,
   Animated,
-  Dimensions
+  Dimensions,
+  PanResponder,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native';
 
 import OrgHabits from '../components/OrgHabits';
@@ -20,6 +19,7 @@ const orgTimestampUtils = require('org-parse').OrgTimestamp;
 
 import { completeHabit, resetHabit } from '../actions';
 
+const barHeight = 30;
 class SplitPane extends React.Component {
   constructor(props) {
     super(props);
@@ -35,35 +35,33 @@ class SplitPane extends React.Component {
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderMove: (e, gesture) => {
-        this.setState({ currTop: this.state.prevTop + gesture.dy });
+        let currTop = this.state.prevTop + gesture.dy;
+        currTop = currTop < 0 ? 0 : currTop;
+        currTop = currTop > this.state.stageH ? this.state.stageH : currTop;
+        this.setState({ currTop });
       },
       onPanResponderRelease: (e, gesture) => {
-        let h = this.state.stageH - barHeight;
+        let h = this.state.stageH; // - barHeight;
         let fourth = h / 4;
         let half = h / 2;
         let flr = Math.floor(this.state.currTop / fourth);
 
         let newState;
-        switch (flr) {
-          case 0:
-            newState = {
-              prevTop: 0,
-              currTop: 0
-            };
-            break;
-          case 1:
-          case 2:
-            newState = {
-              prevTop: half,
-              currTop: half
-            };
-            break;
-          case 3:
-            newState = {
-              prevTop: h,
-              currTop: h
-            };
-            break;
+        if (flr <= 0) {
+          newState = {
+            prevTop: 0,
+            currTop: 0
+          };
+        } else if (flr === 1 || flr === 2) {
+          newState = {
+            prevTop: half,
+            currTop: half
+          };
+        } else if (flr >= 3) {
+          newState = {
+            prevTop: h,
+            currTop: h
+          };
         }
         this.setState(newState);
       }
@@ -79,32 +77,26 @@ class SplitPane extends React.Component {
           this.setState({
             stageW: width,
             stageH: height,
-            currTop: (height - barHeight) / 2,
-            prevTop: (height - barHeight) / 2
+            currTop: height / 2,
+            prevTop: height / 2
           });
         }}>
         <ScrollView
           alwaysBounceVertical={false}
-          style={[
-            styles.viewA,
-            { height: this.state.currTop + barHeight / 2 }
-          ]}>
+          style={[styles.viewA, { height: this.state.currTop }]}>
           {this.props.viewA}
         </ScrollView>
+        {this.renderDraggable()}
         <ScrollView
           alwaysBounceVertical={false}
           style={[
             styles.viewB,
             {
-              height: this.state.stageH -
-                barHeight -
-                this.state.currTop +
-                barHeight / 2
+              height: this.state.stageH - this.state.currTop
             }
           ]}>
           {this.props.viewB}
         </ScrollView>
-        {this.renderDraggable()}
       </View>
     );
   }
@@ -112,41 +104,39 @@ class SplitPane extends React.Component {
   renderDraggable() {
     return (
       <View style={styles.draggableContainer}>
-        <Animated.View
+        <View
           {...this.panResponder.panHandlers}
           style={[
             styles.bar,
             {
               left: 0,
-              top: this.state.currTop,
+              top: 0,
               width: this.state.stageW
             }
           ]}>
-          <View style={styles.barInner}><Text>{'helllooooooo!'}</Text></View>
-        </Animated.View>
+          <View style={styles.barInner} />
+        </View>
       </View>
     );
   }
 }
 
-const barHeight = 50;
 var styles = StyleSheet.create({
   bar: {
     height: barHeight,
-    backgroundColor: '#ccc5'
+    backgroundColor: '#ccc'
   },
   barInner: {
     backgroundColor: '#3333',
-    //position: 'absolute',
-    top: barHeight / 2 - 5,
-    height: 10,
+    top: barHeight / 2 - 10,
+    height: 20,
     width: '100%'
   },
   mainContainer: {
-    flex: 1
-  },
-  draggableContainer: {
-    position: 'absolute'
+    flex: 1,
+    borderColor: '#000',
+    borderWidth: 1,
+    overflow: 'hidden'
   },
   viewA: {
     width: '100%',
