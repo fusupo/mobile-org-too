@@ -1,18 +1,24 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { NavigationActions } from 'react-navigation';
 
 import {
-  Easing,
+  Button,
   PanResponder,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableHighlight,
   View
 } from 'react-native';
 
 const orgTimestampUtils = require('org-parse').OrgTimestamp;
 
 const styles = StyleSheet.create({
+  text: {
+    fontFamily: 'space-mono',
+    fontSize: 10
+  },
   container: {
     flex: 1,
     paddingTop: 15
@@ -55,9 +61,9 @@ class OrgAgenda extends React.Component {
         // responder. This typically means a gesture has succeeded
         //this.setState({ prevDX: 0, currX: 0 });
         if (gestureState.dy > 1) {
-          this.props.decrementDate();
-        } else if (gestureState.dy < -1) {
           this.props.incrementDate();
+        } else if (gestureState.dy < -1) {
+          this.props.decrementDate();
         }
       },
       onPanResponderTerminate: (evt, gestureState) => {
@@ -72,20 +78,6 @@ class OrgAgenda extends React.Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
-    // let dayHeight = this.state.dayHeight;
-    // if (nextProps.percH !== this.props.percH) {
-    //   if (nextProps.percH <= 0.50) {
-    //     dayHeight = magic / 2;
-    //   } else {
-    //     dayHeight = magic / 3;
-    //   }
-    //   this.setState({
-    //     dayHeight
-    //   });
-    // }
-  }
-
   render() {
     let { agendaYesterday, agendaToday, agendaTomorrow, dx } = this.props;
 
@@ -98,39 +90,78 @@ class OrgAgenda extends React.Component {
       '#956066',
       '#564975'
     ];
+    const entry = (d, idx) => (
+      <View
+        key={idx}
+        style={{
+          //   flex: 1
+          flexDirection: 'row'
+        }}>
+        <View {...this._panResponder.panHandlers}>
+          <Text style={styles.text}>{`${d.time}...... `}</Text>
+        </View>
+        <TouchableHighlight
+          onPress={() => {
+            this.props.onNodeTitleClick(d.bufferID, d.nodeID);
+          }}>
+          <Text key={idx} style={styles.text}>{d.content}</Text>
+        </TouchableHighlight>
+      </View>
+    );
     const build = (data, height) => {
       const foo = agendaKeys.map((k, kidx) => {
         const listData = data.schedule[k];
         const color = colors[kidx];
-        const list = listData.map((d, idx) => (
-          <View
-            key={idx}
-            style={{
-              //   flex: 1
-            }}>
-            <Text key={idx}>{d}</Text>
-          </View>
-        ));
+        const list = listData.map((d, idx) => {
+          if (d.nodeID === 'NOW') {
+            return (
+              <View
+                {...this._panResponder.panHandlers}
+                key={idx}
+                style={{
+                  //   flex: 1
+                }}>
+                <Text
+                  style={[styles.text, { color: 'yellow' }]}
+                  key={
+                    idx
+                  }>{`${d.time}...... now - - - - - - - - - - - - - - - - - -`}</Text>
+              </View>
+            );
+          } else {
+            return entry(d, idx);
+          }
+        });
+        const header = k !== agendaKeys[0]
+          ? <View {...this._panResponder.panHandlers}>
+              <Text style={styles.text}>{k}</Text>
+            </View>
+          : <View {...this._panResponder.panHandlers}>
+              <Text
+                style={[
+                  styles.text,
+                  { color: '#fff', backgroundColor: '#000' }
+                ]}>
+                {data.headerStr}
+              </Text>
+            </View>;
         return (
           <View
             key={k}
             style={{
               // borderColor: '#000',
               // borderWidth: 1,
-              flex: list.length, // + 1,
+              flex: list.length + 1,
               backgroundColor: color
             }}>
-            {k !== agendaKeys[0]
-              ? <Text>{k}</Text>
-              : <Text style={{ color: '#fff', backgroundColor: '#000' }}>
-                  {data.headerStr}
-                </Text>}
+            {header}
             {list}
           </View>
         );
       });
       return (
         <View
+          key={data.headerStr}
           style={{
             // borderColor: '#000',
             // borderWidth: 1,
@@ -138,25 +169,17 @@ class OrgAgenda extends React.Component {
             // flex: 1,
             flexDirection: 'column'
           }}>
-
           {foo}
         </View>
       );
     };
 
+    //{...this._panResponder.panHandlers}
     const buildSml = (data, height) => {
       const foo = agendaKeys.map((k, kidx) => {
         const listData = data.schedule[k];
         const color = colors[kidx];
-        const list = listData.map((d, idx) => (
-          <View
-            key={idx}
-            style={{
-              //   flex: 1
-            }}>
-            <Text key={idx}>{d}</Text>
-          </View>
-        ));
+        const list = listData.map((d, idx) => entry(d, idx));
         return (
           <View
             key={k}
@@ -171,6 +194,7 @@ class OrgAgenda extends React.Component {
       });
       return (
         <View
+          key={data.headerStr}
           style={{
             // borderColor: '#000',
             // borderWidth: 1,
@@ -178,7 +202,8 @@ class OrgAgenda extends React.Component {
             // flex: 1,
             flexDirection: 'column'
           }}>
-          <Text style={{ color: '#fff', backgroundColor: '#000' }}>
+          <Text
+            style={[styles.text, { color: '#fff', backgroundColor: '#000' }]}>
             {data.headerStr}
           </Text>
           {foo}
@@ -186,63 +211,43 @@ class OrgAgenda extends React.Component {
       );
     };
 
-    let xxx;
-    if (this.props.percH <= 0.50) {
-      xxx = (
+    const xxx = (
+      <View
+        style={{
+          // borderColor: '#f00',
+          // borderWidth: 1,
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
         <View
           style={{
-            // borderColor: '#f00',
-            // borderWidth: 1,
             flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center'
+            position: 'absolute',
+            top: 0
           }}>
-          <View
-            style={{
-              flex: 1,
-              position: 'absolute',
-              top: 0
-            }}>
-            {build(agendaToday, magic / 2)}
-          </View>
+          {this.props.percH <= 0.5
+            ? build(agendaToday, magic / 2)
+            : [
+                buildSml(agendaYesterday, magic / 4),
+                build(agendaToday, magic / 2),
+                buildSml(agendaTomorrow, magic / 4)
+              ]}
         </View>
-      );
-    } else {
-      xxx = (
-        <View
-          style={{
-            // borderColor: '#f00',
-            // borderWidth: 1,
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-          <View
-            style={{
-              flex: 1,
-              position: 'absolute',
-              top: 0
-            }}>
-            {buildSml(agendaYesterday, magic / 4)}
-            {build(agendaToday, magic / 2)}
-            {buildSml(agendaTomorrow, magic / 4)}
-          </View>
-        </View>
-      );
-    }
+      </View>
+    );
 
     return (
       <View
-        {...this._panResponder.panHandlers}
         style={{
           flex: 1,
-          borderColor: '#000',
-          borderWidth: 1,
-          overflow: 'hidden'
+          // borderColor: '#000',
+          // borderWidth: 1,
+          overflow: 'hidden',
+          backgroundColor: '#000'
         }}
         onLayout={event => {
           const { x, y, width, height } = event.nativeEvent.layout;
-          console.log(height);
           this.setState({
             stageH: height
           });
@@ -265,10 +270,18 @@ const mapStateToProps = (state, ownProps) => {
   let prevDate = ownProps.prevDate;
   const dx = orgTimestampUtils.diff(date, prevDate, 'days');
 
-  const nodes = Object.values(state.orgBuffers).reduce(
-    (m, v) => m.concat(Object.values(v.orgNodes)),
-    []
-  );
+  const nodes = Object.entries(state.orgBuffers).reduce((m, v) => {
+    const bufferID = v[0];
+    const entries = Object.values(v[1].orgNodes).map(n => {
+      return {
+        bufferID,
+        nodeID: n.id,
+        scheduled: n.scheduled,
+        content: n.headline.content
+      };
+    });
+    return m.concat(entries);
+  }, []);
 
   const filterRange = (ns, start, end) => {
     return ns.filter(
@@ -281,50 +294,20 @@ const mapStateToProps = (state, ownProps) => {
 
   const hours = [0, 6, 9, 12, 13, 18, 24];
 
-  const buildDay = (headerStr, start, end) => {
+  const buildDayToo = (headerStr, start, end) => {
+    const bar = d => ({
+      bufferID: d.bufferID,
+      nodeID: d.nodeID,
+      time: `${padMaybe(d.scheduled.hour)}:${padMaybe(d.scheduled.minute)}`,
+      content: d.content
+    });
     let now = date;
-    let realNow = orgTimestampUtils.now();
-    const nowStr = `${padMaybe(now.hour)}:${padMaybe(now.minute)}...... now - - - - - - - - - - - - - - - - - - - - - - - - - -`;
-    const cand = filterRange(candidates, start, end);
-    let agenda = [headerStr];
-    for (let i = 0; i < hours.length - 1; i++) {
-      const a = orgTimestampUtils.add(start, { hours: hours[i] });
-      const b = orgTimestampUtils.add(start, { hours: hours[i + 1] });
-      let foo = filterRange(cand, a, b);
-
-      if (
-        orgTimestampUtils.compare(now, a) > 0 &&
-        orgTimestampUtils.compare(now, b) < 0
-      ) {
-        if (foo.length > 0) {
-          if (orgTimestampUtils.compare(now, foo[0].scheduled) < 0) {
-            foo.unshift(nowStr);
-          } else if (orgTimestampUtils.compare(now, foo[foo.length - 1]) > 0) {
-            foo.push(nowStr);
-          } else {
-            const fooFore = filterRange(foo, a, now);
-            const fooAft = filterRange(foo, now, b);
-            foo = fooFore.concat(nowStr, fooAft);
-          }
-        } else {
-          foo.push(nowStr);
-        }
-      }
-
-      agenda = agenda.concat(foo);
-      agenda.push(
-        `${padMaybe(b.hour)}:${padMaybe(b.minute)}...... ----------------`
-      );
-    }
-    agenda.pop();
-    return agenda;
-  };
-
-  const buildDay2 = (headerStr, start, end) => {
-    const bar = d =>
-      `${padMaybe(d.scheduled.hour)}:${padMaybe(d.scheduled.minute)}...... ${d.headline.content}`;
-    let now = date;
-    const nowStr = `${padMaybe(now.hour)}:${padMaybe(now.minute)}...... now - - - - - - - - - - - - - - - - - - - - - - - - - -`;
+    const nowStr = {
+      bufferID: 'NOW',
+      nodeID: 'NOW',
+      time: `${padMaybe(now.hour)}:${padMaybe(now.minute)}`,
+      content: 'NOW'
+    };
     const cand = filterRange(candidates, start, end);
     let agenda = { headerStr, schedule: {} };
     for (let i = 0; i < hours.length - 1; i++) {
@@ -339,30 +322,21 @@ const mapStateToProps = (state, ownProps) => {
       ) {
         if (foo.length > 0) {
           if (orgTimestampUtils.compare(now, foo[0].scheduled) < 0) {
-            console.log('insert now str 1');
             foobar.unshift(nowStr);
           } else if (orgTimestampUtils.compare(now, foo[foo.length - 1]) > 0) {
-            console.log('insert now str 2');
             foobar.push(nowStr);
           } else {
             const fooFore = filterRange(foo, a, now).map(bar);
             const fooAft = filterRange(foo, now, b).map(bar);
-            console.log('insert now str 3');
-            foobar = fooFore.concat(nowStr, fooAft);
+            foobar = fooFore.concat([nowStr], fooAft);
           }
         } else {
-          console.log('insert now str 4');
           foobar.push(nowStr);
         }
       }
 
       agenda.schedule[`${padMaybe(a.hour)}:${padMaybe(a.minute)}`] = foobar;
-      // agenda = agenda.concat(foo);
-      // agenda.push(
-      //   `${padMaybe(b.hour)}:${padMaybe(b.minute)}...... ----------------`
-      // );
     }
-    //agenda.pop();
     return agenda;
   };
 
@@ -427,9 +401,9 @@ const mapStateToProps = (state, ownProps) => {
       break;
   }
 
-  agendaYesterday = buildDay2(targYesStr, yesterday, today);
-  agendaToday = buildDay2(targTodStr, today, tomorrow);
-  agendaTomorrow = buildDay2(targTomStr, tomorrow, dayAfterTomorrow);
+  agendaYesterday = buildDayToo(targYesStr, yesterday, today);
+  agendaToday = buildDayToo(targTodStr, today, tomorrow);
+  agendaTomorrow = buildDayToo(targTomStr, tomorrow, dayAfterTomorrow);
 
   return {
     agendaYesterday,
@@ -440,7 +414,19 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => {
-  return {};
+  return {
+    onNodeTitleClick: (bufferID, nodeID) => {
+      dispatch(
+        NavigationActions.navigate({
+          routeName: 'NodeDetail',
+          params: {
+            bufferID,
+            nodeID
+          }
+        })
+      );
+    }
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrgAgenda);

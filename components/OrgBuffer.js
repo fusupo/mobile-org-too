@@ -1,7 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, View, TouchableHighlight } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
-import { addNewNode, deleteNode, cycleNodeCollapse } from '../actions';
+import { Text, StyleSheet, View } from 'react-native';
 
 import { connect } from 'react-redux';
 
