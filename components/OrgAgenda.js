@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import {
-  Animated,
   Easing,
   PanResponder,
   ScrollView,
@@ -21,10 +20,14 @@ const styles = StyleSheet.create({
 });
 
 const magic = 504;
+const padMaybe = n => {
+  n = '' + n;
+  n = n.length === 1 ? '0' + n : n;
+  return n;
+};
 
 class OrgAgenda extends React.Component {
   state = {
-    transXAnim: new Animated.Value(0), // Initial value for opacity: 0
     stageH: 0,
     dayHeight: magic / 2
   };
@@ -70,105 +73,114 @@ class OrgAgenda extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    let dayHeight = this.state.dayHeight;
-    if (nextProps.percH !== this.props.percH) {
-      if (nextProps.percH <= 0.50) {
-        dayHeight = magic / 2;
-        this.state.transXAnim.setValue(-dayHeight * 2);
-      } else {
-        dayHeight = magic / 3;
-        this.state.transXAnim.setValue(-dayHeight);
-      }
-      this.setState({
-        dayHeight
-      });
-      console.log('foo');
-    } else {
-      console.log('bar');
-      const h = dayHeight;
-      let startX;
-      let endX = -h;
-      console.log(nextProps.dx);
-      switch (nextProps.dx) {
-        case -1:
-          if (nextProps.percH <= 0.50) {
-            startX = -h * 3;
-            endX = -h * 2;
-          } else {
-            startX = -h * 2;
-            endX = -h;
-          }
-          break;
-        case 0:
-          if (nextProps.percH <= 0.50) {
-            startX = -h * 2;
-            endX = -h * 2;
-          } else {
-            startX = -h;
-            endX = -h;
-          }
-          break;
-        case 1:
-          if (nextProps.percH <= 0.50) {
-            startX = -h;
-            endX = -h * 2;
-          } else {
-            startX = 0;
-            endX = -h;
-          }
-          // if (nextProps.percH <= 0.50) {
-          //   dayHeight = magic / 2;
-          // } else {
-          //   dayHeight = magic / 3;
-          // }
-          break;
-      }
-      this.state.transXAnim.setValue(startX);
-      Animated.timing(
-        // Animate over time
-        this.state.transXAnim, // The animated value to drive
-        {
-          toValue: endX, // Animate to opacity: 1 (opaque)
-          duration: 250, // Make it take a while
-          easing: Easing.inOut(Easing.quad),
-          delay: 1
-        }
-      ).start(e => {
-        console.log(e);
-        console.log(this.props.dx);
-      }); // Starts the animation
-    }
+    // let dayHeight = this.state.dayHeight;
+    // if (nextProps.percH !== this.props.percH) {
+    //   if (nextProps.percH <= 0.50) {
+    //     dayHeight = magic / 2;
+    //   } else {
+    //     dayHeight = magic / 3;
+    //   }
+    //   this.setState({
+    //     dayHeight
+    //   });
+    // }
   }
 
   render() {
-    let {
-      agendaYesterdayM1,
-      agendaYesterday,
-      agendaToday,
-      agendaTomorrow,
-      agendaTomorrowP1,
-      dx
-    } = this.props;
-    const build = data => {
-      const foo = data.map((d, idx) => {
-        if (typeof d === 'string') {
-          return <Text key={idx}>{d}</Text>;
-        } else {
-          return (
-            <Text key={idx}>
-              {`${d.scheduled.hour}:${d.scheduled.minute}...... ${d.headline.content}`}
-            </Text>
-          );
-        }
+    let { agendaYesterday, agendaToday, agendaTomorrow, dx } = this.props;
+
+    let agendaKeys = ['00:00', '06:00', '09:00', '12:00', '13:00', '18:00'];
+    let colors = [
+      '#92021C',
+      '#EC6E58',
+      '#F6BD78',
+      '#F6BD78',
+      '#956066',
+      '#564975'
+    ];
+    const build = (data, height) => {
+      const foo = agendaKeys.map((k, kidx) => {
+        const listData = data.schedule[k];
+        const color = colors[kidx];
+        const list = listData.map((d, idx) => (
+          <View
+            key={idx}
+            style={{
+              //   flex: 1
+            }}>
+            <Text key={idx}>{d}</Text>
+          </View>
+        ));
+        return (
+          <View
+            key={k}
+            style={{
+              // borderColor: '#000',
+              // borderWidth: 1,
+              flex: list.length, // + 1,
+              backgroundColor: color
+            }}>
+            {k !== agendaKeys[0]
+              ? <Text>{k}</Text>
+              : <Text style={{ color: '#fff', backgroundColor: '#000' }}>
+                  {data.headerStr}
+                </Text>}
+            {list}
+          </View>
+        );
       });
       return (
         <View
           style={{
-            height: this.state.dayHeight,
-            //margin: 10,
-            borderColor: '#000',
-            borderWidth: 1
+            // borderColor: '#000',
+            // borderWidth: 1,
+            height: height,
+            // flex: 1,
+            flexDirection: 'column'
           }}>
+
+          {foo}
+        </View>
+      );
+    };
+
+    const buildSml = (data, height) => {
+      const foo = agendaKeys.map((k, kidx) => {
+        const listData = data.schedule[k];
+        const color = colors[kidx];
+        const list = listData.map((d, idx) => (
+          <View
+            key={idx}
+            style={{
+              //   flex: 1
+            }}>
+            <Text key={idx}>{d}</Text>
+          </View>
+        ));
+        return (
+          <View
+            key={k}
+            style={{
+              // borderColor: '#000',
+              // borderWidth: 1
+              backgroundColor: color
+            }}>
+            {list}
+          </View>
+        );
+      });
+      return (
+        <View
+          style={{
+            // borderColor: '#000',
+            // borderWidth: 1,
+            height: height,
+            // flex: 1,
+            flexDirection: 'column'
+          }}>
+          <Text style={{ color: '#fff', backgroundColor: '#000' }}>
+            {data.headerStr}
+          </Text>
           {foo}
         </View>
       );
@@ -179,44 +191,42 @@ class OrgAgenda extends React.Component {
       xxx = (
         <View
           style={{
-            borderColor: '#f00',
-            borderWidth: 1,
+            // borderColor: '#f00',
+            // borderWidth: 1,
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-          <Animated.View
+          <View
             style={{
+              flex: 1,
               position: 'absolute',
-              top: this.state.transXAnim
+              top: 0
             }}>
-            {build(agendaYesterdayM1)}
-            {build(agendaYesterday)}
-            {build(agendaToday)}
-            {build(agendaTomorrow)}
-            {build(agendaTomorrowP1)}
-          </Animated.View>
+            {build(agendaToday, magic / 2)}
+          </View>
         </View>
       );
     } else {
       xxx = (
         <View
           style={{
-            borderColor: '#f00',
-            borderWidth: 1,
-            flex: 1
+            // borderColor: '#f00',
+            // borderWidth: 1,
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center'
           }}>
-          <Animated.View
+          <View
             style={{
+              flex: 1,
               position: 'absolute',
-              top: this.state.transXAnim
+              top: 0
             }}>
-            {build(agendaYesterdayM1)}
-            {build(agendaYesterday)}
-            {build(agendaToday)}
-            {build(agendaTomorrow)}
-            {build(agendaTomorrowP1)}
-          </Animated.View>
+            {buildSml(agendaYesterday, magic / 4)}
+            {build(agendaToday, magic / 2)}
+            {buildSml(agendaTomorrow, magic / 4)}
+          </View>
         </View>
       );
     }
@@ -274,7 +284,7 @@ const mapStateToProps = (state, ownProps) => {
   const buildDay = (headerStr, start, end) => {
     let now = date;
     let realNow = orgTimestampUtils.now();
-    const nowStr = `${now.hour}:${now.minute}...... now - - - - - - - - - - - - - - - - - - - - - - - - - -`;
+    const nowStr = `${padMaybe(now.hour)}:${padMaybe(now.minute)}...... now - - - - - - - - - - - - - - - - - - - - - - - - - -`;
     const cand = filterRange(candidates, start, end);
     let agenda = [headerStr];
     for (let i = 0; i < hours.length - 1; i++) {
@@ -302,9 +312,57 @@ const mapStateToProps = (state, ownProps) => {
       }
 
       agenda = agenda.concat(foo);
-      agenda.push(`${b.hour}:${b.minute}...... ----------------`);
+      agenda.push(
+        `${padMaybe(b.hour)}:${padMaybe(b.minute)}...... ----------------`
+      );
     }
     agenda.pop();
+    return agenda;
+  };
+
+  const buildDay2 = (headerStr, start, end) => {
+    const bar = d =>
+      `${padMaybe(d.scheduled.hour)}:${padMaybe(d.scheduled.minute)}...... ${d.headline.content}`;
+    let now = date;
+    const nowStr = `${padMaybe(now.hour)}:${padMaybe(now.minute)}...... now - - - - - - - - - - - - - - - - - - - - - - - - - -`;
+    const cand = filterRange(candidates, start, end);
+    let agenda = { headerStr, schedule: {} };
+    for (let i = 0; i < hours.length - 1; i++) {
+      const a = orgTimestampUtils.add(start, { hours: hours[i] });
+      const b = orgTimestampUtils.add(start, { hours: hours[i + 1] });
+      let foo = filterRange(cand, a, b);
+      let foobar = filterRange(cand, a, b).map(bar);
+
+      if (
+        orgTimestampUtils.compare(now, a) > 0 &&
+        orgTimestampUtils.compare(now, b) < 0
+      ) {
+        if (foo.length > 0) {
+          if (orgTimestampUtils.compare(now, foo[0].scheduled) < 0) {
+            console.log('insert now str 1');
+            foobar.unshift(nowStr);
+          } else if (orgTimestampUtils.compare(now, foo[foo.length - 1]) > 0) {
+            console.log('insert now str 2');
+            foobar.push(nowStr);
+          } else {
+            const fooFore = filterRange(foo, a, now).map(bar);
+            const fooAft = filterRange(foo, now, b).map(bar);
+            console.log('insert now str 3');
+            foobar = fooFore.concat(nowStr, fooAft);
+          }
+        } else {
+          console.log('insert now str 4');
+          foobar.push(nowStr);
+        }
+      }
+
+      agenda.schedule[`${padMaybe(a.hour)}:${padMaybe(a.minute)}`] = foobar;
+      // agenda = agenda.concat(foo);
+      // agenda.push(
+      //   `${padMaybe(b.hour)}:${padMaybe(b.minute)}...... ----------------`
+      // );
+    }
+    //agenda.pop();
     return agenda;
   };
 
@@ -320,110 +378,63 @@ const mapStateToProps = (state, ownProps) => {
 
   let diff = orgTimestampUtils.diff(today, realToday, 'days');
 
-  const yesterdayM1 = orgTimestampUtils.sub(today, { days: 2 });
   const yesterday = orgTimestampUtils.sub(today, { days: 1 });
   const tomorrow = orgTimestampUtils.add(today, { days: 1 });
   const dayAfterTomorrow = orgTimestampUtils.add(today, { days: 2 });
-  const dayAfterTomorrowP1 = orgTimestampUtils.add(today, { days: 3 });
 
-  candidates = filterRange(nodes, yesterdayM1, dayAfterTomorrowP1);
+  candidates = filterRange(nodes, yesterday, dayAfterTomorrow);
   candidates.sort((a, b) => {
     return orgTimestampUtils.compare(a.scheduled, b.scheduled);
   });
 
-  const padMaybe = n => {
-    n = '' + n;
-    n = n.length === 1 ? '0' + n : n;
-    return n;
-  };
   const yesStr = '-----++----YESTERDAY----------';
   const todStr = '-----++----TODAY--------------';
   const tomStr = '-----++----TOMORROW-----------';
   const dateStr = d =>
     `-----++----[${d.year}-${padMaybe(d.month)}-${padMaybe(d.date)} ${d.day}]---`;
-  let targYesM1Str, targYesStr, targTodStr, targTomStr, targTomP1Str;
+  let targYesStr, targTodStr, targTomStr;
 
   switch (diff) {
-    case -3:
-      targYesM1Str = dateStr(yesterdayM1);
-      targYesStr = dateStr(yesterday);
-      targTodStr = dateStr(today);
-      targTomStr = dateStr(tomorrow);
-      targTomP1Str = yesStr;
-      break;
     case -2:
-      targYesM1Str = dateStr(yesterdayM1);
       targYesStr = dateStr(yesterday);
       targTodStr = dateStr(today);
       targTomStr = yesStr;
-      targTomP1Str = todStr;
       break;
     case -1:
-      targYesM1Str = dateStr(yesterdayM1);
       targYesStr = dateStr(yesterday);
       targTodStr = yesStr;
       targTomStr = todStr;
-      targTomP1Str = tomStr;
       break;
     case 0:
-      targYesM1Str = dateStr(yesterdayM1);
       targYesStr = yesStr;
       targTodStr = todStr;
       targTomStr = tomStr;
-      targTomP1Str = dateStr(dayAfterTomorrow);
       break;
     case 1:
-      targYesM1Str = yesStr;
       targYesStr = todStr;
       targTodStr = tomStr;
       targTomStr = dateStr(tomorrow);
-      targTomP1Str = dateStr(dayAfterTomorrow);
       break;
     case 2:
-      targYesM1Str = todStr;
       targYesStr = tomStr;
       targTodStr = dateStr(today);
       targTomStr = dateStr(tomorrow);
-      targTomP1Str = dateStr(dayAfterTomorrow);
-      break;
-    case 3:
-      targYesM1Str = tomStr;
-      targYesStr = dateStr(yesterday);
-      targTodStr = dateStr(today);
-      targTomStr = dateStr(tomorrow);
-      targTomP1Str = dateStr(dayAfterTomorrow);
       break;
     default:
-      targYesM1Str = dateStr(yesterdayM1);
       targYesStr = dateStr(yesterday);
       targTodStr = dateStr(today);
       targTomStr = dateStr(tomorrow);
-      targTomP1Str = dateStr(dayAfterTomorrow);
       break;
   }
 
-  agendaYesterdayM1 = buildDay(targYesM1Str, yesterdayM1, yesterday);
-  agendaYesterday = buildDay(targYesStr, yesterday, today);
-  agendaToday = buildDay(targTodStr, today, tomorrow);
-  agendaTomorrow = buildDay(targTomStr, tomorrow, dayAfterTomorrow);
-  agendaTomorrowP1 = buildDay(
-    targTomP1Str,
-    dayAfterTomorrow,
-    dayAfterTomorrowP1
-  );
-
-  agendaYesterdayM1.key = dateStr(yesterdayM1);
-  agendaYesterday.key = dateStr(yesterday);
-  agendaToday.key = dateStr(today);
-  agendaTomorrow.key = dateStr(tomorrow);
-  agendaTomorrowP1.key = dateStr(dayAfterTomorrow);
+  agendaYesterday = buildDay2(targYesStr, yesterday, today);
+  agendaToday = buildDay2(targTodStr, today, tomorrow);
+  agendaTomorrow = buildDay2(targTomStr, tomorrow, dayAfterTomorrow);
 
   return {
-    agendaYesterdayM1,
     agendaYesterday,
     agendaToday,
     agendaTomorrow,
-    agendaTomorrowP1,
     dx
   };
 };
