@@ -161,7 +161,7 @@ export function updateNodeBody(bufferID, nodeID, text) {
 export function toggleNodeTag(bufferID, nodeID, tag) {
   return {
     type: TOGGLE_NODE_TAG,
-    bgufferID,
+    bufferID,
     nodeID,
     tag
   };
