@@ -54,7 +54,7 @@ class OrgTagsEditable extends Component {
       : null;
 
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         <Modal
           animationType={'fade'}
           transparent={false}
@@ -172,11 +172,11 @@ class OrgTagsEditable extends Component {
             this.setModalVisible(!this.state.modalVisible);
           }}
           style={{
-            borderColor: '#000',
-            borderWidth: 0.5,
-            height: '100%'
+            // borderColor: '#000',
+            // borderWidth: 0.5,
+            flex: 1
           }}>
-          <View style={{ flexDirection: 'column' }}>
+          <View style={{ flex: 1, flexDirection: 'column' }}>
             {tagList}
           </View>
         </TouchableHighlight>
@@ -195,7 +195,6 @@ const mapStateToProps = (state, ownProps) => {
     return m.concat(tags);
   }, []);
   allTags = R.uniq(allTags);
-  //  console.log(allTags);
   return {
     tags: node.headline.tags || [],
     allTags

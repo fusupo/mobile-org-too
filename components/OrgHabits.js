@@ -101,7 +101,6 @@ class OrgHabits extends React.Component {
   render() {
     const { date, habits, habitData, onHabitPress } = this.props;
     const showDateModal = nodeID => {
-      console.log(date);
       this.setState({
         dateModalNodeID: nodeID,
         dateModalDate: new Date(
@@ -449,8 +448,6 @@ function someAction(nodeID, date, noteText) {
       }
       return M;
     }, undefined);
-
-    console.log(bufferID, nodeID, nowStr, noteText);
 
     dispatch(completeHabit(bufferID, nodeID, nowStr, noteText));
     dispatch(resetHabit(bufferID, nodeID, nowStr));

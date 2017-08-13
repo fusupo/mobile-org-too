@@ -87,7 +87,7 @@ const NodeDetailScreen = ({
             <ScrollView style={styles.container}>
               <View
                 style={[styles.container, styles.border, { marginTop: 20 }]}>
-                <OrgHeadlineEditable bufferID={bufferID} node={node} />
+                <OrgHeadlineEditable bufferID={bufferID} nodeID={nodeID} />
               </View>
               <View style={[styles.container, styles.border]}>
                 <OrgScheduling

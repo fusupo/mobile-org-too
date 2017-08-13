@@ -60,7 +60,14 @@ class OrgHeadlineEditable extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  return {};
+  const { bufferID, nodeID } = ownProps;
+  const nodes = state.orgBuffers[bufferID].orgNodes;
+  const node = nodes[nodeID];
+  return {
+    bufferID,
+    nodeID,
+    node
+  };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
