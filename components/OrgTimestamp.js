@@ -2,15 +2,15 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Swipeout from 'react-native-swipeout';
 import {
-  TouchableHighlight,
+  ActionSheetIOS,
+  Button,
+  DatePickerIOS,
+  Picker,
   StyleSheet,
   Text,
   TextInput,
-  View,
-  DatePickerIOS,
-  Button,
-  ActionSheetIOS,
-  Picker
+  TouchableHighlight,
+  View
 } from 'react-native';
 
 const orgHeadlineUtil = require('org-parse').OrgHeadline;

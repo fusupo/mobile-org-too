@@ -100,10 +100,8 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = dispatch => {
   return {
     onTimestampUpdate: (bufferID, nodeID, timestampType) => date => {
-      console.log('UPDATE TIMESTAMP');
       const timestamp = OrgTimestampUtil.parseDate(date);
       timestamp.type = 'active';
-      console.log(bufferID, nodeID, timestampType, timestamp);
       dispatch(updateNodeTimestamp(bufferID, nodeID, timestampType, timestamp));
     },
     onTimestampRepIntUpdate: (bufferID, nodeID, timestampType) => (

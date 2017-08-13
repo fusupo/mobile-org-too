@@ -2,16 +2,20 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import {
-  TouchableHighlight,
+  ActionSheetIOS,
+  Button,
+  DatePickerIOS,
+  Modal,
+  PanResponder,
   ScrollView,
   StyleSheet,
   Text,
-  View,
-  PanResponder
+  TouchableHighlight,
+  View
 } from 'react-native';
 
 const orgDrawerUtils = require('org-parse').OrgDrawer;
-const orgTimestampUtils = require('org-parse').OrgTimestamp;
+const OrgTimestampUtil = require('org-parse').OrgTimestamp;
 
 import { completeHabit, resetHabit } from '../actions';
 
@@ -25,7 +29,13 @@ const styles = StyleSheet.create({
 class OrgHabits extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { currX: 0, prevDX: 0 };
+    this.state = {
+      currX: 0,
+      prevDX: 0,
+      modalVisible: false,
+      modalDate: new Date(),
+      modalNodeID: null
+    };
   }
 
   componentWillMount() {
@@ -78,17 +88,90 @@ class OrgHabits extends React.Component {
       }
     });
   }
-
+  setModalVisible(visible) {
+    this.setState({ modalVisible: visible });
+  }
   render() {
     const { date, habits, habitData, onHabitPress } = this.props;
     return (
       <ScrollView>
+        <Modal
+          animationType={'fade'}
+          transparent={false}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {
+            alert('Modal has been closed.');
+          }}>
+          <View style={{ flex: 1, marginTop: 22 }}>
+            <DatePickerIOS
+              style={{ height: 150, flex: 12 }}
+              date={this.state.modalDate}
+              onDateChange={modalDate => this.setState({ modalDate })}
+              mode="datetime"
+            />
+
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ flex: 1 }}>
+                <Button
+                  title={'Cancel'}
+                  onPress={() => {
+                    this.setModalVisible(!this.state.modalVisible);
+                  }}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Button
+                  title={'OK'}
+                  onPress={() => {
+                    this.setModalVisible(!this.state.modalVisible);
+
+                    const timestamp = OrgTimestampUtil.parseDate(
+                      this.state.modalDate
+                    );
+                    console.log(this.state.modalNodeID);
+                    onHabitPress(this.state.modalNodeID, timestamp);
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
+
         {habits.map((h, idx) => (
           <View key={h.id} style={{ flexDirection: 'row' }}>
             <TouchableHighlight
               underlayColor="#00ff00"
               style={{ flex: 1 }}
-              onPress={() => onHabitPress(h.id, date)}>
+              onPress={() => {
+                ActionSheetIOS.showActionSheetWithOptions(
+                  {
+                    options: ['confirm', 'edit date', 'cancel']
+                  },
+                  idx => {
+                    if (idx === 0) {
+                      const tdate = OrgTimestampUtil.momentToObj(
+                        OrgTimestampUtil.momentFromObj(date)
+                      );
+                      tdate.hour += OrgTimestampUtil.now().hour;
+                      tdate.minute += OrgTimestampUtil.now().minute;
+                      onHabitPress(h.id, tdate);
+                    } else if (idx === 1) {
+                      console.log(date);
+                      this.setState({
+                        modalNodeID: h.id,
+                        modalDate: new Date(
+                          date.year,
+                          date.month - 1,
+                          date.date,
+                          new Date().getHours(),
+                          new Date().getMinutes()
+                        )
+                      });
+                      this.setModalVisible(true);
+                    }
+                  }
+                );
+              }}>
               <Text style={{ textAlign: 'right', fontSize: 12 }}>
                 {h.headline.content}
               </Text>
@@ -145,7 +228,7 @@ const mapStateToProps = (state, ownProps) => {
   });
 
   const getRealNow = () => {
-    const now = orgTimestampUtils.now();
+    const now = OrgTimestampUtil.now();
     now.hour -= now.hour;
     now.minute -= now.minute;
     return now;
@@ -158,11 +241,11 @@ const mapStateToProps = (state, ownProps) => {
       return true;
     })
     .map(n => {
-      const now = date; //orgTimestampUtils.now();
+      const now = date; //OrgTimestampUtil.now();
       now.hour -= now.hour;
       now.minute -= now.minute;
-      const past = orgTimestampUtils.sub(now, { days: 14 });
-      const fut = orgTimestampUtils.add(now, { days: 7 });
+      const past = OrgTimestampUtil.sub(now, { days: 14 });
+      const fut = OrgTimestampUtil.add(now, { days: 7 });
       if (n.logbook) {
         // don't know why there'd be no logbook if passed previous
         // filter...maybe if completely new habit but not yet logged done in
@@ -182,12 +265,12 @@ const mapStateToProps = (state, ownProps) => {
             le.type === 'state' &&
             le.state === '"DONE"' &&
             le.from === '"TODO"' &&
-            orgTimestampUtils.compare(le.timestamp, past) > 0 &&
-            orgTimestampUtils.compare(le.timestamp, fut) < 0
+            OrgTimestampUtil.compare(le.timestamp, past) > 0 &&
+            OrgTimestampUtil.compare(le.timestamp, fut) < 0
         );
 
         logData = logData.sort((a, b) =>
-          orgTimestampUtils.compare(a.timestamp, b.timestamp)
+          OrgTimestampUtil.compare(a.timestamp, b.timestamp)
         );
 
         let ret = [];
@@ -195,13 +278,13 @@ const mapStateToProps = (state, ownProps) => {
         let rngMax = 0;
         if (logData.length > 0) {
           for (let i = 0; i < 21; i++) {
-            const curr = orgTimestampUtils.add(past, { days: 1 * i });
-            const next = orgTimestampUtils.add(curr, { days: 1 });
+            const curr = OrgTimestampUtil.add(past, { days: 1 * i });
+            const next = OrgTimestampUtil.add(curr, { days: 1 });
             const ts = logData.length > 0 ? logData[0].timestamp : null;
             if (
               ts !== null &&
-              orgTimestampUtils.compare(ts, curr) > 0 &&
-              orgTimestampUtils.compare(ts, next) < 0
+              OrgTimestampUtil.compare(ts, curr) > 0 &&
+              OrgTimestampUtil.compare(ts, next) < 0
             ) {
               logData.shift();
               ret.push('x');
@@ -209,7 +292,7 @@ const mapStateToProps = (state, ownProps) => {
               rngMin = repMinVal * { d: 1, w: 7 }[repMinU];
               rngMax = repMaxVal ? repMaxVal * { d: 1, w: 7 }[repMaxU] : 0;
               if (rngMax > 0) rngMin--;
-            } else if (orgTimestampUtils.compare(getRealNow(), curr) === 0) {
+            } else if (OrgTimestampUtil.compare(getRealNow(), curr) === 0) {
               ret.push('!');
             } else {
               if (rngMax && rngMax > 0) {
@@ -258,9 +341,7 @@ const mapDispatchToProps = dispatch => {
 function someAction(nodeID, date) {
   return (dispatch, getState) => {
     const state = getState();
-    date.hour += orgTimestampUtils.now().hour;
-    date.minute += orgTimestampUtils.now().minute;
-    const nowStr = orgTimestampUtils.serialize(date); //;orgTimestampUtils.now());
+    const nowStr = OrgTimestampUtil.serialize(date); //;OrgTimestampUtil.now());
     // super inefficient way of finding bufferID from nodeID !!!!
     let bufferID = Object.entries(state.orgBuffers).reduce((M, V) => {
       if (M === undefined) {
@@ -275,6 +356,8 @@ function someAction(nodeID, date) {
       }
       return M;
     }, undefined);
+
+    console.log(bufferID, nodeID, nowStr);
 
     dispatch(completeHabit(bufferID, nodeID, nowStr));
     dispatch(resetHabit(bufferID, nodeID, nowStr));
