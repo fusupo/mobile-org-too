@@ -110,8 +110,8 @@ export function deleteNode(bufferID, nodeID) {
   return { type: DELETE_NODE, bufferID, nodeID };
 }
 
-export function completeHabit(bufferID, nodeID, timestampStr) {
-  return { type: COMPLETE_HABIT, bufferID, nodeID, timestampStr };
+export function completeHabit(bufferID, nodeID, timestampStr, noteText) {
+  return { type: COMPLETE_HABIT, bufferID, nodeID, timestampStr, noteText };
 }
 
 export function resetHabit(bufferID, nodeID, timestampStr) {

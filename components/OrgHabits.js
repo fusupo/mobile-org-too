@@ -10,11 +10,12 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableHighlight,
   View
 } from 'react-native';
 
-const orgDrawerUtils = require('org-parse').OrgDrawer;
+const OrgDrawerUtil = require('org-parse').OrgDrawer;
 const OrgTimestampUtil = require('org-parse').OrgTimestamp;
 
 import { completeHabit, resetHabit } from '../actions';
@@ -32,9 +33,12 @@ class OrgHabits extends React.Component {
     this.state = {
       currX: 0,
       prevDX: 0,
-      modalVisible: false,
-      modalDate: new Date(),
-      modalNodeID: null
+      dateModalVisible: false,
+      dateModalDate: new Date(),
+      dateModalNodeID: null,
+      noteModalVisible: false,
+      noteModalText: null,
+      noteModalNodeID: null
     };
   }
 
@@ -88,25 +92,61 @@ class OrgHabits extends React.Component {
       }
     });
   }
-  setModalVisible(visible) {
-    this.setState({ modalVisible: visible });
+  setDateModalVisible(visible) {
+    this.setState({ dateModalVisible: visible });
+  }
+  setNoteModalVisible(visible) {
+    this.setState({ noteModalVisible: visible });
   }
   render() {
     const { date, habits, habitData, onHabitPress } = this.props;
+    const showDateModal = nodeID => {
+      console.log(date);
+      this.setState({
+        dateModalNodeID: nodeID,
+        dateModalDate: new Date(
+          date.year,
+          date.month - 1,
+          date.date,
+          new Date().getHours(),
+          new Date().getMinutes()
+        )
+      });
+      this.setDateModalVisible(true);
+    };
+    const showOKEditCancelSheet = nodeID => {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['confirm', 'edit date', 'cancel']
+        },
+        idx => {
+          if (idx === 0) {
+            const tdate = OrgTimestampUtil.momentToObj(
+              OrgTimestampUtil.momentFromObj(date)
+            );
+            tdate.hour += OrgTimestampUtil.now().hour;
+            tdate.minute += OrgTimestampUtil.now().minute;
+            onHabitPress(nodeID, tdate);
+          } else if (idx === 1) {
+            showDateModal(nodeID);
+          }
+        }
+      );
+    };
     return (
       <ScrollView>
         <Modal
           animationType={'fade'}
           transparent={false}
-          visible={this.state.modalVisible}
+          visible={this.state.dateModalVisible}
           onRequestClose={() => {
-            alert('Modal has been closed.');
+            alert('Date Modal has been closed.');
           }}>
           <View style={{ flex: 1, marginTop: 22 }}>
             <DatePickerIOS
               style={{ height: 150, flex: 12 }}
-              date={this.state.modalDate}
-              onDateChange={modalDate => this.setState({ modalDate })}
+              date={this.state.dateModalDate}
+              onDateChange={dateModalDate => this.setState({ dateModalDate })}
               mode="datetime"
             />
 
@@ -115,7 +155,7 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'Cancel'}
                   onPress={() => {
-                    this.setModalVisible(!this.state.modalVisible);
+                    this.setDateModalVisible(!this.state.dateModalVisible);
                   }}
                 />
               </View>
@@ -123,13 +163,73 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'OK'}
                   onPress={() => {
-                    this.setModalVisible(!this.state.modalVisible);
+                    this.setDateModalVisible(!this.state.dateModalVisible);
 
                     const timestamp = OrgTimestampUtil.parseDate(
-                      this.state.modalDate
+                      this.state.dateModalDate
                     );
-                    console.log(this.state.modalNodeID);
-                    onHabitPress(this.state.modalNodeID, timestamp);
+                    onHabitPress(
+                      this.state.dateModalNodeID,
+                      timestamp,
+                      this.state.noteModalText
+                    );
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          animationType={'none'}
+          transparent={false}
+          visible={this.state.noteModalVisible}
+          onRequestClose={() => {
+            alert('Note Modal has been closed.');
+            console.log('Note Modal has been closed.');
+          }}>
+          <View style={{ marginTop: 40, flexDirection: 'column' }}>
+            <TextInput
+              style={{ height: '50%', borderColor: '#ccc', borderWidth: 1 }}
+              multiline={true}
+              value={this.state.noteModalText}
+              onChangeText={noteModalText => {
+                this.setState({ noteModalText });
+              }}
+            />
+            <View style={{ flex: 1, flexDirection: 'row' }}>
+              <View style={{ flex: 1 }}>
+                <Button
+                  title={'Cancel'}
+                  onPress={() => {
+                    this.setNoteModalVisible(!this.state.noteModalVisible);
+                  }}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Button
+                  title={'Edit Date'}
+                  onPress={() => {
+                    this.setNoteModalVisible(!this.state.noteModalVisible);
+                    showDateModal(this.state.noteModalNodeID);
+                  }}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Button
+                  title={'OK'}
+                  onPress={() => {
+                    this.setNoteModalVisible(!this.state.noteModalVisible);
+                    const tdate = OrgTimestampUtil.momentToObj(
+                      OrgTimestampUtil.momentFromObj(date)
+                    );
+                    tdate.hour += OrgTimestampUtil.now().hour;
+                    tdate.minute += OrgTimestampUtil.now().minute;
+                    onHabitPress(
+                      this.state.noteModalNodeID,
+                      tdate,
+                      this.state.noteModalText
+                    );
                   }}
                 />
               </View>
@@ -143,34 +243,26 @@ class OrgHabits extends React.Component {
               underlayColor="#00ff00"
               style={{ flex: 1 }}
               onPress={() => {
-                ActionSheetIOS.showActionSheetWithOptions(
-                  {
-                    options: ['confirm', 'edit date', 'cancel']
-                  },
-                  idx => {
-                    if (idx === 0) {
-                      const tdate = OrgTimestampUtil.momentToObj(
-                        OrgTimestampUtil.momentFromObj(date)
+                this.setState({ noteModalText: null });
+                const idx = OrgDrawerUtil.indexOfKey(h.propDrawer, 'LOGGING');
+                if (idx >= 0) {
+                  switch (h.propDrawer.properties[idx][1]) {
+                    case 'DONE(@)':
+                      // SHOW NOTE EDITOR
+                      this.setState({ noteModalNodeID: h.id });
+                      this.setNoteModalVisible(!this.state.noteModalVisible);
+                      break;
+                    default:
+                      console.log(
+                        'UNHANDLED LOGGING TYPE IN ORGHABITS!! -- ',
+                        h.propDrawer.properties[idx][1]
                       );
-                      tdate.hour += OrgTimestampUtil.now().hour;
-                      tdate.minute += OrgTimestampUtil.now().minute;
-                      onHabitPress(h.id, tdate);
-                    } else if (idx === 1) {
-                      console.log(date);
-                      this.setState({
-                        modalNodeID: h.id,
-                        modalDate: new Date(
-                          date.year,
-                          date.month - 1,
-                          date.date,
-                          new Date().getHours(),
-                          new Date().getMinutes()
-                        )
-                      });
-                      this.setModalVisible(true);
-                    }
+                      break;
                   }
-                );
+                } else {
+                  // SHOW OK/EDIT/CANCEL SHEET
+                  showOKEditCancelSheet(h.id);
+                }
               }}>
               <Text style={{ textAlign: 'right', fontSize: 12 }}>
                 {h.headline.content}
@@ -222,7 +314,7 @@ const mapStateToProps = (state, ownProps) => {
   );
 
   const habits = nodes.filter(n => {
-    const idx = orgDrawerUtils.indexOfKey(n.propDrawer, 'STYLE');
+    const idx = OrgDrawerUtil.indexOfKey(n.propDrawer, 'STYLE');
     if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
     return true;
   });
@@ -236,7 +328,7 @@ const mapStateToProps = (state, ownProps) => {
 
   const habitData = nodes
     .filter(n => {
-      const idx = orgDrawerUtils.indexOfKey(n.propDrawer, 'STYLE');
+      const idx = OrgDrawerUtil.indexOfKey(n.propDrawer, 'STYLE');
       if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
       return true;
     })
@@ -334,11 +426,12 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onHabitPress: (nodeID, date) => dispatch(someAction(nodeID, date))
+    onHabitPress: (nodeID, date, noteText = null) =>
+      dispatch(someAction(nodeID, date, noteText))
   };
 };
 
-function someAction(nodeID, date) {
+function someAction(nodeID, date, noteText) {
   return (dispatch, getState) => {
     const state = getState();
     const nowStr = OrgTimestampUtil.serialize(date); //;OrgTimestampUtil.now());
@@ -357,9 +450,9 @@ function someAction(nodeID, date) {
       return M;
     }, undefined);
 
-    console.log(bufferID, nodeID, nowStr);
+    console.log(bufferID, nodeID, nowStr, noteText);
 
-    dispatch(completeHabit(bufferID, nodeID, nowStr));
+    dispatch(completeHabit(bufferID, nodeID, nowStr, noteText));
     dispatch(resetHabit(bufferID, nodeID, nowStr));
   };
 }
