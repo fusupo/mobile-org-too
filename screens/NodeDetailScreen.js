@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
+  addNewNode,
   cycleNodeCollapse,
   deleteNode,
   insertNewNodeProp,
@@ -61,7 +62,8 @@ const NodeDetailScreen = ({
   onAddLogNote,
   onUpdateLogNote,
   onRemoveLogNote,
-  onUpdateNodeBody
+  onUpdateNodeBody,
+  onAddOnePress
 }) => {
   if (node) {
     // childNodes
@@ -120,7 +122,19 @@ const NodeDetailScreen = ({
               />
             </ScrollView>
           }
-          viewB={list}
+          viewB={
+            <View style={{ flex: 1 }}>
+              <Button
+                onPress={() => {
+                  onAddOnePress(bufferID, nodeID, node);
+                }}
+                title="Add Child"
+                color="#841584"
+                accessibilityLabel="add child node"
+              />
+              {list}
+            </View>
+          }
         />
         <Button
           onPress={() => {
@@ -203,6 +217,9 @@ const mapDispatchToProps = dispatch => {
     },
     onUpdateNodeBody: (bufferID, nodeID) => text => {
       dispatch(updateNodeBody(bufferID, nodeID, text));
+    },
+    onAddOnePress: (bufferID, nodeID, node) => {
+      dispatch(addNewNode(bufferID, nodeID, node.headline.level + 1));
     }
   };
 };
