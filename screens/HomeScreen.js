@@ -5,7 +5,11 @@ import { connect } from 'react-redux';
 import { Button, ScrollView, Text, TextInput, View } from 'react-native';
 
 import { FontAwesome } from '@expo/vector-icons';
+import ModalDropdown from 'react-native-modal-dropdown';
+
 import { registerDbxAccessToken, addNewNode } from '../actions';
+
+const orgHeadlineUtil = require('org-parse').OrgHeadline;
 
 import OrgBuffer from '../components/OrgBuffer';
 import OrgHeadline from '../components/OrgHeadline.js';
@@ -21,52 +25,38 @@ class HomeScreen extends React.Component {
   };
 
   componentWillMount() {
+    let keywords = orgHeadlineUtil.keywords().slice(0);
+    keywords.push('none');
+    this.setState({
+      keywords,
+      keywordFilterIdx: keywords.length - 1
+    });
+
     this.props.loadInboxFile();
   }
 
   render() {
     const { buffers, onAddOne } = this.props;
-    const search = () => {
-      const results = R.map(
-        n => (
-          <OrgHeadline
-            key={n.nodeID}
-            bufferID={n.bufferID}
-            nodeID={n.nodeID}
-            levelOffset={n.level}
-          />
-        ),
-        R.filter(
-          //n => n.content.search(this.state.searchStr) > -1,
-          n =>
-            n.content.toLowerCase().search(this.state.searchStr.toLowerCase()) >
-            -1,
-          R.reduce(
-            (m, b) =>
-              R.concat(
-                R.reduce(
-                  (m2, n) =>
-                    R.insert(
-                      m2.length,
-                      {
-                        bufferID: b[0],
-                        nodeID: n[1].id,
-                        content: n[1].headline.content,
-                        level: n[1].headline.level
-                      },
-                      m2
-                    ),
-                  [],
-                  Object.entries(b[1].orgNodes)
-                ),
-                m
-              ),
-            [],
-            Object.entries(buffers)
-          )
-        )
-      );
 
+    const filter = pool => {
+      const results = R.filter(
+        n =>
+          n.keyword &&
+          n.keyword.search(this.state.keywords[this.state.keywordFilterIdx]) >
+            -1,
+        pool
+      );
+      return results;
+    };
+
+    const search = pool => {
+      const results = R.filter(
+        //n => n.content.search(this.state.searchStr) > -1,
+        n =>
+          n.content.toLowerCase().search(this.state.searchStr.toLowerCase()) >
+          -1,
+        pool
+      );
       return results;
     };
 
@@ -82,22 +72,92 @@ class HomeScreen extends React.Component {
           />
         </View>
       ));
-      const searchResults = this.state.searchStr ? search() : null;
-      const display = this.state.searchStr ? searchResults : listAll;
+
+      const doFilter =
+        this.state.keywordFilterIdx !== this.state.keywords.length - 1;
+      const doSearch = this.state.searchStr && this.state.searchStr !== '';
+      let display;
+      if (doFilter || doSearch) {
+        let pool = R.reduce(
+          (m, b) =>
+            R.concat(
+              R.reduce(
+                (m2, n) =>
+                  R.insert(
+                    m2.length,
+                    {
+                      bufferID: b[0],
+                      nodeID: n[1].id,
+                      content: n[1].headline.content,
+                      level: n[1].headline.level,
+                      keyword: n[1].headline.todoKeyword
+                    },
+                    m2
+                  ),
+                [],
+                Object.entries(b[1].orgNodes)
+              ),
+              m
+            ),
+          [],
+          Object.entries(buffers)
+        );
+
+        if (doFilter) {
+          pool = filter(pool);
+        }
+
+        if (doSearch) {
+          pool = search(pool);
+        }
+
+        display = R.map(
+          n => (
+            <OrgHeadline
+              key={n.nodeID}
+              bufferID={n.bufferID}
+              nodeID={n.nodeID}
+              levelOffset={n.level}
+            />
+          ),
+          pool
+        );
+      } else {
+        display = listAll;
+      }
+      // const searchResults = this.state.searchStr ? search() : null;
+
+      // const display = this.state.searchStr ? searchResults : listAll;
+
       return (
         <View>
-          <View style={{ flexDirection: 'row' }}>
-            <FontAwesome style={{ flex: 1 }} name={'search'} size={25} />
-            <TextInput
-              style={{
-                flex: 10,
-                borderColor: '#000',
-                borderWidth: 1,
-                borderRadius: 5
-              }}
-              value={this.state.searchStr}
-              onChangeText={searchStr => this.setState({ searchStr })}
-            />
+          <View style={{ flexDirection: 'column' }}>
+            <View style={{ flexDirection: 'row' }}>
+              <FontAwesome style={{ flex: 1 }} name={'search'} size={25} />
+              <TextInput
+                style={{
+                  flex: 10,
+                  borderColor: '#000',
+                  borderWidth: 1,
+                  borderRadius: 5
+                }}
+                value={this.state.searchStr}
+                onChangeText={searchStr => this.setState({ searchStr })}
+              />
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+              <ModalDropdown
+                style={{ flex: 1, padding: 20 }}
+                options={this.state.keywords}
+                defaultIndex={this.state.keywordFilterIdx}
+                onSelect={idx => {
+                  const keywordFilterIdx = parseInt(idx);
+                  this.setState({ keywordFilterIdx });
+                }}>
+                <Text>{this.state.keywords[this.state.keywordFilterIdx]}</Text>
+              </ModalDropdown>
+              <Text style={{ flex: 1 }}>{'bar'}</Text>
+            </View>
           </View>
           <ScrollView>
             {display}
