@@ -22,6 +22,7 @@ export const INSERT_NEW_NODE_LOG_NOTE = 'INSERT_NEW_NODE_LOG_NOTE';
 export const UPDATE_NODE_LOG_NOTE = 'UPDATE_NODE_LOG_NOTE';
 export const REMOVE_NODE_LOG_NOTE = 'REMOVE_NODE_LOG_NOTE';
 export const UPDATE_NODE_BODY = 'UPDATE_NODE_BODY';
+export const TOGGLE_NODE_TAG = 'TOGGLE_NODE_TAG';
 
 /*
  * other constants
@@ -154,5 +155,14 @@ export function updateNodeBody(bufferID, nodeID, text) {
     bufferID,
     nodeID,
     text
+  };
+}
+
+export function toggleNodeTag(bufferID, nodeID, tag) {
+  return {
+    type: TOGGLE_NODE_TAG,
+    bgufferID,
+    nodeID,
+    tag
   };
 }

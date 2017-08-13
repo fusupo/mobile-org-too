@@ -3,6 +3,8 @@ import { NavigationActions } from 'react-navigation';
 
 import { StacksOverTabs } from './navigation/StacksOverTabs';
 
+import R from 'ramda';
+
 import {
   REGISTER_DBX_ACCESS_TOKEN,
   COMPLETE_HABIT,
@@ -21,7 +23,8 @@ import {
   INSERT_NEW_NODE_LOG_NOTE,
   UPDATE_NODE_LOG_NOTE,
   REMOVE_NODE_LOG_NOTE,
-  UPDATE_NODE_BODY
+  UPDATE_NODE_BODY,
+  TOGGLE_NODE_TAG
 } from './actions';
 
 const OrgDrawerUtils = require('org-parse').OrgDrawer;
@@ -74,6 +77,15 @@ function headline(
       break;
     case UPDATE_NODE_HEADLINE_CONTENT:
       return Object.assign({}, state, { content: action.text });
+      break;
+    case TOGGLE_NODE_TAG:
+      let tags = state.tags || [];
+      if (R.contains(action.tag, tags)) {
+        tags = R.without(action.tag, tags);
+      } else {
+        tags = R.insert(0, action.tag, tags);
+      }
+      return Object.assign({}, state, { tags });
       break;
     default:
       return state;
@@ -312,6 +324,7 @@ function orgNodes(state = {}, action) {
     case UPDATE_NODE_LOG_NOTE:
     case REMOVE_NODE_LOG_NOTE:
     case UPDATE_NODE_BODY:
+    case TOGGLE_NODE_TAG:
       const nodeID = action.nodeID;
       let newNodeObj = {};
       const newNode = orgNode(state[nodeID], action);
@@ -399,6 +412,7 @@ function orgBuffers(state = {}, action) {
     case UPDATE_NODE_LOG_NOTE:
     case REMOVE_NODE_LOG_NOTE:
     case UPDATE_NODE_BODY:
+    case TOGGLE_NODE_TAG:
       nextState[action.bufferID].orgNodes = orgNodes(
         nextState[action.bufferID].orgNodes,
         action

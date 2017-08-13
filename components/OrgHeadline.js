@@ -10,6 +10,7 @@ import { addNewNode, deleteNode, cycleNodeCollapse } from '../actions';
 const OrgDrawerUtil = require('org-parse').OrgDrawer;
 import OrgNode from './OrgNode';
 import OrgTree from './OrgTree';
+import OrgTags from './OrgTagsEditable';
 
 const styles = StyleSheet.create({
   rowContainer: { flex: 1, flexDirection: 'row' },
@@ -37,44 +38,60 @@ class OrgHeadline extends Component {
       onNodeTitlePress,
       onDeleteNodePress,
       onAddOnePress,
-      onNodeArrowPress
+      onNodeArrowPress,
+      levelOffset
     } = this.props;
+    //   <Swipeout
+    // style={{ flex: 1 }}
+    // right={[
+    //   {
+    //     text: 'deleteNode',
+    //     onPress: () => {
+    //       onDeleteNodePress(bufferID, nodeID);
+    //     }
+    //   }
+    // ]}
+    // left={[
+    //   {
+    //     text: 'addOne',
+    //     onPress: () => {
+    //       onAddOnePress(bufferID, nodeID, node);
+    //     }
+    //   }
+    // ]}>
+    // </Swipeout>
     return (
-      <View style={{ flexDirection: 'column', flex: 1 }}>
-        <Swipeout
-          right={[
+      <View
+        style={{
+          flexDirection: 'column',
+          flex: 1
+        }}>
+        <View
+          style={[
+            styles.orgNodeWrapper,
             {
-              text: 'deleteNode',
-              onPress: () => {
-                onDeleteNodePress(bufferID, nodeID);
-              }
-            }
-          ]}
-          left={[
-            {
-              text: 'addOne',
-              onPress: () => {
-                onAddOnePress(bufferID, nodeID, node);
-              }
+              marginLeft: 27 * (node.headline.level - 1 - levelOffset),
+              borderColor: '#337',
+              borderWidth: 1,
+              flex: 1,
+              flexDirection: 'row'
             }
           ]}>
-          <View
-            style={[
-              styles.orgNodeWrapper,
-              {
-                marginLeft: 10 * node.headline.level
-              }
-            ]}>
-            <TouchableHighlight
-              style={{ width: 40 }}
-              onPress={() => {
-                onNodeArrowPress(bufferID, nodeID);
-              }}>
-              <FontAwesome
-                name={isCollapsed ? 'caret-down' : 'caret-up'}
-                size={25}
-              />
-            </TouchableHighlight>
+          <TouchableHighlight
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              flex: 1
+            }}
+            onPress={() => {
+              onNodeArrowPress(bufferID, nodeID);
+            }}>
+            <FontAwesome
+              name={isCollapsed ? 'caret-down' : 'caret-up'}
+              size={25}
+            />
+          </TouchableHighlight>
+          <View style={{ flex: 4 }}>
             <OrgNode
               bufferID={bufferID}
               nodeID={nodeID}
@@ -83,7 +100,10 @@ class OrgHeadline extends Component {
               }}
             />
           </View>
-        </Swipeout>
+          <View style={{ flex: 1 }}>
+            <OrgTags bufferID={bufferID} nodeID={nodeID} />
+          </View>
+        </View>
         {isCollapsed ? null : <OrgTree bufferID={bufferID} nodeID={nodeID} />}
       </View>
     );
@@ -91,7 +111,7 @@ class OrgHeadline extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { bufferID, nodeID } = ownProps;
+  const { bufferID, nodeID, levelOffset } = ownProps;
   const node = state.orgBuffers[bufferID].orgNodes[nodeID];
   //
   const idx = OrgDrawerUtil.indexOfKey(node.propDrawer, 'collapseStatus');
@@ -107,7 +127,8 @@ const mapStateToProps = (state, ownProps) => {
   //
   return {
     node,
-    isCollapsed
+    isCollapsed,
+    levelOffset: levelOffset || 0
   };
 };
 

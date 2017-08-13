@@ -23,7 +23,7 @@ export class OrgTree extends React.Component {
         case 'expanded':
         case 'maximized':
           return (
-            <View>
+            <View style={{ flex: 1 }}>
               {tree.children.map((t, idx) => {
                 return (
                   <OrgHeadline

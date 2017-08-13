@@ -69,7 +69,12 @@ const NodeDetailScreen = ({
     const listItems = childIDs.length === 0
       ? null
       : childIDs.map(cn => (
-          <OrgHeadline key={cn.nodeID} bufferID={bufferID} nodeID={cn.nodeID} />
+          <OrgHeadline
+            key={cn.nodeID}
+            bufferID={bufferID}
+            nodeID={cn.nodeID}
+            levelOffset={node.headline.level}
+          />
         ));
     const list = listItems
       ? <ScrollView style={{ flex: 1 }}>{listItems}</ScrollView>
