@@ -83,7 +83,7 @@ function headline(
       if (R.contains(action.tag, tags)) {
         tags = R.without(action.tag, tags);
       } else {
-        tags = R.insert(0, action.tag, tags);
+        tags = R.insert(tags.length, action.tag, tags);
       }
       return Object.assign({}, state, { tags });
       break;

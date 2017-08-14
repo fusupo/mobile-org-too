@@ -2,7 +2,14 @@ import Expo from 'expo';
 import React from 'react';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
-import { Button, ScrollView, Text, TextInput, View } from 'react-native';
+import {
+  Button,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableHighlight,
+  View
+} from 'react-native';
 
 import { FontAwesome } from '@expo/vector-icons';
 import ModalDropdown from 'react-native-modal-dropdown';
@@ -21,7 +28,9 @@ class HomeScreen extends React.Component {
   state = {
     buffersLoaded: false,
     inboxFileIsOk: false,
-    searchStr: null
+    searchStr: null,
+    tagFilters: [],
+    tagFilterType: 'AND'
   };
 
   componentWillMount() {
@@ -35,10 +44,33 @@ class HomeScreen extends React.Component {
     this.props.loadInboxFile();
   }
 
-  render() {
-    const { buffers, onAddOne } = this.props;
+  toggleTagFilter(tag) {
+    let tags = this.state.tagFilters || [];
+    if (R.contains(tag, tags)) {
+      tags = R.without(tag, tags);
+    } else {
+      tags = R.insert(tags.length, tag, tags);
+    }
+    this.setState({ tagFilters: tags });
+  }
 
-    const filter = pool => {
+  render() {
+    const { buffers, onAddOne, allTags } = this.props;
+
+    const filterTags = pool => {
+      const { tagFilters, tagFilterType } = this.state;
+      const results = R.filter(n => {
+        const i = R.intersection(tagFilters, n.tags);
+        if (tagFilterType === 'AND') {
+          return i.length === tagFilters.length;
+        } else if (tagFilterType === 'OR') {
+          return i.length > 0;
+        }
+      }, pool);
+      return results;
+    };
+
+    const filterKeywords = pool => {
       const results = R.filter(
         n =>
           n.keyword &&
@@ -61,23 +93,13 @@ class HomeScreen extends React.Component {
     };
 
     if (Object.entries(buffers).length > 0) {
-      const listAll = Object.entries(buffers).map(e => (
-        <View key={e[0]}>
-          <OrgBuffer bufferID={e[0]} />
-          <Button
-            title={'add One'}
-            onPress={() => {
-              onAddOne(e[0]);
-            }}
-          />
-        </View>
-      ));
-
-      const doFilter =
+      const doKeywordFilter =
         this.state.keywordFilterIdx !== this.state.keywords.length - 1;
+      const doTagFilter = this.state.tagFilters.length > 0;
       const doSearch = this.state.searchStr && this.state.searchStr !== '';
+
       let display;
-      if (doFilter || doSearch) {
+      if (doKeywordFilter || doTagFilter || doSearch) {
         let pool = R.reduce(
           (m, b) =>
             R.concat(
@@ -90,7 +112,8 @@ class HomeScreen extends React.Component {
                       nodeID: n[1].id,
                       content: n[1].headline.content,
                       level: n[1].headline.level,
-                      keyword: n[1].headline.todoKeyword
+                      keyword: n[1].headline.todoKeyword,
+                      tags: n[1].headline.tags || []
                     },
                     m2
                   ),
@@ -103,8 +126,12 @@ class HomeScreen extends React.Component {
           Object.entries(buffers)
         );
 
-        if (doFilter) {
-          pool = filter(pool);
+        if (doTagFilter) {
+          pool = filterTags(pool);
+        }
+
+        if (doKeywordFilter) {
+          pool = filterKeywords(pool);
         }
 
         if (doSearch) {
@@ -123,16 +150,24 @@ class HomeScreen extends React.Component {
           pool
         );
       } else {
+        const listAll = Object.entries(buffers).map(e => (
+          <View key={e[0]}>
+            <OrgBuffer bufferID={e[0]} />
+            <Button
+              title={'add One'}
+              onPress={() => {
+                onAddOne(e[0]);
+              }}
+            />
+          </View>
+        ));
         display = listAll;
       }
-      // const searchResults = this.state.searchStr ? search() : null;
-
-      // const display = this.state.searchStr ? searchResults : listAll;
 
       return (
         <View>
           <View style={{ flexDirection: 'column' }}>
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'row', padding: 10 }}>
               <FontAwesome style={{ flex: 1 }} name={'search'} size={25} />
               <TextInput
                 style={{
@@ -145,18 +180,102 @@ class HomeScreen extends React.Component {
                 onChangeText={searchStr => this.setState({ searchStr })}
               />
             </View>
-            <View style={{ flexDirection: 'row' }}>
-              <ModalDropdown
-                style={{ flex: 1, padding: 20 }}
-                options={this.state.keywords}
-                defaultIndex={this.state.keywordFilterIdx}
-                onSelect={idx => {
-                  const keywordFilterIdx = parseInt(idx);
-                  this.setState({ keywordFilterIdx });
+            <View
+              style={{
+                flexDirection: 'row',
+                padding: 10
+              }}>
+              <FontAwesome style={{ flex: 1 }} name={'filter'} size={25} />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flex: 10
                 }}>
-                <Text>{this.state.keywords[this.state.keywordFilterIdx]}</Text>
-              </ModalDropdown>
-              <Text style={{ flex: 1 }}>{'bar'}</Text>
+                <ModalDropdown
+                  style={{
+                    borderColor: '#000',
+                    borderWidth: 1,
+                    flex: 1
+                    //                  padding: 20
+                  }}
+                  animated={false}
+                  options={this.state.keywords}
+                  defaultIndex={this.state.keywordFilterIdx}
+                  onSelect={idx => {
+                    const keywordFilterIdx = parseInt(idx);
+                    this.setState({ keywordFilterIdx });
+                  }}>
+                  <Text>
+                    {this.state.keywords[this.state.keywordFilterIdx]}
+                  </Text>
+                </ModalDropdown>
+                <View
+                  style={{
+                    flex: 4,
+                    flexDirection: 'row'
+                    //      padding: 20
+                  }}>
+                  <ModalDropdown
+                    style={{
+                      //padding: 20,
+                      flex: 1,
+                      borderColor: '#000',
+                      borderWidth: 1
+                    }}
+                    animated={false}
+                    options={allTags}
+                    renderRow={(rowData, sectionID, rowID, highlightRow) => {
+                      const rowStyle = this.state.tagFilters.indexOf(rowData) >
+                        -1
+                        ? { backgroundColor: '#ccc' }
+                        : {};
+                      return (
+                        <View style={rowStyle}><Text>{rowData}</Text></View>
+                      );
+                    }}
+                    onSelect={idx => {
+                      this.toggleTagFilter(allTags[idx]);
+                    }}>
+                    <Text>
+                      {'tags'}
+                    </Text>
+                  </ModalDropdown>
+                  <TouchableHighlight
+                    style={{ flex: 1 }}
+                    onPress={() => {
+                      if (this.state.tagFilterType === 'AND') {
+                        this.setState({ tagFilterType: 'OR' });
+                      } else {
+                        this.setState({ tagFilterType: 'AND' });
+                      }
+                    }}>
+                    <Text>{this.state.tagFilterType}</Text>
+                  </TouchableHighlight>
+                  <View
+                    style={{
+                      borderColor: '#000',
+                      borderWidth: 1,
+                      flex: 2,
+                      flexDirection: 'column'
+                    }}>
+                    {this.state.tagFilters.map(t => (
+                      <TouchableHighlight
+                        key={t}
+                        style={{
+                          flex: 0,
+                          paddingBottom: 2,
+                          paddingTop: 1,
+                          paddingLeft: 5
+                        }}
+                        onPress={() => {
+                          this.toggleTagFilter(t);
+                        }}>
+                        <Text>{t}</Text>
+                      </TouchableHighlight>
+                    ))}
+                  </View>
+                </View>
+              </View>
             </View>
           </View>
           <ScrollView>
@@ -170,10 +289,23 @@ class HomeScreen extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
-  buffers: state.orgBuffers,
-  settings: state.settings
-});
+const mapStateToProps = state => {
+  const buffers = state.orgBuffers;
+  const allTags = R.uniq(
+    Object.values(buffers).reduce((m, v) => {
+      let tags = Object.values(v.orgNodes).reduce((m2, v2) => {
+        return m2.concat(v2.headline.tags || []);
+      }, []);
+      return m.concat(tags);
+    }, [])
+  );
+  console.log('foo');
+  return {
+    buffers,
+    allTags,
+    settings: state.settings
+  };
+};
 
 const mapDispatchToProps = dispatch => {
   return {
