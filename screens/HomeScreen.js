@@ -299,7 +299,6 @@ const mapStateToProps = state => {
       return m.concat(tags);
     }, [])
   );
-  console.log('foo');
   return {
     buffers,
     allTags,
