@@ -1,15 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
-  TouchableHighlight,
-  Switch,
-  View,
+  ActivityIndicator,
+  AsyncStorage,
+  Button,
   ScrollView,
+  StyleSheet,
+  Switch,
   Text,
   TextInput,
-  StyleSheet,
-  Button,
-  AsyncStorage
+  TouchableHighlight,
+  View
 } from 'react-native';
 
 import { doCloudUpload } from '../main';
@@ -26,7 +27,9 @@ const styles = StyleSheet.create({
 class FileNameInput extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { text: 'Useless Placeholder' };
+    this.state = {
+      text: 'Useless Placeholder'
+    };
   }
   componentDidMount() {
     if (this.props.file === undefined) {
@@ -94,6 +97,15 @@ class SettingsScreen extends React.Component {
     title: 'settings'
   });
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      showSpinner: false,
+      showError: false,
+      error: 'some error text here'
+    };
+  }
+
   render() {
     return (
       <View>
@@ -108,7 +120,28 @@ class SettingsScreen extends React.Component {
           onEndEditing={this.props.tryUpdateInboxFile}
         />
         <FileNameInputList files={this.props.orgFiles} />
-        <Button title={'sync w/ dropbox'} onPress={this.props.onSync} />
+        <Button
+          title={'sync w/ dropbox'}
+          onPress={() => {
+            this.setState({ showSpinner: true });
+            this.props.onSync(
+              () => {
+                this.setState({ showSpinner: false });
+              },
+              e => {
+                this.setState({
+                  showSpinner: false,
+                  showError: true,
+                  error: e
+                });
+              }
+            );
+          }}
+        />
+        {this.state.showSpinner ? <View><ActivityIndicator /></View> : null}
+        {this.state.showError
+          ? <Text style={{ color: '#f00' }}>{this.state.error}</Text>
+          : null}
       </View>
     );
   }
@@ -126,8 +159,8 @@ const mapDispatchToProps = dispatch => {
     tryUpdateInboxFile: path => {
       dispatch(someActionToo(path));
     },
-    onSync: () => {
-      dispatch(doCloudUpload());
+    onSync: (onSucc, onErr) => {
+      dispatch(doCloudUpload(onSucc, onErr));
     }
   };
 };
