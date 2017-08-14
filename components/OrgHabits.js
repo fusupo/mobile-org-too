@@ -133,7 +133,7 @@ class OrgHabits extends React.Component {
       );
     };
     return (
-      <ScrollView>
+      <ScrollView style={{ flex: 1, marginBottom: 30 }}>
         <Modal
           animationType={'fade'}
           transparent={false}
