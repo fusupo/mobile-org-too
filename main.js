@@ -175,7 +175,7 @@ class AppContainer extends React.Component {
 Expo.registerRootComponent(AppContainer);
 
 //
-export function doCloudUpload() {
+export function doCloudUpload(onSucc, onErr) {
   return dispatch => {
     const state = store.getState();
     const ds = new DropboxDataSource({ accessToken: state.dbxAccessToken });
@@ -184,16 +184,19 @@ export function doCloudUpload() {
       const orgNodes = state.orgBuffers[firstBufferKey].orgNodes;
       const orgTree = state.orgBuffers[firstBufferKey].orgTree;
       const orgSettings = state.orgBuffers[firstBufferKey].orgSettings;
-      let foo = ds.serializeAndUpload(
-        orgNodes,
-        orgTree,
-        orgSettings,
-        state.settings.inboxFile.path
-      );
+      let foo = ds
+        .serializeAndUpload(
+          orgNodes,
+          orgTree,
+          orgSettings,
+          state.settings.inboxFile.path
+        )
+        .then(onSucc());
     } catch (e) {
       console.warn(
         'There was an error serializing and/or uploading files to drobbox on the home screen'
       );
+      onErr(e);
       console.log(e);
       throw e;
     } finally {
