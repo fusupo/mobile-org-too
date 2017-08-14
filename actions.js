@@ -14,6 +14,7 @@ export const CLEAR_NODE_TIMESTAMP = 'CLEAR_NODE_TIMESTAMP';
 export const ADD_NEW_NODE = 'ADD_NEW_NODE';
 export const DELETE_NODE = 'DELETE_NODE';
 export const COMPLETE_HABIT = 'COMPLETE_HABIT';
+export const COMPLETE_TODO = 'COMPLETE_TODO';
 export const RESET_HABIT = 'RESET_HABIT';
 export const INSERT_NEW_NODE_PROP = 'INSERT_NEW_NODE_PROP';
 export const UPDATE_NODE_PROP = 'UPDATE_NODE_PROP';
@@ -113,6 +114,16 @@ export function deleteNode(bufferID, nodeID) {
 
 export function completeHabit(bufferID, nodeID, timestampStr, noteText) {
   return { type: COMPLETE_HABIT, bufferID, nodeID, timestampStr, noteText };
+}
+
+export function completeTodo(bufferID, nodeID, timestampStr, noteText) {
+  return {
+    type: COMPLETE_TODO,
+    bufferID,
+    nodeID,
+    timestampStr,
+    noteText
+  };
 }
 
 export function resetHabit(bufferID, nodeID, timestampStr) {

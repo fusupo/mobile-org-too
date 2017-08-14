@@ -4,42 +4,55 @@ import { StyleSheet, Text } from 'react-native';
 
 import ModalDropdown from 'react-native-modal-dropdown';
 
-import { updateNodeTodoKeyword } from '../actions';
+import {
+  updateNodeTimestamp,
+  updateNodeTodoKeyword,
+  completeTodo
+} from '../actions';
 
-const orgHeadlineUtil = require('org-parse').OrgHeadline;
+const OrgHeadlineUtil = require('org-parse').OrgHeadline;
+const OrgTimestampUtil = require('org-parse').OrgTimestamp;
 
 class OrgTodoKeywordEditable extends Component {
   constructor(props) {
     super(props);
-    let keywords = orgHeadlineUtil.keywords().slice(0);
-    keywords.push('none');
+    let keywords = OrgHeadlineUtil.keywords().slice(0);
+    keywords.shift('none');
     this.state = {
       keywords
     };
   }
 
   render() {
-    const todoKeywordStr = this.props.keyword;
+    const {
+      keyword,
+      onNodeTodoKeywordUpdate,
+      onSelectDone,
+      bufferID,
+      nodeID
+    } = this.props;
+    const { keywords } = this.state;
+
     const todoKeyword = (
       <ModalDropdown
         options={this.state.keywords}
         onSelect={idx => {
-          this.props.onNodeTodoKeywordUpdate(
-            this.props.bufferID,
-            this.props.nodeID,
-            this.state.keywords[idx]
-          );
+          const targKeyword = keywords[idx];
+          if (keyword === 'TODO' && targKeyword === 'DONE')
+            onSelectDone(bufferID, nodeID);
+          onNodeTodoKeywordUpdate(bufferID, nodeID, targKeyword);
         }}>
         <Text
           style={{
-            backgroundColor: todoKeywordStr
-              ? orgHeadlineUtil.colorForKeyword(todoKeywordStr)
+            backgroundColor: keyword
+              ? OrgHeadlineUtil.colorForKeyword(keyword)
               : '#fff'
           }}>
-          {todoKeywordStr ? todoKeywordStr : 'none'}
+          {keyword ? keyword : 'none'}
         </Text>
       </ModalDropdown>
     );
+
     return todoKeyword;
   }
 }
@@ -55,6 +68,19 @@ const mapDispatchToProps = dispatch => {
   return {
     onNodeTodoKeywordUpdate: (bufferID, nodeID, keyword) => {
       dispatch(updateNodeTodoKeyword(bufferID, nodeID, keyword));
+    },
+    onSelectDone: (bufferID, nodeID, noteText = '') => {
+      dispatch(
+        completeTodo(
+          bufferID,
+          nodeID,
+          OrgTimestampUtil.serialize(OrgTimestampUtil.now()),
+          noteText
+        )
+      );
+      dispatch(
+        updateNodeTimestamp(bufferID, nodeID, 'CLOSED', OrgTimestampUtil.now())
+      );
     }
   };
 };

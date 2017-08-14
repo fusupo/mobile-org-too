@@ -8,6 +8,7 @@ import R from 'ramda';
 import {
   REGISTER_DBX_ACCESS_TOKEN,
   COMPLETE_HABIT,
+  COMPLETE_TODO,
   RESET_HABIT,
   DELETE_NODE,
   ADD_NEW_NODE,
@@ -177,13 +178,13 @@ function closed(state = null, action) {
       case UPDATE_NODE_TIMESTAMP:
         nextState = action.timestamp;
         break;
-      case UPDATE_NODE_TIMESTAMP_REP_INT:
-        nextState = Object.assign({}, state, {
-          repInt: action.repInt,
-          repMin: action.repMin,
-          repMax: action.repMax
-        });
-        break;
+      // case UPDATE_NODE_TIMESTAMP_REP_INT:
+      //   nextState = Object.assign({}, state, {
+      //     repInt: action.repInt,
+      //     repMin: action.repMin,
+      //     repMax: action.repMax
+      //   });
+      //   break;
       case CLEAR_NODE_TIMESTAMP:
         nextState = null;
         //short circuit the null check bellow
@@ -261,9 +262,10 @@ function logbook(state = { entries: [] }, action) {
       clonedEntries.splice(action.idx, 1);
       nextState = Object.assign({}, state, { entries: clonedEntries });
       break;
+    case COMPLETE_TODO:
     case COMPLETE_HABIT:
       // i think I may need to deep copy this stuff
-      clonedEntries = state.entries.slice(0);
+      clonedEntries = state && state.entries ? state.entries.slice(0) : [];
       clonedEntries.unshift({
         type: 'state',
         state: '"DONE"',
@@ -308,6 +310,7 @@ function orgNodes(state = {}, action) {
       delete nextState[action.nodeID];
       break;
     case ADD_NEW_NODE:
+    case COMPLETE_TODO:
     case COMPLETE_HABIT:
     case RESET_HABIT:
     case CYCLE_NODE_COLLAPSE:
@@ -402,6 +405,7 @@ function orgBuffers(state = {}, action) {
     case UPDATE_NODE_TIMESTAMP_REP_INT:
     case CLEAR_NODE_TIMESTAMP:
     case COMPLETE_HABIT:
+    case COMPLETE_TODO:
     case RESET_HABIT:
     case CYCLE_NODE_COLLAPSE:
     case INSERT_NEW_NODE_PROP:
