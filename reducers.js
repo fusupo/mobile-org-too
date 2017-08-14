@@ -264,13 +264,12 @@ function logbook(state = { entries: [] }, action) {
     case COMPLETE_HABIT:
       // i think I may need to deep copy this stuff
       clonedEntries = state.entries.slice(0);
-      console.log(clonedEntries);
       clonedEntries.unshift({
         type: 'state',
         state: '"DONE"',
         from: '"TODO"',
         timestamp: action.timestampStr,
-        text: action.noteText
+        text: action.noteText || ''
       });
       nextState = Object.assign({}, state, { entries: clonedEntries });
       break;
