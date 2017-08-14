@@ -63,7 +63,8 @@ const NodeDetailScreen = ({
   onUpdateLogNote,
   onRemoveLogNote,
   onUpdateNodeBody,
-  onAddOnePress
+  onAddOnePress,
+  isNew
 }) => {
   if (node) {
     // childNodes
@@ -91,7 +92,11 @@ const NodeDetailScreen = ({
             <ScrollView style={styles.container}>
               <View
                 style={[styles.container, styles.border, { marginTop: 20 }]}>
-                <OrgHeadlineEditable bufferID={bufferID} nodeID={nodeID} />
+                <OrgHeadlineEditable
+                  bufferID={bufferID}
+                  nodeID={nodeID}
+                  autoFocus={isNew}
+                />
               </View>
               <View style={[styles.container, styles.border]}>
                 <OrgScheduling
@@ -166,7 +171,7 @@ const NodeDetailScreen = ({
 
 const mapStateToProps = (state, ownProps) => {
   const params = ownProps.navigation.state.params;
-  const { bufferID, nodeID } = params;
+  const { bufferID, nodeID, isNew } = params;
   const nodes = state.orgBuffers[bufferID].orgNodes;
   const tree = state.orgBuffers[bufferID].orgTree;
   const node = nodes[nodeID];
@@ -174,7 +179,8 @@ const mapStateToProps = (state, ownProps) => {
     bufferID,
     nodeID,
     node,
-    tree
+    tree,
+    isNew
   };
 };
 

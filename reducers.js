@@ -440,7 +440,11 @@ function nav(state, action) {
       nextState = StacksOverTabs.router.getStateForAction(
         NavigationActions.navigate({
           routeName: 'NewNode',
-          params: { bufferID: action.bufferID, nodeID: action.nodeID }
+          params: {
+            bufferID: action.bufferID,
+            nodeID: action.nodeID,
+            isNew: true
+          }
         }),
         state
       );
