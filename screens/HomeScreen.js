@@ -165,7 +165,7 @@ class HomeScreen extends React.Component {
       }
 
       return (
-        <View>
+        <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'column' }}>
             <View style={{ flexDirection: 'row', padding: 10 }}>
               <FontAwesome style={{ flex: 1 }} name={'search'} size={25} />
@@ -278,7 +278,7 @@ class HomeScreen extends React.Component {
               </View>
             </View>
           </View>
-          <ScrollView>
+          <ScrollView style={{ flex: 1 }}>
             {display}
           </ScrollView>
         </View>

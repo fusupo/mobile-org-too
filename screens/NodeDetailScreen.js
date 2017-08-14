@@ -79,7 +79,9 @@ const NodeDetailScreen = ({
           />
         ));
     const list = listItems
-      ? <ScrollView style={{ flex: 1 }}>{listItems}</ScrollView>
+      ? <ScrollView style={{ flex: 1, marginBottom: 30 }}>
+          {listItems}
+        </ScrollView>
       : null;
 
     return (
