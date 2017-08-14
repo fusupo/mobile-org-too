@@ -38,6 +38,18 @@ class CalendarScreen extends React.Component {
     };
   }
 
+  componentDidMount() {
+    // this is likely super inefficient as this initiates a whole bunch of
+    // calculations on each update
+    setInterval(() => {
+      let date = orgTimestampUtils.clone(this.state.date);
+      let now = orgTimestampUtils.now();
+      date.hour = now.hour;
+      date.minute = now.minute;
+      this.setState({ date });
+    }, 1000);
+  }
+
   _clone(d) {
     const ret = orgTimestampUtils.momentToObj(
       orgTimestampUtils.momentFromObj(d)

@@ -305,7 +305,7 @@ const mapStateToProps = (state, ownProps) => {
     const nowStr = {
       bufferID: 'NOW',
       nodeID: 'NOW',
-      time: `${padMaybe(now.hour)}:${padMaybe(now.minute)}`,
+      time: `${padMaybe(now.hour)}:${padMaybe(now.minute)}:${padMaybe(new Date().getSeconds())}`,
       content: 'NOW'
     };
     const cand = filterRange(candidates, start, end);
