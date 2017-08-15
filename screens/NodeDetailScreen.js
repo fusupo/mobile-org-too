@@ -123,10 +123,12 @@ const NodeDetailScreen = ({
                   onRemoveLogNote={onRemoveLogNote(bufferID, nodeID)}
                 />
               </View>
-              <OrgBody
-                onUpdateNodeBody={onUpdateNodeBody(bufferID, nodeID)}
-                bodyText={node.body}
-              />
+              <View style={[styles.container, styles.border]}>
+                <OrgBody
+                  onUpdateNodeBody={onUpdateNodeBody(bufferID, nodeID)}
+                  bodyText={node.body}
+                />
+              </View>
             </ScrollView>
           }
           viewB={
