@@ -178,28 +178,46 @@ Expo.registerRootComponent(AppContainer);
 export function doCloudUpload(onSucc, onErr) {
   return dispatch => {
     const state = store.getState();
+    const { orgBuffers } = state;
     const ds = new DropboxDataSource({ accessToken: state.dbxAccessToken });
-    try {
-      const firstBufferKey = Object.keys(state.orgBuffers)[0];
-      const orgNodes = state.orgBuffers[firstBufferKey].orgNodes;
-      const orgTree = state.orgBuffers[firstBufferKey].orgTree;
-      const orgSettings = state.orgBuffers[firstBufferKey].orgSettings;
-      let foo = ds
-        .serializeAndUpload(
-          orgNodes,
-          orgTree,
-          orgSettings,
-          state.settings.inboxFile.path
-        )
-        .then(onSucc());
-    } catch (e) {
-      console.warn(
-        'There was an error serializing and/or uploading files to drobbox on the home screen'
+    let idx = 0;
+
+    const saveNext = (path, succ, err) => {
+      try {
+        const orgNodes = orgBuffers[path].orgNodes;
+        const orgTree = orgBuffers[path].orgTree;
+        const orgSettings = orgBuffers[path].orgSettings;
+        let foo = ds
+          .serializeAndUpload(orgNodes, orgTree, orgSettings, path)
+          .then(succ());
+      } catch (e) {
+        console.warn(
+          'There was an error serializing and/or uploading files to drobbox on the home screen'
+        );
+        err(e);
+        console.log(e);
+        throw e;
+      }
+    };
+
+    //    onSucc();
+    let error = null;
+    let completeCount = 0;
+    Object.keys(orgBuffers).forEach(path => {
+      saveNext(
+        path,
+        () => {
+          completeCount++;
+          if (completeCount === Object.keys(orgBuffers).length) {
+            error ? onErr(error) : onSucc();
+          }
+        },
+        e => {
+          completeCount++;
+          console.log(e);
+          error = e;
+        }
       );
-      onErr(e);
-      console.log(e);
-      throw e;
-    } finally {
-    }
+    });
   };
 }
