@@ -12,6 +12,7 @@ import {
   TouchableHighlight,
   View
 } from 'react-native';
+import CheckBox from 'react-native-check-box';
 
 import { doCloudUpload } from '../main';
 import DropboxDataSource from '../utilities/DropboxDataSource';
@@ -19,6 +20,7 @@ import DropboxDataSource from '../utilities/DropboxDataSource';
 import Tree from '../components/Tree';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import R from 'ramda';
 
 const styles = StyleSheet.create({
   container: {
@@ -73,7 +75,7 @@ class FileNameInput extends React.Component {
         />
         <Button
           onPress={() => {
-            console.log('foo');
+            this.props.onClearInboxPress();
           }}
           title="X"
           color="#841584"
@@ -109,16 +111,23 @@ class SettingsScreen extends React.Component {
   }
 
   render() {
-    const { dbxds } = this.props;
+    const {
+      dbxds,
+      inboxFile,
+      orgFiles,
+      onNodeCheckPress,
+      onClearInboxPress
+    } = this.props;
     return (
       <View style={{ flex: 1 }}>
         <Text>{'inbox'}</Text>
         <FileNameInput
-          file={this.props.inboxFile}
+          file={inboxFile}
+          onClearInboxPress={() => onClearInboxPress(inboxFile.path)}
           isOk={
-            this.props.inboxFile === null || this.props.inboxFile === undefined
+            inboxFile === null || inboxFile === undefined
               ? null
-              : this.props.inboxFile.isOk
+              : inboxFile.isOk
           }
           onEndEditing={this.props.tryUpdateInboxFile}
         />
@@ -169,7 +178,19 @@ class SettingsScreen extends React.Component {
               });
             }}
             renderLeafItem={(title, path, type, hasKids) => {
-              return <View><Text>{title}</Text></View>;
+              const isChecked = R.contains(path, orgFiles);
+              const selectable = path.endsWith('.org');
+              return (
+                <View style={{ flexDirection: 'row' }}>
+                  <CheckBox
+                    isChecked={isChecked}
+                    style={selectable ? {} : { opacity: 0.25 }}
+                    onClick={() => {
+                      if (selectable) onNodeCheckPress(path, orgFiles, dbxds);
+                    }}
+                  /><Text style={{ flex: 1 }}>{title}</Text>
+                </View>
+              );
             }}
             renderBranchItem={(title, path, type, hasKids, isCollapsed) => {
               let pref;
@@ -205,16 +226,90 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     tryUpdateInboxFile: path => {
       dispatch(someActionToo(path));
     },
     onSync: (onSucc, onErr) => {
       dispatch(doCloudUpload(onSucc, onErr));
+    },
+    onClearInboxPress: () => {
+      dispatch(clearInboxFile());
+    },
+    onNodeCheckPress: (path, orgFiles, dbxds) => {
+      dispatch({ type: 'settings:toggleOrgFile', path });
+      if (R.contains(path, orgFiles)) {
+        dispatch(removeBuffer(path));
+      } else {
+        dispatch(loadFile(path, dbxds));
+      }
     }
   };
 };
+
+function clearInboxFile() {
+  return (dispatch, getState) => {
+    const path = getState().settings.inboxFile.path;
+    dispatch({
+      type: 'settings:inboxFile:clear'
+    });
+    dispatch(removeBuffer(path));
+    dispatch(saveSettingsToStorage());
+  };
+}
+
+function removeBuffer(path) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: 'removeOrgBuffer',
+      path
+    });
+    dispatch(saveSettingsToStorage());
+  };
+}
+
+// REFER HOME SCREEN FOR VERY SIMILAR CODE !!!
+function loadFile(path, dbxds) {
+  return async (dispatch, getState) => {
+    const foo = await loadParseOrgFilesAsync(path, dbxds);
+    dispatch({
+      type: 'addOrgBuffer',
+      path: path,
+      data: foo
+    });
+    dispatch(saveSettingsToStorage());
+  };
+}
+
+async function loadParseOrgFilesAsync(filePath, dbxds) {
+  try {
+    let foo = await dbxds.loadParseOrgFilesAsync(filePath);
+    return foo;
+  } catch (e) {
+    console.warn(
+      'There was an error retrieving files from drobbox on the home screen '
+    );
+    console.log(e);
+    return null;
+    throw e;
+  }
+}
+
+function saveSettingsToStorage() {
+  return async (dispatch, getState) => {
+    console.log(JSON.stringify(getState().settings));
+    try {
+      await AsyncStorage.setItem(
+        '@mobile-org-too:settings',
+        JSON.stringify(getState().settings)
+      );
+    } catch (error) {
+      console.log('err saving data:', error);
+      // Error saving data
+    }
+  };
+}
 
 function someActionToo(path) {
   return (dispatch, getState) => {
@@ -227,7 +322,7 @@ function someActionToo(path) {
         path: path,
         isFolder: res['.tag'] === 'folder'
       });
-      dispatch(someActionThree());
+      dispatch(saveSettingsToStorage());
     };
     const err = path => {
       console.log('err');
@@ -247,21 +342,6 @@ function someActionToo(path) {
         }
       })
       .catch(e => err(path));
-  };
-}
-
-function someActionThree() {
-  return async (dispatch, getState) => {
-    try {
-      await AsyncStorage.setItem(
-        '@mobile-org-too:settings',
-        JSON.stringify(getState().settings)
-      );
-      //dispatch(loadInboxFile());
-    } catch (error) {
-      console.log('err saving data:', error);
-      // Error saving data
-    }
   };
 }
 

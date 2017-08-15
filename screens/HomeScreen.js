@@ -41,7 +41,7 @@ class HomeScreen extends React.Component {
       keywordFilterIdx: keywords.length - 1
     });
 
-    this.props.loadInboxFile();
+    this.props.loadOrgFiles();
   }
 
   toggleTagFilter(tag) {
@@ -308,15 +308,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    initApp: () => {
-      dispatch(
-        NavigationActions.navigate({
-          routeName: 'SettingsTab'
-        })
-      );
-    },
-    loadInboxFile: () => {
-      dispatch(loadInboxFile());
+    loadOrgFiles: () => {
+      dispatch(loadOrgFiles());
     },
     onReceiveDbxAccessToken: token => {
       dispatch(registerDbxAccessToken(token));
@@ -327,7 +320,8 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-function loadInboxFile() {
+// REFER SETTINGS SCREEN FOR VERY SIMILAR CODE !!!
+function loadOrgFiles() {
   return async (dispatch, getState) => {
     const foo = await loadParseOrgFilesAsync(
       getState().settings.inboxFile.path,
@@ -337,6 +331,14 @@ function loadInboxFile() {
       type: 'addOrgBuffer',
       path: getState().settings.inboxFile.path,
       data: foo
+    });
+    getState().settings.orgFiles.forEach(async path => {
+      const bar = await loadParseOrgFilesAsync(path, getState().dbxAccessToken);
+      dispatch({
+        type: 'addOrgBuffer',
+        path: path,
+        data: bar
+      });
     });
   };
 }

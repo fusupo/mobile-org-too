@@ -71,7 +71,7 @@ const TabNav = TabNavigator(
     tabBarPosition: 'bottom',
     animationEnabled: false,
     swipeEnabled: false,
-    initialRouteName: 'SettingsTab'
+    initialRouteName: 'MainTab'
   }
 );
 

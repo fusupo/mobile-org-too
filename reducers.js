@@ -390,8 +390,10 @@ function orgBuffers(state = {}, action) {
   nextState = Object.assign({}, state);
   switch (action.type) {
     case 'addOrgBuffer':
-      nextState = Object.assign({}, state);
-      nextState[action.path] = action.data;
+      nextState = R.assoc(action.path, action.data, state);
+      break;
+    case 'removeOrgBuffer':
+      nextState = R.dissoc(action.path, state);
       break;
     case DELETE_NODE:
       nextState[action.bufferID].orgTree = orgTree(
@@ -487,9 +489,28 @@ function settings(
         inboxFile: { path: action.path, isFolder: action.isFolder, isOk: false }
       });
       break;
+    case 'settings:inboxFile:clear':
+      nextState = Object.assign({}, state, {
+        inboxFile: { path: 'insert filepath', isFolder: false, isOK: null }
+      });
+      break;
+    case 'settings:toggleOrgFile':
+      let nextOrgFiles;
+      const { path } = action;
+      const { orgFiles } = state;
+      if (R.contains(path, orgFiles)) {
+        nextOrgFiles = R.without(path, orgFiles);
+      } else {
+        nextOrgFiles = R.insert(orgFiles.length, path, orgFiles);
+      }
+      nextState = Object.assign({}, state, {
+        orgFiles: nextOrgFiles
+      });
+      break;
   }
 
   const res = nextState || state;
+
   return res;
 }
 
