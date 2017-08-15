@@ -16,6 +16,8 @@ import {
 import { doCloudUpload } from '../main';
 import DropboxDataSource from '../utilities/DropboxDataSource';
 
+import Tree from '../components/Tree';
+
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const styles = StyleSheet.create({
@@ -107,8 +109,9 @@ class SettingsScreen extends React.Component {
   }
 
   render() {
+    const { dbxds } = this.props;
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         <Text>{'inbox'}</Text>
         <FileNameInput
           file={this.props.inboxFile}
@@ -126,7 +129,7 @@ class SettingsScreen extends React.Component {
             this.setState({ showSpinner: true });
             this.props.onSync(
               () => {
-                this.setState({ showSpinner: false });
+                setTimeout(() => this.setState({ showSpinner: false }), 1000);
               },
               e => {
                 this.setState({
@@ -142,15 +145,63 @@ class SettingsScreen extends React.Component {
         {this.state.showError
           ? <Text style={{ color: '#f00' }}>{this.state.error}</Text>
           : null}
+        <ScrollView style={{ margin: 20, borderColor: '#000', borderWidth: 1 }}>
+          <Tree
+            title={'foobarbaz'}
+            path={''}
+            type={'branch'}
+            getHasKids={(path, cbk) => {
+              dbxds.filesListFolderAsync(path).then(res => {
+                cbk(res.entries.length > 0);
+              });
+            }}
+            getItems={(path, cbk) => {
+              dbxds.filesListFolderAsync(path).then(res => {
+                cbk(
+                  res.entries.map(r => {
+                    return {
+                      title: r.name,
+                      path: r.path_lower,
+                      type: r['.tag'] === 'folder' ? 'branch' : 'leaf'
+                    };
+                  })
+                );
+              });
+            }}
+            renderLeafItem={(title, path, type, hasKids) => {
+              return <View><Text>{title}</Text></View>;
+            }}
+            renderBranchItem={(title, path, type, hasKids, isCollapsed) => {
+              let pref;
+              let textStyle = { fontWeight: 'bold' };
+              if (hasKids) {
+                if (isCollapsed) {
+                  pref = '⤷';
+                } else {
+                  pref = '↓';
+                }
+              } else {
+                pref = '⇢';
+              }
+              return (
+                <View><Text style={textStyle}>{pref + ' ' + title}</Text></View>
+              );
+            }}
+          />
+        </ScrollView>
       </View>
     );
   }
 }
 
 const mapStateToProps = state => {
+  const dbxds = new DropboxDataSource({
+    accessToken: state.dbxAccessToken
+  });
   return {
     inboxFile: state.settings.inboxFile,
-    orgFiles: state.settings.orgFiles
+    orgFiles: state.settings.orgFiles,
+    dbxds
   };
 };
 
