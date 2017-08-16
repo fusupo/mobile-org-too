@@ -11,6 +11,8 @@ import HomeScreen from '../screens/HomeScreen';
 import CalendarScreen from '../screens/CalendarScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
+import { getCurrentRouteName } from '../selectors';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -71,23 +73,41 @@ const TabNav = TabNavigator(
     tabBarPosition: 'bottom',
     animationEnabled: false,
     swipeEnabled: false,
-    initialRouteName: 'MainTab'
+    initialRouteName: 'MainTab',
+    lazy: true
   }
 );
 
 class AppWithState extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { currRoute: 'MainTab' };
+  }
   render() {
     if (this.props.inboxFileOk) {
-      return <TabNav />;
+      return (
+        <TabNav
+          onNavigationStateChange={(prevState, currState, action) => {
+            console.log('how out here?');
+            console.log(this.props.nav);
+            this.setState({ currRoute: getCurrentRouteName(currState) });
+            console.log('how out here?');
+          }}
+          screenProps={{ currRoute: this.state.currRoute }}
+        />
+      );
     } else {
       return <SettingsScreen />;
     }
   }
 }
 
-const mapStateToProps = state => ({
-  inboxFileOk: state.settings.inboxFile.isOk
-});
+const mapStateToProps = (state, ownProps) => {
+  return {
+    inboxFileOk: state.settings.inboxFile.isOk,
+    nav: state.nav
+  };
+};
 
 const mapDispatchToProps = dispatch => {
   return {};

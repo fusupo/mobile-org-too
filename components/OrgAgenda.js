@@ -80,7 +80,6 @@ class OrgAgenda extends React.Component {
 
   render() {
     let { agendaYesterday, agendaToday, agendaTomorrow, dx } = this.props;
-
     let agendaKeys = ['00:00', '06:00', '09:00', '12:00', '13:00', '18:00'];
     let colors = [
       '#92021C',
