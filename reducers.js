@@ -473,6 +473,7 @@ function nav(state, action) {
 function settings(
   state = {
     inboxFile: { path: 'insert filepath', isFolder: false, isOk: null },
+    ledgerFile: { path: 'insert filepath', isFolder: false, isOk: null },
     orgFiles: []
   },
   action
@@ -492,6 +493,25 @@ function settings(
     case 'settings:inboxFile:clear':
       nextState = Object.assign({}, state, {
         inboxFile: { path: 'insert filepath', isFolder: false, isOK: null }
+      });
+      break;
+    case 'settings:ledgerFile:ok':
+      nextState = Object.assign({}, state, {
+        ledgerFile: { path: action.path, isFolder: action.isFolder, isOk: true }
+      });
+      break;
+    case 'settings:ledgerFile:error':
+      nextState = Object.assign({}, state, {
+        ledgerFile: {
+          path: action.path,
+          isFolder: action.isFolder,
+          isOk: false
+        }
+      });
+      break;
+    case 'settings:ledgerFile:clear':
+      nextState = Object.assign({}, state, {
+        ledgerFile: { path: 'insert filepath', isFolder: false, isOK: null }
       });
       break;
     case 'settings:toggleOrgFile':
@@ -527,13 +547,31 @@ function dbxAccessToken(state = null, action) {
   }
 }
 
+/////////////////////////////////////////////////////////////////////////  LEDGER
+
+function ledger(state = [], action) {
+  switch (action.type) {
+    case 'removeLedger':
+      console.log('remove ledger');
+      break;
+  }
+  return state;
+}
+
+///////////////////////////////////////////////////////////////////////////  DATA
+
+const data = combineReducers({
+  ledger
+});
+
 /////////////////////////////////////////////////////////////////  MOBILE ORG TOO
 
 const mobileOrgTooApp = combineReducers({
   orgBuffers,
   nav,
   settings,
-  dbxAccessToken
+  dbxAccessToken,
+  data
 });
 
 export default mobileOrgTooApp;

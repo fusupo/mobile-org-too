@@ -73,7 +73,7 @@ const TabNav = TabNavigator(
     tabBarPosition: 'bottom',
     animationEnabled: false,
     swipeEnabled: false,
-    initialRouteName: 'MainTab',
+    initialRouteName: 'SettingsTab',
     lazy: true
   }
 );
@@ -88,10 +88,7 @@ class AppWithState extends React.Component {
       return (
         <TabNav
           onNavigationStateChange={(prevState, currState, action) => {
-            console.log('how out here?');
-            console.log(this.props.nav);
             this.setState({ currRoute: getCurrentRouteName(currState) });
-            console.log('how out here?');
           }}
           screenProps={{ currRoute: this.state.currRoute }}
         />
