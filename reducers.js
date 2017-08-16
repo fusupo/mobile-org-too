@@ -549,13 +549,18 @@ function dbxAccessToken(state = null, action) {
 
 /////////////////////////////////////////////////////////////////////////  LEDGER
 
-function ledger(state = [], action) {
+function ledger(state = null, action) {
+  let nextState;
   switch (action.type) {
     case 'removeLedger':
-      console.log('remove ledger');
+      nextState = null;
+      break;
+
+    case 'addLedger':
+      nextState = action.data;
       break;
   }
-  return state;
+  return nextState || state;
 }
 
 ///////////////////////////////////////////////////////////////////////////  DATA

@@ -1,8 +1,7 @@
+import { parseLedger } from './ledger-parse';
 const parseOrg = require('org-parse').parseOrg;
 const serialize = require('org-parse').serialize;
 const Dropbox = require('dropbox');
-
-import { gitHubAccessToken } from '../secrets';
 
 export default class DropboxDataSource {
   constructor(config = {}) {
@@ -26,6 +25,27 @@ export default class DropboxDataSource {
           obj['orgTree'] = nodesAndTree.tree;
           obj['orgNodes'] = nodesAndTree.nodes;
           obj['orgSettings'] = nodesAndTree.settings;
+          resolve(obj);
+        })
+        .catch(err => reject(err));
+    });
+  }
+
+  loadParseLedgerFileAsync(filePath) {
+    let obj = {};
+    return new Promise((resolve, reject) => {
+      this.dbx
+        .filesGetTemporaryLink({
+          path: filePath
+        })
+        .then(res => fetch(res.link))
+        .then(res => res.text())
+        .then(resText => {
+          obj['ledgerText'] = resText;
+          return parseLedger(resText);
+        })
+        .then(items => {
+          obj['ledgerNodes'] = items;
           resolve(obj);
         })
         .catch(err => reject(err));
