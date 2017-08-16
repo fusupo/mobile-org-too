@@ -1,3 +1,4 @@
+import R from 'ramda';
 import Expo from 'expo';
 import React from 'react';
 import { NavigationActions } from 'react-navigation';
@@ -21,7 +22,9 @@ const orgHeadlineUtil = require('org-parse').OrgHeadline;
 import OrgBuffer from '../components/OrgBuffer';
 import OrgHeadline from '../components/OrgHeadline.js';
 import DropboxDataSource from '../utilities/DropboxDataSource';
-import R from 'ramda';
+
+import { getAllNodes } from '../selectors';
+
 let count = 0;
 
 class HomeScreen extends React.Component {
@@ -55,7 +58,7 @@ class HomeScreen extends React.Component {
   }
 
   render() {
-    const { buffers, onAddOne, allTags } = this.props;
+    const { /*allNodes,*/ buffers, onAddOne, allTags } = this.props;
 
     const filterTags = pool => {
       const { tagFilters, tagFilterType } = this.state;
@@ -290,6 +293,7 @@ class HomeScreen extends React.Component {
 }
 
 const mapStateToProps = state => {
+  //  const allNodes = getAllNodes(state);
   const buffers = state.orgBuffers;
   const allTags = R.uniq(
     Object.values(buffers).reduce((m, v) => {
@@ -300,6 +304,7 @@ const mapStateToProps = state => {
     }, [])
   );
   return {
+    //allNodes,
     buffers,
     allTags,
     settings: state.settings
