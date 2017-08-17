@@ -30,11 +30,11 @@ const TabNav = TabNavigator(
       screen: HomeScreen,
       path: '/',
       navigationOptions: {
-        title: 'Home',
-        tabBarLabel: 'Home',
+        title: '', //'Home',
+        // tabBarLabel: 'Home',
         tabBarIcon: ({ tintColor, focused }) => (
           <Ionicons
-            name={focused ? 'ios-home' : 'ios-home-outline'}
+            name={focused ? 'md-school' : 'md-school'}
             size={26}
             style={{ color: tintColor }}
           />
@@ -45,7 +45,7 @@ const TabNav = TabNavigator(
       screen: CalendarScreen,
       path: '/agenda',
       navigationOptions: {
-        title: 'Agenda',
+        title: '', //'Agenda',
         tabBarIcon: ({ tintColor, focused }) => (
           <Ionicons
             name={focused ? 'ios-clock' : 'ios-clock-outline'}
@@ -59,7 +59,7 @@ const TabNav = TabNavigator(
       screen: LedgerScreen,
       path: '/ledger',
       navigationOptions: {
-        title: 'Ledger',
+        title: '', //'Ledger',
         tabBarIcon: ({ tintColor, focused }) => (
           <Ionicons
             name={focused ? 'logo-usd' : 'logo-usd'}
@@ -73,7 +73,7 @@ const TabNav = TabNavigator(
       screen: SettingsScreen,
       path: '/settings',
       navigationOptions: {
-        title: 'Settings',
+        title: '', //'Settings',
         tabBarIcon: ({ tintColor, focused }) => (
           <Ionicons
             name={focused ? 'ios-settings' : 'ios-settings-outline'}

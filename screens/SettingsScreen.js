@@ -304,7 +304,6 @@ function clearLedgerFile() {
   return (dispatch, getState) => {
     const ledgerFile = getState().settings.ledgerFile;
     const path = ledgerFile && ledgerFile.path ? ledgerFile.path : 'none';
-    console.log(path);
     if (path !== 'none') {
       dispatch({
         type: 'settings:ledgerFile:clear'
@@ -363,7 +362,6 @@ async function loadParseOrgFilesAsync(filePath, dbxds) {
 
 function saveSettingsToStorage() {
   return async (dispatch, getState) => {
-    console.log(JSON.stringify(getState().settings));
     try {
       await AsyncStorage.setItem(
         '@mobile-org-too:settings',
