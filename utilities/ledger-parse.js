@@ -1,5 +1,6 @@
 let currency = '';
 
+import R from 'ramda';
 import shortid from 'shortid';
 
 const RegPost = /^(?:[ ]{2,})((?:[\w\:]|(?:[ ]\w))*)(?:[ ]{2,}|)(\$?)(?:[ ]*)([\.\-0-9]*)/i;
@@ -43,10 +44,44 @@ const parseLedger = srcStr =>
   });
 
 const serialize = items => {
-  return '';
+  const out = R.reduce(
+    (m, i) => {
+      const { date, consolidated, payee, postings } = i;
+      return (
+        m +
+        `${date} ${consolidated !== ' ' ? consolidated + ' ' : ''}${payee}\n` +
+        R.reduce(
+          (m2, p) => {
+            const { amount, currency, account } = p;
+            const amountStr = amount; //formatAmount(amount);
+            const accountStr = account.join(':');
+            const spaces = R.repeat(
+              ' ',
+              62 - 4 - accountStr.length - 2 - amountStr.length
+            ).join('');
+            if (amount) {
+              return (
+                m2 + `    ${accountStr}${spaces}${currency} ${amountStr}\n`
+              );
+            } else {
+              return m2 + `    ${accountStr}\n`;
+            }
+          },
+          '',
+          postings
+        ) +
+        '\n'
+      );
+    },
+    '',
+    items
+  );
+  console.log(items, out);
+  return out;
 };
 
 module.exports.parseLedger = parseLedger;
+module.exports.serialize = serialize;
 
 // exports.add = function(transaction) {
 //   if (

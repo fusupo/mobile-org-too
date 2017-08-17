@@ -550,14 +550,28 @@ function dbxAccessToken(state = null, action) {
 /////////////////////////////////////////////////////////////////////////  LEDGER
 
 function ledger(state = null, action) {
-  let nextState;
+  let nextState, ledgernodes;
   switch (action.type) {
     case 'removeLedger':
       nextState = null;
       break;
-
     case 'addLedger':
       nextState = action.data;
+      break;
+    case 'ledger:addNode':
+      ledgerNodes = R.insert(
+        state.ledgerNodes.length,
+        action.node,
+        state.ledgerNodes
+      );
+      nextState = Object.assign({}, state, { ledgerNodes });
+      break;
+    case 'ledger:updateNode':
+      console.log(action.node.id);
+      const idx = R.findIndex(n => n.id === action.node.id, state.ledgerNodes);
+      console.log(idx);
+      ledgerNodes = R.update(idx, action.node, state.ledgerNodes);
+      nextState = Object.assign({}, state, { ledgerNodes });
       break;
   }
   return nextState || state;

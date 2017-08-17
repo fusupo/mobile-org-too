@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import List from './List';
 
 class Tree extends Component {
   constructor(props) {
@@ -42,24 +43,27 @@ class Tree extends Component {
 
     let items = null;
     if (!isCollapsed) {
-      items = this.state.itemData.map((d, idx) => {
-        return (
-          <View key={idx}>
-            <Tree
-              title={d.title}
-              path={d.path}
-              getItems={getItems}
-              type={d.type}
-              getHasKids={getHasKids}
-              renderLeafItem={renderLeafItem}
-              renderBranchItem={renderBranchItem}
-            />
-          </View>
-        );
-      });
       items = (
-        <View style={{ flexDirection: 'column', marginLeft: 10 }}>{items}</View>
+        <List
+          data={itemData}
+          renderItem={(d, idx) => {
+            return (
+              <View key={idx}>
+                <Tree
+                  title={d.title}
+                  path={d.path}
+                  getItems={getItems}
+                  type={d.type}
+                  getHasKids={getHasKids}
+                  renderLeafItem={renderLeafItem}
+                  renderBranchItem={renderBranchItem}
+                />
+              </View>
+            );
+          }}
+        />
       );
+      items = <View style={{ marginLeft: 20 }}>{items}</View>;
     }
 
     let touchableMaybe;

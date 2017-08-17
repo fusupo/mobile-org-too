@@ -178,7 +178,9 @@ Expo.registerRootComponent(AppContainer);
 export function doCloudUpload(onSucc, onErr) {
   return dispatch => {
     const state = store.getState();
-    const { orgBuffers } = state;
+    const { orgBuffers, data, settings } = state;
+    const { ledger } = data;
+    const ledgerFilePath = settings.ledgerFile.path;
     const ds = new DropboxDataSource({ accessToken: state.dbxAccessToken });
     let idx = 0;
 
@@ -200,7 +202,6 @@ export function doCloudUpload(onSucc, onErr) {
       }
     };
 
-    //    onSucc();
     let error = null;
     let completeCount = 0;
     Object.keys(orgBuffers).forEach(path => {
@@ -209,7 +210,16 @@ export function doCloudUpload(onSucc, onErr) {
         () => {
           completeCount++;
           if (completeCount === Object.keys(orgBuffers).length) {
-            error ? onErr(error) : onSucc();
+            try {
+              ds.serializeAndUploadLedger(ledger.ledgerNodes, ledgerFilePath);
+            } catch (e) {
+              console.warn(
+                'There was an error serializing and/or uploading ledger file to drobbox on the home screen'
+              );
+              onErr(error);
+            } finally {
+              error ? onErr(error) : onSucc();
+            }
           }
         },
         e => {
