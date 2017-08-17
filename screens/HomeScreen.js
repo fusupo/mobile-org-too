@@ -325,7 +325,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-// REFER SETTINGS SCREEN FOR VERY SIMILAR CODE !!!
+// REFER SETTINGS SCREEN AND LEDGER SCREEN FOR VERY SIMILAR CODE !!!
 function loadOrgFiles() {
   return async (dispatch, getState) => {
     const foo = await loadParseOrgFilesAsync(

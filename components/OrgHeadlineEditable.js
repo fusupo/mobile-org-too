@@ -55,7 +55,6 @@ class OrgHeadlineEditable extends Component {
           onSubmitEditing={() => {
             endEdit();
           }}
-          autoCorrect={false}
           onChangeText={content => this.setState({ content })}
           onEndEditing={e => {
             endEdit();

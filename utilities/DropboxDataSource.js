@@ -1,8 +1,7 @@
+import { parseLedger, serialize as ledgerSerialize } from './ledger-parse';
 const parseOrg = require('org-parse').parseOrg;
-const serialize = require('org-parse').serialize;
+const orgSerialize = require('org-parse').serialize;
 const Dropbox = require('dropbox');
-
-import { gitHubAccessToken } from '../secrets';
 
 export default class DropboxDataSource {
   constructor(config = {}) {
@@ -26,6 +25,27 @@ export default class DropboxDataSource {
           obj['orgTree'] = nodesAndTree.tree;
           obj['orgNodes'] = nodesAndTree.nodes;
           obj['orgSettings'] = nodesAndTree.settings;
+          resolve(obj);
+        })
+        .catch(err => reject(err));
+    });
+  }
+
+  loadParseLedgerFileAsync(filePath) {
+    let obj = {};
+    return new Promise((resolve, reject) => {
+      this.dbx
+        .filesGetTemporaryLink({
+          path: filePath
+        })
+        .then(res => fetch(res.link))
+        .then(res => res.text())
+        .then(resText => {
+          obj['ledgerText'] = resText;
+          return parseLedger(resText);
+        })
+        .then(items => {
+          obj['ledgerNodes'] = items;
           resolve(obj);
         })
         .catch(err => reject(err));
@@ -62,12 +82,26 @@ export default class DropboxDataSource {
   }
 
   serializeAndUpload(nodes, tree, settings, path) {
-    const contents = serialize(nodes, tree, settings);
+    const contents = orgSerialize(nodes, tree, settings);
     return new Promise((resolve, reject) => {
       this.dbx
         .filesUpload({
           contents,
           path: path,
+          mode: { '.tag': 'overwrite' }
+        })
+        .then(res => resolve(res))
+        .catch(err => reject(err));
+    });
+  }
+
+  serializeAndUploadLedger(ledgerNodes, path) {
+    const contents = ledgerSerialize(ledgerNodes);
+    return new Promise((resolve, reject) => {
+      this.dbx
+        .filesUpload({
+          contents,
+          path: path.replace('.ledger', 'DummyOut.ledger'),
           mode: { '.tag': 'overwrite' }
         })
         .then(res => resolve(res))
