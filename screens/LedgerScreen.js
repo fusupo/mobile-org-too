@@ -55,6 +55,23 @@ const styles = StyleSheet.create({
   }
 });
 
+const formatAmount = amnt => {
+  if (amnt === '') return amnt;
+  let formatted = amnt + '';
+  let idx = formatted.indexOf('.');
+  if (idx === -1) {
+    formatted = formatted + '.00';
+  } else if (idx < formatted.length - 3) {
+    console.log('less than', idx, formatted.length - 3);
+    formatted = formatted.substring(0, idx + 3);
+  } else if (idx > formatted.length - 3) {
+    const numToAdd = idx - (formatted.length - 3);
+    const zeroes = R.repeat('0', numToAdd).join('');
+    formatted = formatted + zeroes;
+  }
+  return formatted;
+};
+
 const AccountLine = ({ account }) => (
   <View style={[styles.container, { flexDirection: 'row' }]}>
     {account.map((a, idx) => (
@@ -107,7 +124,11 @@ class ListItem extends Component {
               onPress={() => {
                 this.setState({ isCollapsed: !this.state.isCollapsed });
               }}>
-              <View style={[styles.container, { flexDirection: 'row' }]}>
+              <View
+                style={[
+                  styles.container,
+                  { marginLeft: 5, marginRight: 5, flexDirection: 'row' }
+                ]}>
                 <Text
                   style={[
                     styles.container,
@@ -116,7 +137,7 @@ class ListItem extends Component {
                 <Text
                   style={
                     styles.text
-                  }>{`${node.postings.reduce((m, p) => m + (p.amount === '' ? 0 : parseFloat(p.amount)), 0)}`}</Text>
+                  }>{`${formatAmount(node.postings.reduce((m, p) => m + (p.amount === '' ? 0 : parseFloat(p.amount)), 0))}`}</Text>
               </View>
             </TouchableHighlight>
           : <View>
@@ -141,7 +162,7 @@ class LedgerItemDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      consolidated: '',
+      consolidated: ' ',
       date: new Date(),
       id: 'new',
       payee: '',
@@ -150,8 +171,9 @@ class LedgerItemDetails extends Component {
     };
   }
 
-  _updatePosting = (idx, account, amount, currency) => {
+  _updatePosting = (idx, account, amnt, currency) => {
     const oldPostings = this.state.postings;
+    const amount = formatAmount(amnt);
     const postings = idx === oldPostings.length
       ? R.insert(idx, { account, amount, currency }, this.state.postings)
       : R.update(idx, { account, amount, currency }, this.state.postings);
@@ -159,6 +181,7 @@ class LedgerItemDetails extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
+    console.log(nextProps.data);
     if (nextProps.data) {
       this.setState({
         ...nextProps.data,
@@ -166,7 +189,7 @@ class LedgerItemDetails extends Component {
       });
     } else {
       this.setState({
-        consolidated: '',
+        consolidated: ' ',
         date: new Date(),
         id: 'new',
         payee: '',

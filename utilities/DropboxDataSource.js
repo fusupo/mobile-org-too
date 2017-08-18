@@ -101,7 +101,7 @@ export default class DropboxDataSource {
       this.dbx
         .filesUpload({
           contents,
-          path: path.replace('.ledger', 'DummyOut.ledger'),
+          path: path,
           mode: { '.tag': 'overwrite' }
         })
         .then(res => resolve(res))

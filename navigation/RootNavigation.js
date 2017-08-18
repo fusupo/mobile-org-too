@@ -88,7 +88,7 @@ const TabNav = TabNavigator(
     tabBarPosition: 'bottom',
     animationEnabled: false,
     swipeEnabled: false,
-    initialRouteName: 'LedgerTab',
+    initialRouteName: 'MainTab',
     lazy: true
   }
 );
