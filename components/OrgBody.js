@@ -15,9 +15,9 @@ const styles = StyleSheet.create({
     flex: 1
   },
   border: {
-    // borderWidth: 1,
-    // borderStyle: 'solid',
-    // margin: 10
+    borderWidth: 1,
+    borderStyle: 'solid',
+    margin: 10
   },
   textInput: {
     height: 70
@@ -71,48 +71,94 @@ class OrgBody extends Component {
               />
             </View>
           </View>
-          <ScrollView horizontal={true}>
-            <TextInput
+          <ScrollView
+            style={[
+              styles.container
+              // , styles.border
+            ]}
+            horizontal={true}>
+            <View
               style={[
-                styles.text,
-                styles.textInput,
-                styles.container,
-                styles.border
-              ]}
-              value={text === undefined ? bodyText : text}
-              multiline={true}
-              autoFocus={true}
-              onChangeText={text => {
-                this.setState({ text });
-              }}
-            />
+                styles.container
+                // , styles.border
+              ]}>
+              <TextInput
+                style={[
+                  styles.text,
+                  //                styles.textInput,
+                  // styles.border,
+                  { width: '100%' }
+                ]}
+                value={text === undefined ? bodyText : text}
+                multiline={true}
+                autoFocus={true}
+                onChangeText={text => {
+                  this.setState({ text });
+                }}
+              />
+            </View>
           </ScrollView>
         </View>
-      : <View style={[styles.container, styles.border]}>
-          <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
-            <View
-              className="OrgBody"
-              style={{
-                flexDirection: 'row',
-                backgroundColor: '#cccccc'
-              }}>
+      : <View style={[styles.border]}>
+          <View
+            className="OrgBody"
+            style={{
+              flexDirection: 'row',
+              backgroundColor: '#cccccc'
+            }}>
+            <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
               <Ionicons
                 name={this.state.isCollapsed ? 'ios-book-outline' : 'ios-book'}
                 size={20}
                 style={{ marginLeft: 5 }}
               />
-            </View>
-          </TouchableHighlight>
-          <TouchableHighlight
-            onPress={
-              this.state.isCollapsed
-                ? null
-                : () => this.setState({ isEditing: true })
-            }>
-            <ScrollView horizontal={true}>
-              <Text style={styles.text}>{bodyText}</Text>
-            </ScrollView>
-          </TouchableHighlight>
+            </TouchableHighlight>
+          </View>
+          {this.state.isCollapsed
+            ? <ScrollView
+                style={[
+                  styles.container
+                  // , styles.border
+                ]}
+                horizontal={true}>
+                <View
+                  style={[
+                    styles.container
+                    // , styles.border
+                  ]}>
+                  <Text
+                    style={[
+                      styles.text,
+                      // , styles.border
+                      { width: '100%' }
+                    ]}>
+                    {bodyText}
+                  </Text>
+                </View>
+              </ScrollView>
+            : <TouchableHighlight
+                onPress={
+                  this.state.isCollapsed
+                    ? null
+                    : () => this.setState({ isEditing: true })
+                }>
+                <ScrollView
+                  style={[
+                    styles.container
+                    // , styles.border
+                  ]}
+                  horizontal={true}>
+                  <View
+                    style={[
+                      styles.container
+                      // , styles.border
+                    ]}>
+                    <Text style={[styles.container, styles.text]}>
+                      {bodyText}
+                    </Text>
+                  </View>
+                </ScrollView>
+              </TouchableHighlight>}
         </View>;
     return <View style={{ flex: 16 }}>{showEditor}</View>;
   }
