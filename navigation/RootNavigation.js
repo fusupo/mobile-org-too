@@ -10,6 +10,7 @@ import { TabNavigator } from 'react-navigation';
 import HomeScreen from '../screens/HomeScreen';
 import CalendarScreen from '../screens/CalendarScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import LedgerScreen from '../screens/LedgerScreen';
 
 import { getCurrentRouteName } from '../selectors';
 
@@ -29,11 +30,11 @@ const TabNav = TabNavigator(
       screen: HomeScreen,
       path: '/',
       navigationOptions: {
-        title: 'Home',
-        tabBarLabel: 'Home',
+        title: '', //'Home',
+        // tabBarLabel: 'Home',
         tabBarIcon: ({ tintColor, focused }) => (
           <Ionicons
-            name={focused ? 'ios-home' : 'ios-home-outline'}
+            name={focused ? 'md-school' : 'md-school'}
             size={26}
             style={{ color: tintColor }}
           />
@@ -44,10 +45,24 @@ const TabNav = TabNavigator(
       screen: CalendarScreen,
       path: '/agenda',
       navigationOptions: {
-        title: 'Agenda',
+        title: '', //'Agenda',
         tabBarIcon: ({ tintColor, focused }) => (
           <Ionicons
-            name={focused ? 'ios-calendar' : 'ios-calendar-outline'}
+            name={focused ? 'ios-clock' : 'ios-clock-outline'}
+            size={26}
+            style={{ color: tintColor }}
+          />
+        )
+      }
+    },
+    LedgerTab: {
+      screen: LedgerScreen,
+      path: '/ledger',
+      navigationOptions: {
+        title: '', //'Ledger',
+        tabBarIcon: ({ tintColor, focused }) => (
+          <Ionicons
+            name={focused ? 'logo-usd' : 'logo-usd'}
             size={26}
             style={{ color: tintColor }}
           />
@@ -58,7 +73,7 @@ const TabNav = TabNavigator(
       screen: SettingsScreen,
       path: '/settings',
       navigationOptions: {
-        title: 'Settings',
+        title: '', //'Settings',
         tabBarIcon: ({ tintColor, focused }) => (
           <Ionicons
             name={focused ? 'ios-settings' : 'ios-settings-outline'}
@@ -88,10 +103,7 @@ class AppWithState extends React.Component {
       return (
         <TabNav
           onNavigationStateChange={(prevState, currState, action) => {
-            console.log('how out here?');
-            console.log(this.props.nav);
             this.setState({ currRoute: getCurrentRouteName(currState) });
-            console.log('how out here?');
           }}
           screenProps={{ currRoute: this.state.currRoute }}
         />

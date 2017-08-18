@@ -60,11 +60,9 @@ class FileNameInput extends React.Component {
         break;
     }
     return (
-      <View style={{ padding: 10, flexDirection: 'row' }}>
+      <View style={{ flex: 1, flexDirection: 'row' }}>
         <TextInput
           style={{
-            padding: 5,
-            height: 40,
             borderColor,
             borderWidth: 4,
             flex: 1
@@ -74,9 +72,7 @@ class FileNameInput extends React.Component {
           value={this.state.text}
         />
         <Button
-          onPress={() => {
-            this.props.onClearInboxPress();
-          }}
+          onPress={this.props.onClearFilePress}
           title="X"
           color="#841584"
           style={{ flex: 1 }}
@@ -88,10 +84,64 @@ class FileNameInput extends React.Component {
 
 class FileNameInputList extends React.Component {
   render() {
+    const { dbxds, orgFiles, onNodeCheckPress } = this.props;
     return (
-      <View style={{ padding: 10, flexDirection: 'row' }}>
-        <Text>{'foo'}</Text>
-      </View>
+      <ScrollView style={{ borderColor: '#000', borderWidth: 1 }}>
+        <Tree
+          title={'foobarbaz'}
+          path={''}
+          type={'branch'}
+          getHasKids={(path, cbk) => {
+            dbxds.filesListFolderAsync(path).then(res => {
+              cbk(res.entries.length > 0);
+            });
+          }}
+          getItems={(path, cbk) => {
+            dbxds.filesListFolderAsync(path).then(res => {
+              cbk(
+                res.entries.map(r => {
+                  return {
+                    title: r.name,
+                    path: r.path_lower,
+                    type: r['.tag'] === 'folder' ? 'branch' : 'leaf'
+                  };
+                })
+              );
+            });
+          }}
+          renderLeafItem={(title, path, type, hasKids) => {
+            const isChecked = R.contains(path, orgFiles);
+            const selectable = path.endsWith('.org');
+            return (
+              <View style={{ flexDirection: 'row' }}>
+                <CheckBox
+                  isChecked={isChecked}
+                  style={selectable ? {} : { opacity: 0.25 }}
+                  onClick={() => {
+                    if (selectable) onNodeCheckPress(path, orgFiles, dbxds);
+                  }}
+                /><Text style={{ flex: 1 }}>{title}</Text>
+              </View>
+            );
+          }}
+          renderBranchItem={(title, path, type, hasKids, isCollapsed) => {
+            let pref;
+            let textStyle = { fontWeight: 'bold' };
+            if (hasKids) {
+              if (isCollapsed) {
+                pref = '⤷';
+              } else {
+                pref = '↓';
+              }
+            } else {
+              pref = '⇢';
+            }
+            return (
+              <View><Text style={textStyle}>{pref + ' ' + title}</Text></View>
+            );
+          }}
+        />
+      </ScrollView>
     );
   }
 }
@@ -114,102 +164,86 @@ class SettingsScreen extends React.Component {
     const {
       dbxds,
       inboxFile,
+      ledgerFile,
       orgFiles,
       onNodeCheckPress,
-      onClearInboxPress
+      onClearInboxPress,
+      onClearLedgerPress,
+      tryUpdateInboxFile,
+      tryUpdateLedgerFile
     } = this.props;
     return (
       <View style={{ flex: 1 }}>
-        <Text>{'inbox'}</Text>
-        <FileNameInput
-          file={inboxFile}
-          onClearInboxPress={() => onClearInboxPress(inboxFile.path)}
-          isOk={
-            inboxFile === null || inboxFile === undefined
-              ? null
-              : inboxFile.isOk
-          }
-          onEndEditing={this.props.tryUpdateInboxFile}
-        />
-        <FileNameInputList files={this.props.orgFiles} />
-        <Button
-          title={'sync w/ dropbox'}
-          onPress={() => {
-            this.setState({ showSpinner: true });
-            this.props.onSync(
-              () => {
-                setTimeout(() => this.setState({ showSpinner: false }), 1000);
-              },
-              e => {
-                this.setState({
-                  showSpinner: false,
-                  showError: true,
-                  error: e
-                });
-              }
-            );
-          }}
-        />
-        {this.state.showSpinner ? <View><ActivityIndicator /></View> : null}
-        {this.state.showError
-          ? <Text style={{ color: '#f00' }}>{this.state.error}</Text>
-          : null}
-        <ScrollView style={{ margin: 20, borderColor: '#000', borderWidth: 1 }}>
-          <Tree
-            title={'foobarbaz'}
-            path={''}
-            type={'branch'}
-            getHasKids={(path, cbk) => {
-              dbxds.filesListFolderAsync(path).then(res => {
-                cbk(res.entries.length > 0);
-              });
-            }}
-            getItems={(path, cbk) => {
-              dbxds.filesListFolderAsync(path).then(res => {
-                cbk(
-                  res.entries.map(r => {
-                    return {
-                      title: r.name,
-                      path: r.path_lower,
-                      type: r['.tag'] === 'folder' ? 'branch' : 'leaf'
-                    };
-                  })
-                );
-              });
-            }}
-            renderLeafItem={(title, path, type, hasKids) => {
-              const isChecked = R.contains(path, orgFiles);
-              const selectable = path.endsWith('.org');
-              return (
-                <View style={{ flexDirection: 'row' }}>
-                  <CheckBox
-                    isChecked={isChecked}
-                    style={selectable ? {} : { opacity: 0.25 }}
-                    onClick={() => {
-                      if (selectable) onNodeCheckPress(path, orgFiles, dbxds);
-                    }}
-                  /><Text style={{ flex: 1 }}>{title}</Text>
-                </View>
-              );
-            }}
-            renderBranchItem={(title, path, type, hasKids, isCollapsed) => {
-              let pref;
-              let textStyle = { fontWeight: 'bold' };
-              if (hasKids) {
-                if (isCollapsed) {
-                  pref = '⤷';
-                } else {
-                  pref = '↓';
-                }
-              } else {
-                pref = '⇢';
-              }
-              return (
-                <View><Text style={textStyle}>{pref + ' ' + title}</Text></View>
-              );
-            }}
+        <View style={{ flex: 1, margin: 10 }}>
+          <Text style={{ margin: 5 }}>{'inbox file'}</Text>
+          <FileNameInput
+            file={inboxFile}
+            onClearFilePress={() => onClearInboxPress(inboxFile.path)}
+            isOk={
+              inboxFile === null || inboxFile === undefined
+                ? null
+                : inboxFile.isOk
+            }
+            onEndEditing={tryUpdateInboxFile}
           />
-        </ScrollView>
+        </View>
+        <View style={{ flex: 6, margin: 10 }}>
+          <Text style={{ margin: 5 }}>{'org files'}</Text>
+          <FileNameInputList
+            dbxds={dbxds}
+            orgFiles={orgFiles}
+            onNodeCheckPress={onNodeCheckPress}
+            files={this.props.orgFiles}
+          />
+        </View>
+        <View style={{ flex: 1, margin: 10 }}>
+          <Text style={{ margin: 5 }}>{'ledger file'}</Text>
+          <FileNameInput
+            file={ledgerFile}
+            onClearFilePress={() => onClearLedgerPress()}
+            isOk={
+              ledgerFile === null || ledgerFile === undefined
+                ? null
+                : ledgerFile.isOk
+            }
+            onEndEditing={tryUpdateLedgerFile}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+            <Button
+              title={'sync w/ dropbox'}
+              onPress={() => {
+                this.setState({ showSpinner: true });
+                this.props.onSync(
+                  () => {
+                    setTimeout(
+                      () => this.setState({ showSpinner: false }),
+                      1000
+                    );
+                  },
+                  e => {
+                    this.setState({
+                      showSpinner: false,
+                      showError: true,
+                      error: e
+                    });
+                  }
+                );
+              }}
+            />
+            {this.state.showSpinner ? <View><ActivityIndicator /></View> : null}
+          </View>
+          {this.state.showError
+            ? <Text style={{ color: '#f00' }}>{this.state.error}</Text>
+            : null}
+        </View>
       </View>
     );
   }
@@ -221,6 +255,7 @@ const mapStateToProps = state => {
   });
   return {
     inboxFile: state.settings.inboxFile,
+    ledgerFile: state.settings.ledgerFile,
     orgFiles: state.settings.orgFiles,
     dbxds
   };
@@ -231,11 +266,17 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     tryUpdateInboxFile: path => {
       dispatch(someActionToo(path));
     },
+    tryUpdateLedgerFile: path => {
+      dispatch(someActionThree(path));
+    },
     onSync: (onSucc, onErr) => {
       dispatch(doCloudUpload(onSucc, onErr));
     },
     onClearInboxPress: () => {
       dispatch(clearInboxFile());
+    },
+    onClearLedgerPress: () => {
+      dispatch(clearLedgerFile());
     },
     onNodeCheckPress: (path, orgFiles, dbxds) => {
       dispatch({ type: 'settings:toggleOrgFile', path });
@@ -259,6 +300,20 @@ function clearInboxFile() {
   };
 }
 
+function clearLedgerFile() {
+  return (dispatch, getState) => {
+    const ledgerFile = getState().settings.ledgerFile;
+    const path = ledgerFile && ledgerFile.path ? ledgerFile.path : 'none';
+    if (path !== 'none') {
+      dispatch({
+        type: 'settings:ledgerFile:clear'
+      });
+      dispatch(removeLedger(path));
+      dispatch(saveSettingsToStorage());
+    }
+  };
+}
+
 function removeBuffer(path) {
   return (dispatch, getState) => {
     dispatch({
@@ -269,6 +324,15 @@ function removeBuffer(path) {
   };
 }
 
+function removeLedger(path) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: 'removeLedger',
+      path
+    });
+    dispatch(saveSettingsToStorage());
+  };
+}
 // REFER HOME SCREEN FOR VERY SIMILAR CODE !!!
 function loadFile(path, dbxds) {
   return async (dispatch, getState) => {
@@ -298,7 +362,6 @@ async function loadParseOrgFilesAsync(filePath, dbxds) {
 
 function saveSettingsToStorage() {
   return async (dispatch, getState) => {
-    console.log(JSON.stringify(getState().settings));
     try {
       await AsyncStorage.setItem(
         '@mobile-org-too:settings',
@@ -328,6 +391,40 @@ function someActionToo(path) {
       console.log('err');
       dispatch({
         type: 'settings:inboxFile:error',
+        path: path,
+        isFolder: false
+      });
+    };
+    foo = ds
+      .filesGetMetadataAsync(path)
+      .then(res => {
+        if (res['.tag'] === 'folder') {
+          err(path);
+        } else {
+          success(path, res);
+        }
+      })
+      .catch(e => err(path));
+  };
+}
+
+function someActionThree(path) {
+  return (dispatch, getState) => {
+    const ds = new DropboxDataSource({
+      accessToken: getState().dbxAccessToken
+    });
+    const success = (path, res) => {
+      dispatch({
+        type: 'settings:ledgerFile:ok',
+        path: path,
+        isFolder: res['.tag'] === 'folder'
+      });
+      dispatch(saveSettingsToStorage());
+    };
+    const err = path => {
+      console.log('err');
+      dispatch({
+        type: 'settings:ledgerFile:error',
         path: path,
         isFolder: false
       });

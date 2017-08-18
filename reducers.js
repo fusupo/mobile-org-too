@@ -473,6 +473,7 @@ function nav(state, action) {
 function settings(
   state = {
     inboxFile: { path: 'insert filepath', isFolder: false, isOk: null },
+    ledgerFile: { path: 'insert filepath', isFolder: false, isOk: null },
     orgFiles: []
   },
   action
@@ -492,6 +493,25 @@ function settings(
     case 'settings:inboxFile:clear':
       nextState = Object.assign({}, state, {
         inboxFile: { path: 'insert filepath', isFolder: false, isOK: null }
+      });
+      break;
+    case 'settings:ledgerFile:ok':
+      nextState = Object.assign({}, state, {
+        ledgerFile: { path: action.path, isFolder: action.isFolder, isOk: true }
+      });
+      break;
+    case 'settings:ledgerFile:error':
+      nextState = Object.assign({}, state, {
+        ledgerFile: {
+          path: action.path,
+          isFolder: action.isFolder,
+          isOk: false
+        }
+      });
+      break;
+    case 'settings:ledgerFile:clear':
+      nextState = Object.assign({}, state, {
+        ledgerFile: { path: 'insert filepath', isFolder: false, isOK: null }
       });
       break;
     case 'settings:toggleOrgFile':
@@ -527,13 +547,50 @@ function dbxAccessToken(state = null, action) {
   }
 }
 
+/////////////////////////////////////////////////////////////////////////  LEDGER
+
+function ledger(state = null, action) {
+  let nextState, ledgernodes;
+  switch (action.type) {
+    case 'removeLedger':
+      nextState = null;
+      break;
+    case 'addLedger':
+      nextState = action.data;
+      break;
+    case 'ledger:addNode':
+      ledgerNodes = R.insert(
+        state.ledgerNodes.length,
+        action.node,
+        state.ledgerNodes
+      );
+      nextState = Object.assign({}, state, { ledgerNodes });
+      break;
+    case 'ledger:updateNode':
+      console.log(action.node.id);
+      const idx = R.findIndex(n => n.id === action.node.id, state.ledgerNodes);
+      console.log(idx);
+      ledgerNodes = R.update(idx, action.node, state.ledgerNodes);
+      nextState = Object.assign({}, state, { ledgerNodes });
+      break;
+  }
+  return nextState || state;
+}
+
+///////////////////////////////////////////////////////////////////////////  DATA
+
+const data = combineReducers({
+  ledger
+});
+
 /////////////////////////////////////////////////////////////////  MOBILE ORG TOO
 
 const mobileOrgTooApp = combineReducers({
   orgBuffers,
   nav,
   settings,
-  dbxAccessToken
+  dbxAccessToken,
+  data
 });
 
 export default mobileOrgTooApp;
