@@ -480,6 +480,8 @@ class LedgerScreen extends Component {
   }
 
   render() {
+    if (this.props.screenProps.currRoute !== 'LedgerTab') return null;
+
     const {
       nodes,
       allPayees,
@@ -555,7 +557,8 @@ class LedgerScreen extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
+  if (ownProps.screenProps.currRoute !== 'LedgerTab') return {};
   const ledger = state.data.ledger;
   let nodes = ledger && ledger.ledgerNodes ? ledger.ledgerNodes : [];
   const allPayees = R.uniq(R.map(n => n.payee, nodes));

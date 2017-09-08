@@ -58,6 +58,8 @@ class HomeScreen extends React.Component {
   }
 
   render() {
+    if (this.props.screenProps.currRoute !== 'MainTab') return null;
+
     const { /*allNodes,*/ buffers, onAddOne, allTags } = this.props;
 
     const filterTags = pool => {
@@ -292,7 +294,8 @@ class HomeScreen extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
+  if (ownProps.screenProps.currRoute !== 'MainTab') return {};
   //  const allNodes = getAllNodes(state);
   const buffers = state.orgBuffers;
   const allTags = R.uniq(

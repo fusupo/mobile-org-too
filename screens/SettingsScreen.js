@@ -161,6 +161,8 @@ class SettingsScreen extends React.Component {
   }
 
   render() {
+    if (this.props.screenProps.currRoute !== 'SettingsTab') return null;
+
     const {
       dbxds,
       inboxFile,
@@ -249,7 +251,8 @@ class SettingsScreen extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
+  if (ownProps.screenProps.currRoute !== 'SettingsTab') return {};
   const dbxds = new DropboxDataSource({
     accessToken: state.dbxAccessToken
   });
