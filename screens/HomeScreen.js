@@ -158,14 +158,14 @@ class HomeScreen extends React.Component {
         const listAll = Object.entries(buffers).map(e => (
           <View key={e[0]}>
             <OrgBuffer bufferID={e[0]} />
-            <Button
-              title={'add One'}
-              onPress={() => {
-                onAddOne(e[0]);
-              }}
-            />
           </View>
         ));
+        //   <Button
+        // title={'add One'}
+        // onPress={() => {
+        //   onAddOne(e[0]);
+        // }}
+        //   />
         display = listAll;
       }
 

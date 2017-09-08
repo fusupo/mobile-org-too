@@ -3,7 +3,10 @@ import { Text, StyleSheet, View } from 'react-native';
 
 import { connect } from 'react-redux';
 
+import R from 'ramda';
+
 import OrgHeadline from './OrgHeadline';
+import Tree from '../components/Tree';
 
 const styles = StyleSheet.create({
   txt: {
@@ -24,14 +27,59 @@ const styles = StyleSheet.create({
 });
 
 export const OrgBuffer = ({ bufferID, nodes, tree }) => {
-  const list = tree.children.map(c => {
-    return <OrgHeadline key={c.nodeID} bufferID={bufferID} nodeID={c.nodeID} />;
-  });
+  // const list = tree.children.map(c => {
+  //   return <OrgHeadline key={c.nodeID} bufferID={bufferID} nodeID={c.nodeID} />;
+  // });
+  // return (
+  //   <View>
+  //     <Text>{bufferID}</Text>
+  //     {list}
+  //   </View>
+  // );
   return (
-    <View>
-      <Text>{bufferID}</Text>
-      {list}
-    </View>
+    <Tree
+      title={bufferID}
+      path={[]}
+      type={'branch'}
+      getHasKids={(path, cbk) => {
+        const lens = R.lensPath(path);
+        const branch = R.view(lens, tree);
+        cbk(branch.children.length > 0);
+      }}
+      getItems={(path, cbk) => {
+        const lens = R.lensPath(path);
+        const branch = R.view(lens, tree);
+        cbk(
+          branch.children.map((c, idx) => {
+            const newPath = path.slice(0);
+            newPath.push('children');
+            newPath.push(idx);
+            return {
+              title: nodes[c.nodeID].headline.content,
+              path: newPath,
+              type: c.children.length > 0 ? 'branch' : 'leaf'
+            };
+          })
+        );
+      }}
+      renderLeafItem={(title, path, type, hasKids) => {
+        return <View><Text>{title}</Text></View>;
+      }}
+      renderBranchItem={(title, path, type, hasKids, isCollapsed) => {
+        let pref;
+        let textStyle = { fontWeight: 'bold' };
+        if (hasKids) {
+          if (isCollapsed) {
+            pref = '⤷';
+          } else {
+            pref = '↓';
+          }
+        } else {
+          pref = '⇢';
+        }
+        return <View><Text style={textStyle}>{pref + ' ' + title}</Text></View>;
+      }}
+    />
   );
 };
 
@@ -52,31 +100,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => {
-  return {
-    // onNodeArrowClick: bufferID => {
-    //   return nodeID => {
-    //     dispatch(cycleNodeCollapse(bufferID, nodeID));
-    //   };
-    // },
-    // onNodeTitleClick: bufferID => {
-    //   return nodeID => {
-    //     dispatch(
-    //       NavigationActions.navigate({
-    //         routeName: 'NodeDetail',
-    //         params: {
-    //           bufferID,
-    //           nodeID
-    //         }
-    //       })
-    //     );
-    //   };
-    // },
-    // onAddOne: bufferID => {
-    //   return nodeID => {
-    //     dispatch(addNewNode(bufferID));
-    //   };
-    // },
-  };
+  return {};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrgBuffer);
