@@ -19,6 +19,15 @@ class Tree extends Component {
     );
   }
 
+  componentWillReceiveProps() {
+    if (!this.state.isCollapsed) {
+      const { getItems, path } = this.props;
+      getItems(path, itemData => {
+        this.setState({ itemData });
+      });
+    }
+  }
+
   toggleCollapse() {
     if (this.state.isCollapsed) {
       const { getItems, path } = this.props;
