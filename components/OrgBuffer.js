@@ -8,6 +8,8 @@ import R from 'ramda';
 
 import { addNewNode, deleteNode } from '../actions';
 import OrgHeadline from './OrgHeadline';
+import OrgTodoKeywordEditable from './OrgTodoKeywordEditable';
+import OrgTagsEditable from './OrgTagsEditable';
 import Tree from '../components/Tree';
 const OrgHeadlineUtil = require('org-parse').OrgHeadline;
 
@@ -119,7 +121,22 @@ export class OrgBuffer extends React.Component {
                     }
                   }
                 ]}>
-                {baseLine}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    paddingLeft: 8 * path.length
+                  }}>
+                  <OrgTodoKeywordEditable bufferID={bufferID} nodeID={nodeID} />
+                  <TouchableHighlight
+                    style={{ flex: 1 }}
+                    onPress={() => {
+                      onNodeTitlePress(bufferID, nodeID);
+                    }}>
+                    <Text>{title}</Text>
+                  </TouchableHighlight>
+                  {tags &&
+                    <OrgTagsEditable bufferID={bufferID} nodeID={nodeID} />}
+                </View>
               </Swipeout>
             );
           }
@@ -218,7 +235,28 @@ export class OrgBuffer extends React.Component {
                       }
                     }
                   ]}>
-                  {baseLine}
+                  <View style={{ flexDirection: 'row' }}>
+                    <TouchableHighlight
+                      onPress={onToggleCollapse}
+                      style={{ paddingLeft: 8 * path.length - 11 }}>
+                      <Text style={textStyle}>{pref}</Text>
+                    </TouchableHighlight>
+                    <OrgTodoKeywordEditable
+                      bufferID={bufferID}
+                      nodeID={nodeID}
+                    />
+                    <TouchableHighlight
+                      style={{ flex: 4 }}
+                      onPress={() => {
+                        onNodeTitlePress(bufferID, nodeID);
+                      }}>
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text style={textStyle}>{title}</Text>
+                      </View>
+                    </TouchableHighlight>
+                    {tags &&
+                      <OrgTagsEditable bufferID={bufferID} nodeID={nodeID} />}
+                  </View>
                 </Swipeout>
               );
             }
