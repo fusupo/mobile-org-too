@@ -8,6 +8,7 @@ import R from 'ramda';
 import { addNewNode, deleteNode } from '../actions';
 import OrgHeadline from './OrgHeadline';
 import Tree from '../components/Tree';
+const OrgHeadlineUtil = require('org-parse').OrgHeadline;
 
 const styles = StyleSheet.create({
   txt: {
@@ -76,8 +77,6 @@ export class OrgBuffer extends React.Component {
         ) => {
           const lens = R.lensPath(path);
           const branch = R.view(lens, tree);
-          const nodeID = branch.nodeID;
-          const node = this.props.nodes[nodeID];
           let pref;
           let textStyle = { fontWeight: 'bold' };
           if (hasKids) {
@@ -89,25 +88,50 @@ export class OrgBuffer extends React.Component {
           } else {
             pref = '⇢';
           }
-          return (
-            <View style={{ flexDirection: 'row' }}>
-              <TouchableHighlight
-                style={{ flex: 4 }}
-                onPress={onToggleCollapse}>
-                <Text style={textStyle}>{pref + ' ' + title}</Text>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={{ flex: 1 }}
-                onPress={() => onAddOnePress(bufferID, nodeID, node)}>
-                <Text>{'+'}</Text>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={{ flex: 1 }}
-                onPress={() => onDeleteNodePress(bufferID, nodeID)}>
-                <Text>{'-'}</Text>
-              </TouchableHighlight>
-            </View>
-          );
+          if (path.length === 0) {
+            return (
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableHighlight
+                  style={{ flex: 4 }}
+                  onPress={onToggleCollapse}>
+                  <Text style={textStyle}>{pref + ' ' + title}</Text>
+                </TouchableHighlight>
+              </View>
+            );
+          } else {
+            const nodeID = branch.nodeID;
+            const node = this.props.nodes[nodeID];
+            const keyword = node.headline.todoKeyword;
+            return (
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableHighlight
+                  style={{ flex: 4 }}
+                  onPress={onToggleCollapse}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text
+                      style={{
+                        backgroundColor: keyword
+                          ? OrgHeadlineUtil.colorForKeyword(keyword)
+                          : '#fff'
+                      }}>
+                      {keyword ? keyword : 'none'}
+                    </Text>
+                    <Text style={textStyle}>{pref + ' ' + title}</Text>
+                  </View>
+                </TouchableHighlight>
+                <TouchableHighlight
+                  style={{ flex: 1 }}
+                  onPress={() => onAddOnePress(bufferID, nodeID, node)}>
+                  <Text>{'+'}</Text>
+                </TouchableHighlight>
+                <TouchableHighlight
+                  style={{ flex: 1 }}
+                  onPress={() => onDeleteNodePress(bufferID, nodeID)}>
+                  <Text>{'-'}</Text>
+                </TouchableHighlight>
+              </View>
+            );
+          }
         }}
       />
     );
