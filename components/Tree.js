@@ -73,17 +73,11 @@ class Tree extends Component {
         path,
         type,
         hasKids,
-        isCollapsed
+        isCollapsed,
+        this.toggleCollapse.bind(this)
       );
       if (hasKids) {
-        touchableMaybe = (
-          <TouchableHighlight
-            onPress={() => {
-              this.toggleCollapse();
-            }}>
-            {branchItem}
-          </TouchableHighlight>
-        );
+        touchableMaybe = branchItem;
       } else {
         touchableMaybe = branchItem;
       }

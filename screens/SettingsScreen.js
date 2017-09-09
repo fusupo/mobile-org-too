@@ -88,7 +88,7 @@ class FileNameInputList extends React.Component {
     return (
       <ScrollView style={{ borderColor: '#000', borderWidth: 1 }}>
         <Tree
-          title={'foobarbaz'}
+          title={'home'}
           path={''}
           type={'branch'}
           getHasKids={(path, cbk) => {
@@ -124,7 +124,14 @@ class FileNameInputList extends React.Component {
               </View>
             );
           }}
-          renderBranchItem={(title, path, type, hasKids, isCollapsed) => {
+          renderBranchItem={(
+            title,
+            path,
+            type,
+            hasKids,
+            isCollapsed,
+            onToggleCollapse
+          ) => {
             let pref;
             let textStyle = { fontWeight: 'bold' };
             if (hasKids) {
@@ -137,7 +144,9 @@ class FileNameInputList extends React.Component {
               pref = '⇢';
             }
             return (
-              <View><Text style={textStyle}>{pref + ' ' + title}</Text></View>
+              <TouchableHighlight onPress={onToggleCollapse}>
+                <Text style={textStyle}>{pref + ' ' + title}</Text>
+              </TouchableHighlight>
             );
           }}
         />
