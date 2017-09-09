@@ -26,6 +26,9 @@ class Tree extends Component {
         this.setState({ itemData });
       });
     }
+    this.props.getHasKids(this.props.path, hasKids =>
+      this.setState({ hasKids })
+    );
   }
 
   toggleCollapse() {

@@ -12,6 +12,7 @@ import {
   View
 } from 'react-native';
 
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { FontAwesome } from '@expo/vector-icons';
 import ModalDropdown from 'react-native-modal-dropdown';
 
@@ -33,7 +34,8 @@ class HomeScreen extends React.Component {
     inboxFileIsOk: false,
     searchStr: null,
     tagFilters: [],
-    tagFilterType: 'AND'
+    tagFilterType: 'AND',
+    isLocked: true
   };
 
   componentWillMount() {
@@ -157,7 +159,7 @@ class HomeScreen extends React.Component {
       } else {
         const listAll = Object.entries(buffers).map(e => (
           <View key={e[0]}>
-            <OrgBuffer bufferID={e[0]} />
+            <OrgBuffer bufferID={e[0]} isLocked={this.state.isLocked} />
           </View>
         ));
         //   <Button
@@ -283,7 +285,24 @@ class HomeScreen extends React.Component {
               </View>
             </View>
           </View>
-          <ScrollView style={{ flex: 1 }}>
+          <TouchableHighlight
+            onPress={() => {
+              this.setState({ isLocked: !this.state.isLocked });
+            }}>
+            <View
+              className="OrgScheduling"
+              style={{
+                flexDirection: 'row',
+                backgroundColor: '#cccccc'
+              }}>
+              <Ionicons
+                name={this.state.isLocked ? 'md-lock' : 'md-unlock'}
+                size={20}
+                style={{ marginLeft: 5 }}
+              />
+            </View>
+          </TouchableHighlight>
+          <ScrollView style={{ flex: 1, margin: 10 }}>
             {display}
           </ScrollView>
         </View>

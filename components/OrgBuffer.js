@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, TouchableHighlight, Text, View } from 'react-native';
-
 import { connect } from 'react-redux';
+import { NavigationActions } from 'react-navigation';
+import Swipeout from 'react-native-swipeout';
 
 import R from 'ramda';
 
@@ -35,7 +36,8 @@ export class OrgBuffer extends React.Component {
       nodes,
       tree,
       onAddOnePress,
-      onDeleteNodePress
+      onDeleteNodePress,
+      onNodeTitlePress
     } = this.props;
     const foo = Math.round(Math.random() * 10);
     return (
@@ -65,7 +67,62 @@ export class OrgBuffer extends React.Component {
           );
         }}
         renderLeafItem={(title, path, type, hasKids) => {
-          return <View><Text>{title}</Text></View>;
+          const lens = R.lensPath(path);
+          const branch = R.view(lens, this.props.tree);
+          const nodeID = branch.nodeID;
+          const node = this.props.nodes[nodeID];
+          const keyword = node.headline.todoKeyword;
+          const tags = node.headline.tags;
+          const baseLine = (
+            <View
+              style={{ flexDirection: 'row', paddingLeft: 8 * path.length }}>
+              <Text
+                style={{
+                  backgroundColor: keyword
+                    ? OrgHeadlineUtil.colorForKeyword(keyword)
+                    : '#fff'
+                }}>
+                {keyword ? keyword : 'none'}
+              </Text>
+              <TouchableHighlight
+                style={{ flex: 1 }}
+                onPress={() => {
+                  onNodeTitlePress(bufferID, nodeID);
+                }}>
+                <Text>{title}</Text>
+              </TouchableHighlight>
+              {tags &&
+                <View>
+                  <Text>{tags.join(':')}</Text>
+                </View>}
+            </View>
+          );
+          if (this.props.isLocked) {
+            return baseLine;
+          } else {
+            return (
+              <Swipeout
+                style={{ flex: 1 }}
+                right={[
+                  {
+                    text: 'deleteNode',
+                    onPress: () => {
+                      onDeleteNodePress(bufferID, nodeID);
+                    }
+                  }
+                ]}
+                left={[
+                  {
+                    text: 'addOne',
+                    onPress: () => {
+                      onAddOnePress(bufferID, nodeID, node);
+                    }
+                  }
+                ]}>
+                {baseLine}
+              </Swipeout>
+            );
+          }
         }}
         renderBranchItem={(
           title,
@@ -76,7 +133,7 @@ export class OrgBuffer extends React.Component {
           onToggleCollapse
         ) => {
           const lens = R.lensPath(path);
-          const branch = R.view(lens, tree);
+          const branch = R.view(lens, this.props.tree);
           let pref;
           let textStyle = { fontWeight: 'bold' };
           if (hasKids) {
@@ -94,7 +151,13 @@ export class OrgBuffer extends React.Component {
                 <TouchableHighlight
                   style={{ flex: 4 }}
                   onPress={onToggleCollapse}>
-                  <Text style={textStyle}>{pref + ' ' + title}</Text>
+                  <Text
+                    style={[
+                      textStyle,
+                      { backgroundColor: '#000', color: '#fff' }
+                    ]}>
+                    {pref + ' ' + title}
+                  </Text>
                 </TouchableHighlight>
               </View>
             );
@@ -102,35 +165,63 @@ export class OrgBuffer extends React.Component {
             const nodeID = branch.nodeID;
             const node = this.props.nodes[nodeID];
             const keyword = node.headline.todoKeyword;
-            return (
+            const tags = node.headline.tags;
+            const baseLine = (
               <View style={{ flexDirection: 'row' }}>
                 <TouchableHighlight
+                  onPress={onToggleCollapse}
+                  style={{ paddingLeft: 8 * path.length - 11 }}>
+                  <Text style={textStyle}>{pref}</Text>
+                </TouchableHighlight>
+                <Text
+                  style={{
+                    backgroundColor: keyword
+                      ? OrgHeadlineUtil.colorForKeyword(keyword)
+                      : '#fff'
+                  }}>
+                  {keyword ? keyword : 'none'}
+                </Text>
+                <TouchableHighlight
                   style={{ flex: 4 }}
-                  onPress={onToggleCollapse}>
+                  onPress={() => {
+                    onNodeTitlePress(bufferID, nodeID);
+                  }}>
                   <View style={{ flexDirection: 'row' }}>
-                    <Text
-                      style={{
-                        backgroundColor: keyword
-                          ? OrgHeadlineUtil.colorForKeyword(keyword)
-                          : '#fff'
-                      }}>
-                      {keyword ? keyword : 'none'}
-                    </Text>
-                    <Text style={textStyle}>{pref + ' ' + title}</Text>
+                    <Text style={textStyle}>{title}</Text>
                   </View>
                 </TouchableHighlight>
-                <TouchableHighlight
-                  style={{ flex: 1 }}
-                  onPress={() => onAddOnePress(bufferID, nodeID, node)}>
-                  <Text>{'+'}</Text>
-                </TouchableHighlight>
-                <TouchableHighlight
-                  style={{ flex: 1 }}
-                  onPress={() => onDeleteNodePress(bufferID, nodeID)}>
-                  <Text>{'-'}</Text>
-                </TouchableHighlight>
+                {tags &&
+                  <View>
+                    <Text>{tags.join(':')}</Text>
+                  </View>}
               </View>
             );
+            if (this.props.isLocked) {
+              return baseLine;
+            } else {
+              return (
+                <Swipeout
+                  style={{ flex: 1 }}
+                  right={[
+                    {
+                      text: 'deleteNode',
+                      onPress: () => {
+                        onDeleteNodePress(bufferID, nodeID);
+                      }
+                    }
+                  ]}
+                  left={[
+                    {
+                      text: 'addOne',
+                      onPress: () => {
+                        onAddOnePress(bufferID, nodeID, node);
+                      }
+                    }
+                  ]}>
+                  {baseLine}
+                </Swipeout>
+              );
+            }
           }
         }}
       />
@@ -155,6 +246,17 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
+    onNodeTitlePress: (bufferID, nodeID) => {
+      dispatch(
+        NavigationActions.navigate({
+          routeName: 'NodeDetail',
+          params: {
+            bufferID,
+            nodeID
+          }
+        })
+      );
+    },
     onDeleteNodePress: (bufferID, nodeID) => {
       dispatch(deleteNode(bufferID, nodeID));
     },
