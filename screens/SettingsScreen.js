@@ -113,7 +113,11 @@ class FileNameInputList extends React.Component {
             const isChecked = R.contains(path, orgFiles);
             const selectable = path.endsWith('.org');
             return (
-              <View style={{ flexDirection: 'row' }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginLeft: 10 * path.split('/').length
+                }}>
                 <CheckBox
                   isChecked={isChecked}
                   style={selectable ? {} : { opacity: 0.25 }}
@@ -144,7 +148,9 @@ class FileNameInputList extends React.Component {
               pref = '⇢';
             }
             return (
-              <TouchableHighlight onPress={onToggleCollapse}>
+              <TouchableHighlight
+                style={{ marginLeft: 10 * path.split('/').length }}
+                onPress={onToggleCollapse}>
                 <Text style={textStyle}>{pref + ' ' + title}</Text>
               </TouchableHighlight>
             );

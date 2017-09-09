@@ -72,7 +72,7 @@ class Tree extends Component {
           }}
         />
       );
-      items = <View style={{ marginLeft: 20 }}>{items}</View>;
+      items = <View>{items}</View>;
     }
 
     let touchableMaybe;
