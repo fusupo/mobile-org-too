@@ -1,10 +1,8 @@
 import R from 'ramda';
 import Expo from 'expo';
 import React from 'react';
-import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import {
-  Button,
   ScrollView,
   Text,
   TextInput,
@@ -162,6 +160,7 @@ class HomeScreen extends React.Component {
             key={e[0]}
             bufferID={e[0]}
             isLocked={this.state.isLocked}
+            onAddOne={onAddOne}
           />
         ));
         //   <Button
