@@ -1,5 +1,11 @@
 import React from 'react';
-import { StyleSheet, TouchableHighlight, Text, View } from 'react-native';
+import {
+  Button,
+  StyleSheet,
+  TouchableHighlight,
+  Text,
+  View
+} from 'react-native';
 import { connect } from 'react-redux';
 
 import OrgList from '../components/OrgList';
@@ -37,6 +43,16 @@ export class OrgBuffer extends React.Component {
               {bufferID}
             </Text>
           </TouchableHighlight>
+          {!this.props.isLocked &&
+            <Button
+              onPress={() => {
+                console.log('foo');
+                this.props.onAddOne(bufferID);
+              }}
+              title="Add Child"
+              color="#841584"
+              accessibilityLabel="add child node"
+            />}
         </View>
         <OrgList
           data={tree.children}
