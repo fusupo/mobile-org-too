@@ -24,14 +24,12 @@ import {
   View
 } from 'react-native';
 
-import { OrgTree } from '../components/OrgTree';
-
-import OrgHeadline from '../components/OrgHeadline';
 import OrgHeadlineEditable from '../components/OrgHeadlineEditable';
 import OrgScheduling from '../components/OrgScheduling';
 import OrgDrawer from '../components/OrgDrawer';
 import OrgLogbook from '../components/OrgLogbook';
 import OrgBody from '../components/OrgBody';
+import OrgList from '../components/OrgList';
 import SplitPane from '../components/SplitPane';
 
 const OrgTreeUtil = require('org-parse').OrgTree;
@@ -68,22 +66,15 @@ const NodeDetailScreen = ({
 }) => {
   if (node) {
     // childNodes
-    const childIDs = OrgTreeUtil.findBranch(tree, nodeID).children;
-    const listItems = childIDs.length === 0
-      ? null
-      : childIDs.map(cn => (
-          <OrgHeadline
-            key={cn.nodeID}
-            bufferID={bufferID}
-            nodeID={cn.nodeID}
-            levelOffset={node.headline.level}
-          />
-        ));
-    const list = listItems
-      ? <ScrollView style={{ flex: 1, marginBottom: 30 }}>
-          {listItems}
+    const children = OrgTreeUtil.findBranch(tree, nodeID).children;
+    let list = null;
+    if (children.length > 0) {
+      list = (
+        <ScrollView style={{ flex: 1, margin: 10, marginBottom: 40 }}>
+          <OrgList data={children} bufferID={bufferID} isLocked={true} />
         </ScrollView>
-      : null;
+      );
+    }
 
     return (
       <View style={styles.container}>

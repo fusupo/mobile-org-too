@@ -158,9 +158,11 @@ class HomeScreen extends React.Component {
         );
       } else {
         const listAll = Object.entries(buffers).map(e => (
-          <View key={e[0]}>
-            <OrgBuffer bufferID={e[0]} isLocked={this.state.isLocked} />
-          </View>
+          <OrgBuffer
+            key={e[0]}
+            bufferID={e[0]}
+            isLocked={this.state.isLocked}
+          />
         ));
         //   <Button
         // title={'add One'}
