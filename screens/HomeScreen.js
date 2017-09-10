@@ -16,15 +16,11 @@ import ModalDropdown from 'react-native-modal-dropdown';
 
 import { registerDbxAccessToken, addNewNode } from '../actions';
 
-const orgHeadlineUtil = require('org-parse').OrgHeadline;
+const OrgHeadlineUtil = require('org-parse').OrgHeadline;
 
 import OrgBuffer from '../components/OrgBuffer';
-import OrgHeadline from '../components/OrgHeadline.js';
+import OrgHeadlineToo from '../components/OrgHeadlineToo';
 import DropboxDataSource from '../utilities/DropboxDataSource';
-
-import { getAllNodes } from '../selectors';
-
-let count = 0;
 
 class HomeScreen extends React.Component {
   state = {
@@ -37,7 +33,7 @@ class HomeScreen extends React.Component {
   };
 
   componentWillMount() {
-    let keywords = orgHeadlineUtil.keywords().slice(0);
+    let keywords = OrgHeadlineUtil.keywords().slice(0);
     keywords.push('none');
     this.setState({
       keywords,
@@ -60,7 +56,7 @@ class HomeScreen extends React.Component {
   render() {
     if (this.props.screenProps.currRoute !== 'MainTab') return null;
 
-    const { /*allNodes,*/ buffers, onAddOne, allTags } = this.props;
+    const { buffers, onAddOne, allTags } = this.props;
 
     const filterTags = pool => {
       const { tagFilters, tagFilterType } = this.state;
@@ -88,7 +84,6 @@ class HomeScreen extends React.Component {
 
     const search = pool => {
       const results = R.filter(
-        //n => n.content.search(this.state.searchStr) > -1,
         n =>
           n.content.toLowerCase().search(this.state.searchStr.toLowerCase()) >
           -1,
@@ -131,6 +126,10 @@ class HomeScreen extends React.Component {
           Object.entries(buffers)
         );
 
+        if (doSearch) {
+          pool = search(pool);
+        }
+
         if (doTagFilter) {
           pool = filterTags(pool);
         }
@@ -139,23 +138,18 @@ class HomeScreen extends React.Component {
           pool = filterKeywords(pool);
         }
 
-        if (doSearch) {
-          pool = search(pool);
-        }
-
-        display = R.map(
-          n => (
-            <OrgHeadline
+        display = R.map(n => {
+          return (
+            <OrgHeadlineToo
               key={n.nodeID}
               bufferID={n.bufferID}
               nodeID={n.nodeID}
-              levelOffset={n.level}
+              isLocked={true}
             />
-          ),
-          pool
-        );
+          );
+        }, pool);
       } else {
-        const listAll = Object.entries(buffers).map(e => (
+        display = Object.entries(buffers).map(e => (
           <OrgBuffer
             key={e[0]}
             bufferID={e[0]}
@@ -163,13 +157,6 @@ class HomeScreen extends React.Component {
             onAddOne={onAddOne}
           />
         ));
-        //   <Button
-        // title={'add One'}
-        // onPress={() => {
-        //   onAddOne(e[0]);
-        // }}
-        //   />
-        display = listAll;
       }
 
       return (
@@ -204,7 +191,6 @@ class HomeScreen extends React.Component {
                     borderColor: '#000',
                     borderWidth: 1,
                     flex: 1
-                    //                  padding: 20
                   }}
                   animated={false}
                   options={this.state.keywords}
@@ -221,11 +207,9 @@ class HomeScreen extends React.Component {
                   style={{
                     flex: 4,
                     flexDirection: 'row'
-                    //      padding: 20
                   }}>
                   <ModalDropdown
                     style={{
-                      //padding: 20,
                       flex: 1,
                       borderColor: '#000',
                       borderWidth: 1
@@ -316,7 +300,6 @@ class HomeScreen extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   if (ownProps.screenProps.currRoute !== 'MainTab') return {};
-  //  const allNodes = getAllNodes(state);
   const buffers = state.orgBuffers;
   const allTags = R.uniq(
     Object.values(buffers).reduce((m, v) => {
@@ -327,7 +310,6 @@ const mapStateToProps = (state, ownProps) => {
     }, [])
   );
   return {
-    //allNodes,
     buffers,
     allTags,
     settings: state.settings
