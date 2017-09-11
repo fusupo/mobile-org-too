@@ -276,6 +276,7 @@ const mapStateToProps = (state, ownProps) => {
         bufferID,
         nodeID: n.id,
         scheduled: n.scheduled,
+        deadline: n.deadline,
         content: n.headline.content
       };
     });
@@ -285,21 +286,38 @@ const mapStateToProps = (state, ownProps) => {
   const filterRange = (ns, start, end) => {
     return ns.filter(
       n =>
-        n.scheduled &&
-        orgTimestampUtils.compare(n.scheduled, start) >= 0 &&
-        orgTimestampUtils.compare(n.scheduled, end) < 0
+        (n.scheduled &&
+          orgTimestampUtils.compare(n.scheduled, start) >= 0 &&
+          orgTimestampUtils.compare(n.scheduled, end) < 0) ||
+        (n.deadline &&
+          orgTimestampUtils.compare(n.deadline, start) >= 0 &&
+          orgTimestampUtils.compare(n.deadline, end) < 0)
     );
   };
 
   const hours = [0, 6, 9, 12, 13, 18, 24];
 
   const buildDayToo = (headerStr, start, end) => {
-    const bar = d => ({
-      bufferID: d.bufferID,
-      nodeID: d.nodeID,
-      time: `${padMaybe(d.scheduled.hour)}:${padMaybe(d.scheduled.minute)}`,
-      content: d.content
-    });
+    const bar = (m, d) => {
+      let res = [];
+      if (d.scheduled) {
+        res.push({
+          bufferID: d.bufferID,
+          nodeID: d.nodeID,
+          time: `${padMaybe(d.scheduled.hour)}:${padMaybe(d.scheduled.minute)}`,
+          content: 'scheduled: ' + d.content
+        });
+      }
+      if (d.deadline) {
+        res.push({
+          bufferID: d.bufferID,
+          nodeID: d.nodeID,
+          time: `${padMaybe(d.deadline.hour)}:${padMaybe(d.deadline.minute)}`,
+          content: 'deadline: ' + d.content
+        });
+      }
+      return m.concat(res);
+    };
     let now = date;
     const nowStr = {
       bufferID: 'NOW',
@@ -313,20 +331,23 @@ const mapStateToProps = (state, ownProps) => {
       const a = orgTimestampUtils.add(start, { hours: hours[i] });
       const b = orgTimestampUtils.add(start, { hours: hours[i + 1] });
       let foo = filterRange(cand, a, b);
-      let foobar = filterRange(cand, a, b).map(bar);
+      let foobar = filterRange(cand, a, b).reduce(bar, []);
 
       if (
         orgTimestampUtils.compare(now, a) > 0 &&
         orgTimestampUtils.compare(now, b) < 0
       ) {
         if (foo.length > 0) {
-          if (orgTimestampUtils.compare(now, foo[0].scheduled) < 0) {
+          if (
+            orgTimestampUtils.compare(now, foo[0].scheduled) < 0 ||
+            orgTimestampUtils.compare(now, foo[0].deadline < 0)
+          ) {
             foobar.unshift(nowStr);
           } else if (orgTimestampUtils.compare(now, foo[foo.length - 1]) > 0) {
             foobar.push(nowStr);
           } else {
-            const fooFore = filterRange(foo, a, now).map(bar);
-            const fooAft = filterRange(foo, now, b).map(bar);
+            const fooFore = filterRange(foo, a, now).reduce(bar, []);
+            const fooAft = filterRange(foo, now, b).reduce(bar, []);
             foobar = fooFore.concat([nowStr], fooAft);
           }
         } else {
@@ -357,7 +378,9 @@ const mapStateToProps = (state, ownProps) => {
 
   candidates = filterRange(nodes, yesterday, dayAfterTomorrow);
   candidates.sort((a, b) => {
-    return orgTimestampUtils.compare(a.scheduled, b.scheduled);
+    const timeA = !a.scheduled ? a.deadline : a.scheduled;
+    const timeB = !b.scheduled ? b.deadline : b.scheduled;
+    return orgTimestampUtils.compare(timeA, timeB);
   });
 
   const yesStr = '-----++----YESTERDAY----------';
