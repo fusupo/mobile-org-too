@@ -29,6 +29,10 @@ const styles = StyleSheet.create({
 });
 
 export class OrgBuffer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { isCollapsed: true };
+  }
   render() {
     const { bufferID, tree } = this.props;
     return (
@@ -37,7 +41,7 @@ export class OrgBuffer extends React.Component {
           <TouchableHighlight
             style={{ flex: 4 }}
             onPress={() => {
-              console.log('foo');
+              this.setState({ isCollapsed: !this.state.isCollapsed });
             }}>
             <Text style={[{ backgroundColor: '#000', color: '#fff' }]}>
               {bufferID}
@@ -46,7 +50,6 @@ export class OrgBuffer extends React.Component {
           {!this.props.isLocked &&
             <Button
               onPress={() => {
-                console.log('foo');
                 this.props.onAddOne(bufferID);
               }}
               title="Add Child"
@@ -54,11 +57,13 @@ export class OrgBuffer extends React.Component {
               accessibilityLabel="add child node"
             />}
         </View>
-        <OrgList
-          data={tree.children}
-          bufferID={bufferID}
-          isLocked={this.props.isLocked}
-        />
+        {this.state.isCollapsed
+          ? null
+          : <OrgList
+              data={tree.children}
+              bufferID={bufferID}
+              isLocked={this.props.isLocked}
+            />}
       </View>
     );
   }
