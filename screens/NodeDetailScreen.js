@@ -38,18 +38,7 @@ import SplitPane from '../components/SplitPane';
 const OrgTreeUtil = require('org-parse').OrgTree;
 const OrgTimestampUtil = require('org-parse').OrgTimestamp;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  border: {
-    borderWidth: 1,
-    borderStyle: 'solid',
-    marginLeft: 10,
-    marginRight: 10,
-    marginTop: 5
-  }
-});
+import appStyles from '../styles';
 
 class NodeDetailScreen extends React.Component {
   constructor(props) {
@@ -81,7 +70,11 @@ class NodeDetailScreen extends React.Component {
       let list = null;
       if (children.length > 0) {
         list = (
-          <ScrollView style={{ flex: 1, margin: 10, marginBottom: 40 }}>
+          <ScrollView
+            style={[
+              appStyles.container,
+              { flex: 1, margin: 10, marginBottom: 40 }
+            ]}>
             <OrgList
               data={children}
               bufferID={bufferID}
@@ -92,26 +85,30 @@ class NodeDetailScreen extends React.Component {
       }
 
       return (
-        <View style={styles.container}>
+        <View style={appStyles.container}>
           <SplitPane
             viewA={
-              <ScrollView style={styles.container}>
+              <ScrollView style={appStyles.container}>
                 <View
-                  style={[styles.container, styles.border, { marginTop: 20 }]}>
+                  style={[
+                    appStyles.container,
+                    appStyles.border,
+                    { marginTop: 20 }
+                  ]}>
                   <OrgHeadlineEditable
                     bufferID={bufferID}
                     nodeID={nodeID}
                     autoFocus={isNew}
                   />
                 </View>
-                <View style={[styles.container, styles.border]}>
+                <View style={[appStyles.container, appStyles.border]}>
                   <OrgScheduling
                     bufferID={bufferID}
                     nodeID={nodeID}
                     isCollapsed={true}
                   />
                 </View>
-                <View style={[styles.container, styles.border]}>
+                <View style={[appStyles.container, appStyles.border]}>
                   <OrgDrawer
                     drawer={node.propDrawer}
                     isCollapsed={true}
@@ -120,7 +117,7 @@ class NodeDetailScreen extends React.Component {
                     onRemoveProp={onRemoveProp(bufferID, nodeID)}
                   />
                 </View>
-                <View style={[styles.container, styles.border]}>
+                <View style={[appStyles.container, appStyles.border]}>
                   <OrgLogbook
                     log={node.logbook}
                     isCollapsed={true}
@@ -129,7 +126,7 @@ class NodeDetailScreen extends React.Component {
                     onRemoveLogNote={onRemoveLogNote(bufferID, nodeID)}
                   />
                 </View>
-                <View style={[styles.container, styles.border]}>
+                <View style={[appStyles.container, appStyles.border]}>
                   <OrgBody
                     onUpdateNodeBody={onUpdateNodeBody(bufferID, nodeID)}
                     bodyText={node.body}

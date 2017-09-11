@@ -10,23 +10,22 @@ import { connect } from 'react-redux';
 
 import OrgList from '../components/OrgList';
 
-const styles = StyleSheet.create({
-  txt: {
-    textAlign: 'left',
-    fontSize: 14
-  },
-  border: {
-    borderTopWidth: 1,
-    borderStyle: 'solid',
-    paddingLeft: 5
-  },
-  padded: {
-    paddingLeft: 5
-  },
-  orgTree: {
-    flex: 1
-  }
-});
+import appStyles from '../styles';
+
+// const styles = StyleSheet.create({
+//   txt: {
+//     textAlign: 'left',
+//     fontSize: 14
+//   },
+//   border: {
+//     borderTopWidth: 1,
+//     borderStyle: 'solid',
+//     paddingLeft: 5
+//   },
+//   padded: {
+//     paddingLeft: 5
+//   }
+// });
 
 export class OrgBuffer extends React.Component {
   constructor(props) {
@@ -43,7 +42,11 @@ export class OrgBuffer extends React.Component {
             onPress={() => {
               this.setState({ isCollapsed: !this.state.isCollapsed });
             }}>
-            <Text style={[{ backgroundColor: '#000', color: '#fff' }]}>
+            <Text
+              style={[
+                appStyles.baseText,
+                { backgroundColor: '#000', color: '#fff' }
+              ]}>
               {bufferID}
             </Text>
           </TouchableHighlight>

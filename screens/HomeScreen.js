@@ -22,6 +22,8 @@ import OrgBuffer from '../components/OrgBuffer';
 import OrgHeadlineToo from '../components/OrgHeadlineToo';
 import DropboxDataSource from '../utilities/DropboxDataSource';
 
+import appStyles from '../styles';
+
 class HomeScreen extends React.Component {
   state = {
     buffersLoaded: false,
@@ -160,17 +162,24 @@ class HomeScreen extends React.Component {
       }
 
       return (
-        <View style={{ flex: 1 }}>
+        <View style={appStyles.container}>
           <View style={{ flexDirection: 'column' }}>
             <View style={{ flexDirection: 'row', padding: 10 }}>
-              <FontAwesome style={{ flex: 1 }} name={'search'} size={25} />
+              <FontAwesome
+                style={appStyles.container}
+                name={'search'}
+                size={25}
+              />
               <TextInput
-                style={{
-                  flex: 10,
-                  borderColor: '#000',
-                  borderWidth: 1,
-                  borderRadius: 5
-                }}
+                style={[
+                  appStyles.baseText,
+                  {
+                    flex: 10,
+                    borderColor: '#000',
+                    borderWidth: 1,
+                    borderRadius: 2
+                  }
+                ]}
                 value={this.state.searchStr}
                 onChangeText={searchStr => this.setState({ searchStr })}
               />
@@ -180,7 +189,11 @@ class HomeScreen extends React.Component {
                 flexDirection: 'row',
                 padding: 10
               }}>
-              <FontAwesome style={{ flex: 1 }} name={'filter'} size={25} />
+              <FontAwesome
+                style={appStyles.container}
+                name={'filter'}
+                size={25}
+              />
               <View
                 style={{
                   flexDirection: 'row',
@@ -199,7 +212,7 @@ class HomeScreen extends React.Component {
                     const keywordFilterIdx = parseInt(idx);
                     this.setState({ keywordFilterIdx });
                   }}>
-                  <Text>
+                  <Text style={appStyles.baseText}>
                     {this.state.keywords[this.state.keywordFilterIdx]}
                   </Text>
                 </ModalDropdown>
@@ -228,12 +241,12 @@ class HomeScreen extends React.Component {
                     onSelect={idx => {
                       this.toggleTagFilter(allTags[idx]);
                     }}>
-                    <Text>
+                    <Text style={appStyles.baseText}>
                       {'tags'}
                     </Text>
                   </ModalDropdown>
                   <TouchableHighlight
-                    style={{ flex: 1 }}
+                    style={appStyles.container}
                     onPress={() => {
                       if (this.state.tagFilterType === 'AND') {
                         this.setState({ tagFilterType: 'OR' });
@@ -241,7 +254,9 @@ class HomeScreen extends React.Component {
                         this.setState({ tagFilterType: 'AND' });
                       }
                     }}>
-                    <Text>{this.state.tagFilterType}</Text>
+                    <Text style={appStyles.baseText}>
+                      {this.state.tagFilterType}
+                    </Text>
                   </TouchableHighlight>
                   <View
                     style={{
@@ -262,7 +277,7 @@ class HomeScreen extends React.Component {
                         onPress={() => {
                           this.toggleTagFilter(t);
                         }}>
-                        <Text>{t}</Text>
+                        <Text style={appStyles.baseText}>{t}</Text>
                       </TouchableHighlight>
                     ))}
                   </View>

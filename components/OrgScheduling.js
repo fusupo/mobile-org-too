@@ -15,6 +15,8 @@ const OrgTimestampUtil = require('org-parse').OrgTimestamp;
 
 const timestampTypes = ['OPENED', 'SCHEDULED', 'DEADLINE', 'CLOSED'];
 
+import appStyles from '../styles';
+
 class OrgScheduling extends Component {
   constructor(props) {
     super(props);
@@ -64,7 +66,7 @@ class OrgScheduling extends Component {
       ));
 
       return (
-        <View style={{ flex: 1 }}>
+        <View style={appStyles.container}>
           <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
             <View
               className="OrgScheduling"

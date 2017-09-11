@@ -7,19 +7,7 @@ import OrgTags from './OrgTagsEditable';
 
 import { updateNodeHeadlineContent } from '../actions';
 
-const styles = StyleSheet.create({
-  txt: {
-    textAlign: 'left',
-    fontSize: 14
-  },
-  border: {
-    borderTopWidth: 1,
-    borderStyle: 'solid'
-  },
-  padded: {
-    paddingLeft: 5
-  }
-});
+import appStyles from '../styles';
 
 class OrgHeadlineEditable extends Component {
   constructor(props) {
@@ -41,14 +29,17 @@ class OrgHeadlineEditable extends Component {
     };
 
     return (
-      <View style={{ flex: 1, flexDirection: 'row' }}>
+      <View style={[appStyles.container, { flexDirection: 'row' }]}>
         <OrgTodoKeywordEditable
           keyword={node.headline.todoKeyword}
           nodeID={node.id}
           bufferID={bufferID}
         />
         <TextInput
-          style={{ flex: 4, height: 40, borderColor: 'gray', borderWidth: 1 }}
+          style={[
+            appStyles.baseText,
+            { flex: 4, height: 40, borderColor: 'gray', borderWidth: 1 }
+          ]}
           value={content}
           autoFocus={autoFocus}
           clearTextOnFocus={autoFocus && firstEdit}

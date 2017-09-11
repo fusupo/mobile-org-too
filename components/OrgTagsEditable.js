@@ -12,6 +12,9 @@ import {
 import R from 'ramda';
 
 import { toggleNodeTag } from '../actions';
+
+import appStyles from '../styles';
+
 class OrgTagsEditable extends Component {
   constructor(props) {
     super(props);
@@ -35,13 +38,15 @@ class OrgTagsEditable extends Component {
     const tagItems = tags.length > 0
       ? tags.map((tag, idx) => {
           return (
-            <View key={idx} style={{ flex: 1 }}>
+            <View key={idx} style={appStyles.container}>
               <Text
-                style={{
-                  fontFamily: 'space-mono',
-                  backgroundColor: '#cccccc',
-                  fontSize: 10
-                }}>
+                style={[
+                  appStyles.baseText,
+                  {
+                    backgroundColor: '#cccccc',
+                    fontSize: 10
+                  }
+                ]}>
                 {tag}
               </Text>
             </View>
@@ -50,11 +55,11 @@ class OrgTagsEditable extends Component {
       : null;
 
     const tagList = tagItems
-      ? <View style={{ flex: 1 }}>{tagItems}</View>
+      ? <View style={appStyles.container}>{tagItems}</View>
       : null;
 
     return (
-      <View style={{ flex: 1 }}>
+      <View style={appStyles.container}>
         <Modal
           animationType={'fade'}
           transparent={false}
@@ -62,7 +67,11 @@ class OrgTagsEditable extends Component {
           onRequestClose={() => {
             alert('Modal has been closed.');
           }}>
-          <View style={{ flex: 1, marginTop: 22, flexDirection: 'column' }}>
+          <View
+            style={[
+              appStyles.container,
+              { marginTop: 22, flexDirection: 'column' }
+            ]}>
             <View style={{ flex: 4, backgroundColor: '#ddd' }}>
               {tags.map((tag, idx) => (
                 <TouchableHighlight
@@ -72,12 +81,14 @@ class OrgTagsEditable extends Component {
                   }}>
                   <View style={{ flex: 0 }}>
                     <Text
-                      style={{
-                        fontFamily: 'space-mono',
-                        backgroundColor: '#cccccc',
-                        fontSize: 10,
-                        padding: 10
-                      }}>
+                      style={[
+                        appStyles.baseText,
+                        {
+                          backgroundColor: '#cccccc',
+                          fontSize: 10,
+                          padding: 10
+                        }
+                      ]}>
                       {tag}
                     </Text>
                   </View>
@@ -88,12 +99,13 @@ class OrgTagsEditable extends Component {
               {this.state.freeformVisible
                 ? <View>
                     <TextInput
+                      style={appStyles.baseText}
                       value={this.state.freeformText}
                       onChangeText={freeformText =>
                         this.setState({ freeformText })}
                     />
                     <View style={{ flexDirection: 'row' }}>
-                      <View style={{ flex: 1 }}>
+                      <View style={appStyles.container}>
                         <Button
                           title={'CANCEL'}
                           onPress={() => {
@@ -104,7 +116,7 @@ class OrgTagsEditable extends Component {
                           }}
                         />
                       </View>
-                      <View style={{ flex: 1 }}>
+                      <View style={appStyles.container}>
                         <Button
                           title={'OK'}
                           onPress={() => {
@@ -123,18 +135,19 @@ class OrgTagsEditable extends Component {
                     </View>
                   </View>
                 : <TouchableHighlight
-                    style={{ flex: 1 }}
+                    style={appStyles.container}
                     onPress={() => {
-                      // onToggleTag(bufferID, nodeID, tag);
                       this.setFreeformVisible(!this.state.freeformVisible);
                     }}>
                     <Text
-                      style={{
-                        fontFamily: 'space-mono',
-                        backgroundColor: '#cccccc',
-                        fontSize: 10,
-                        padding: 10
-                      }}>
+                      style={[
+                        appStyles.baseText,
+                        {
+                          backgroundColor: '#cccccc',
+                          fontSize: 10,
+                          padding: 10
+                        }
+                      ]}>
                       {'add new'}
                     </Text>
                   </TouchableHighlight>}
@@ -145,19 +158,21 @@ class OrgTagsEditable extends Component {
                       onToggleTag(bufferID, nodeID, tag);
                     }}>
                     <Text
-                      style={{
-                        fontFamily: 'space-mono',
-                        backgroundColor: '#cccccc',
-                        fontSize: 10,
-                        padding: 10
-                      }}>
+                      style={[
+                        appStyles.baseText,
+                        {
+                          backgroundColor: '#cccccc',
+                          fontSize: 10,
+                          padding: 10
+                        }
+                      ]}>
                       {tag}
                     </Text>
                   </TouchableHighlight>
                 </View>
               ))}
             </ScrollView>
-            <View style={{ flex: 1 }}>
+            <View style={appStyles.container}>
               <Button
                 title={'DONE'}
                 onPress={() => {
@@ -171,12 +186,8 @@ class OrgTagsEditable extends Component {
           onPress={() => {
             this.setModalVisible(!this.state.modalVisible);
           }}
-          style={{
-            // borderColor: '#000',
-            // borderWidth: 0.5,
-            flex: 1
-          }}>
-          <View style={{ flex: 1, flexDirection: 'column' }}>
+          style={appStyles.container}>
+          <View style={[appStyles.container, { flexDirection: 'column' }]}>
             {tagList}
           </View>
         </TouchableHighlight>

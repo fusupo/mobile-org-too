@@ -1,12 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {
-  Keyboard,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View
-} from 'react-native';
+import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import Swipeout from 'react-native-swipeout';
 
@@ -23,12 +17,7 @@ const OrgHeadlineUtil = require('org-parse').OrgHeadline;
 
 import OrgTags from './OrgTagsEditable';
 
-const styles = StyleSheet.create({
-  orgNodeWrapper: {
-    flexDirection: 'row',
-    paddingBottom: 10
-  }
-});
+import appStyles from '../styles';
 
 class OrgHeadline extends Component {
   constructor(props) {
@@ -52,11 +41,14 @@ class OrgHeadline extends Component {
       return (
         <View style={{ flex: 1, flexDirection: 'row' }}>
           <Text
-            style={{
-              backgroundColor: keyword
-                ? OrgHeadlineUtil.colorForKeyword(keyword)
-                : '#fff'
-            }}>
+            style={[
+              appStyles.baseText,
+              {
+                backgroundColor: keyword
+                  ? OrgHeadlineUtil.colorForKeyword(keyword)
+                  : '#fff'
+              }
+            ]}>
             {keyword ? keyword : 'none'}
           </Text>
           <TouchableHighlight
@@ -64,11 +56,13 @@ class OrgHeadline extends Component {
             onPress={() => {
               onNodeTitlePress(bufferID, nodeID);
             }}>
-            <Text style={{ color: '#000' }}>{node.headline.content}</Text>
+            <Text style={[appStyles.baseText, { fontSize: 12, color: '#000' }]}>
+              {node.headline.content}
+            </Text>
           </TouchableHighlight>
           {tags &&
             <View>
-              <Text>{tags.join(':')}</Text>
+              <Text style={[appStyles.baseText]}>{tags.join(':')}</Text>
             </View>}
         </View>
       );
@@ -103,7 +97,9 @@ class OrgHeadline extends Component {
               onPress={() => {
                 onNodeTitlePress(bufferID, nodeID);
               }}>
-              <Text style={{ color: '#000' }}>{node.headline.content}</Text>
+              <Text style={[appStyles.baseText, { color: '#000' }]}>
+                {node.headline.content}
+              </Text>
             </TouchableHighlight>
             <View style={{ flex: 1 }}>
               <OrgTags bufferID={bufferID} nodeID={node.id} />

@@ -15,6 +15,8 @@ import {
 
 const orgHeadlineUtil = require('org-parse').OrgHeadline;
 
+import appStyles from '../styles';
+
 class OrgTimestamp extends Component {
   constructor(props) {
     super(props);
@@ -36,10 +38,10 @@ class OrgTimestamp extends Component {
     const okCancel = (onCancelPress, onOkPress) => {
       return (
         <View style={{ flexDirection: 'row' }}>
-          <View style={{ flex: 1 }}>
+          <View style={appStyles.container}>
             <Button title={'Cancel'} onPress={onCancelPress} />
           </View>
-          <View style={{ flex: 1 }}>
+          <View style={appStyles.container}>
             <Button title={'OK'} onPress={onOkPress} />
           </View>
         </View>
@@ -48,7 +50,7 @@ class OrgTimestamp extends Component {
 
     const repUnitsPicker = selectedVal => (
       <Picker
-        style={{ flex: 1, height: 150 }}
+        style={[appStyles.container, { height: 150 }]}
         selectedValue={this.state[selectedVal]}
         onValueChange={(itemValue, itemIndex) => {
           const obj = {};
@@ -133,7 +135,7 @@ class OrgTimestamp extends Component {
           )}
           <View style={{ flexDirection: 'row' }}>
             <Picker
-              style={{ flex: 1 }}
+              style={appStyles.container}
               selectedValue={this.state.repInt}
               onValueChange={(itemValue, itemIndex) =>
                 this.setState({ repInt: itemValue })}>
@@ -213,7 +215,7 @@ class OrgTimestamp extends Component {
               mode="datetime"
             />
             <Picker
-              style={{ flex: 1 }}
+              style={appStyles.container}
               selectedValue={this.state.repInt}
               onValueChange={(itemValue, itemIndex) =>
                 this.setState({ repInt: itemValue })}>
@@ -255,11 +257,7 @@ class OrgTimestamp extends Component {
           ]}>
           <View style={{ flexDirection: 'row', marginLeft: 5 }}>
             <View style={{ flex: 4 }}>
-              <Text
-                style={{
-                  fontFamily: 'space-mono',
-                  fontSize: 12
-                }}>
+              <Text style={appStyles.baseText}>
                 {labelStr}
               </Text>
             </View>
@@ -268,22 +266,14 @@ class OrgTimestamp extends Component {
                 this.setState({ showDatePicker: !this.state.showDatePicker });
               }}
               style={{ flex: 12, flexDirection: 'row' }}>
-              <View style={{ flex: 1, flexDirection: 'row' }}>
+              <View style={[appStyles.container, { flexDirection: 'row' }]}>
                 <View style={{ flex: 2 }}>
-                  <Text
-                    style={{
-                      fontFamily: 'space-mono',
-                      fontSize: 12
-                    }}>
+                  <Text style={appStyles.baseText}>
                     {timestampStr}
                   </Text>
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={{
-                      fontFamily: 'space-mono',
-                      fontSize: 12
-                    }}>
+                <View style={appStyles.container}>
+                  <Text style={appStyles.baseText}>
                     {repIntStr}
                   </Text>
                 </View>

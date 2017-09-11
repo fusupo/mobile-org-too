@@ -10,22 +10,17 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import appStyles from '../styles';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1
-  },
-  border: {
-    borderWidth: 1,
-    borderStyle: 'solid',
-    margin: 10
   },
   textInput: {
     height: 70
   },
   text: {
-    margin: 10,
-    fontFamily: 'space-mono',
-    fontSize: 12
+    margin: 10
   }
 });
 
@@ -49,7 +44,7 @@ class OrgBody extends Component {
     const showEditor = isEditing
       ? <View>
           <View style={{ flexDirection: 'row' }}>
-            <View style={{ flex: 1 }}>
+            <View style={appStyles.container}>
               <Button
                 onPress={() => {
                   this.setState({ isEditing: false });
@@ -59,7 +54,7 @@ class OrgBody extends Component {
                 color="#aa3333"
               />
             </View>
-            <View style={{ flex: 1 }}>
+            <View style={appStyles.container}>
               <Button
                 onPress={() => {
                   onUpdateNodeBody(text);
@@ -71,24 +66,10 @@ class OrgBody extends Component {
               />
             </View>
           </View>
-          <ScrollView
-            style={[
-              styles.container
-              // , styles.border
-            ]}
-            horizontal={true}>
-            <View
-              style={[
-                styles.container
-                // , styles.border
-              ]}>
+          <ScrollView style={[appStyles.container]} horizontal={true}>
+            <View style={[appStyles.container]}>
               <TextInput
-                style={[
-                  styles.text,
-                  //                styles.textInput,
-                  // styles.border,
-                  { width: '100%' }
-                ]}
+                style={[appStyles.baseText, styles.text, { width: '100%' }]}
                 value={text === undefined ? bodyText : text}
                 multiline={true}
                 autoFocus={true}
@@ -99,7 +80,7 @@ class OrgBody extends Component {
             </View>
           </ScrollView>
         </View>
-      : <View style={[styles.border]}>
+      : <View style={[appStyles.border]}>
           <View
             className="OrgBody"
             style={{
@@ -115,21 +96,12 @@ class OrgBody extends Component {
             </TouchableHighlight>
           </View>
           {this.state.isCollapsed
-            ? <ScrollView
-                style={[
-                  styles.container
-                  // , styles.border
-                ]}
-                horizontal={true}>
-                <View
-                  style={[
-                    styles.container
-                    // , styles.border
-                  ]}>
+            ? <ScrollView style={[appStyles.container]} horizontal={true}>
+                <View style={[appStyles.container]}>
                   <Text
                     style={[
+                      appStyles.baseText,
                       styles.text,
-                      // , styles.border
                       { width: '100%' }
                     ]}>
                     {bodyText}
@@ -142,17 +114,8 @@ class OrgBody extends Component {
                     ? null
                     : () => this.setState({ isEditing: true })
                 }>
-                <ScrollView
-                  style={[
-                    styles.container
-                    // , styles.border
-                  ]}
-                  horizontal={true}>
-                  <View
-                    style={[
-                      styles.container
-                      // , styles.border
-                    ]}>
+                <ScrollView style={[appStyles.container]} horizontal={true}>
+                  <View style={[appStyles.container]}>
                     <Text style={[styles.container, styles.text]}>
                       {bodyText}
                     </Text>

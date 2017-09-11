@@ -13,6 +13,8 @@ import {
 const OrgHeadlineUtil = require('org-parse').OrgHeadline;
 const OrgTimestampUtil = require('org-parse').OrgTimestamp;
 
+import appStyles from '../styles';
+
 class OrgTodoKeywordEditable extends Component {
   constructor(props) {
     super(props);
@@ -43,11 +45,14 @@ class OrgTodoKeywordEditable extends Component {
           onNodeTodoKeywordUpdate(bufferID, nodeID, targKeyword);
         }}>
         <Text
-          style={{
-            backgroundColor: keyword
-              ? OrgHeadlineUtil.colorForKeyword(keyword)
-              : '#fff'
-          }}>
+          style={[
+            appStyles.baseText,
+            {
+              backgroundColor: keyword
+                ? OrgHeadlineUtil.colorForKeyword(keyword)
+                : '#fff'
+            }
+          ]}>
           {keyword ? keyword : 'none'}
         </Text>
       </ModalDropdown>
