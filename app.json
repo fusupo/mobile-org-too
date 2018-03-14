@@ -1,11 +1,10 @@
 {
-  "expo":
-  {
+  "expo": {
     "name": "mobile-org-too",
     "description": "No description",
     "slug": "mobile-org-too",
     "privacy": "public",
-    "sdkVersion": "19.0.0",
+    "sdkVersion": "21.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
     "primaryColor": "#cccccc",
