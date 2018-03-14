@@ -1,7 +1,7 @@
 {
   "name": "mobile-org-too",
   "version": "0.0.0",
-  "description": "Hello Expo!",
+  "description": "ios orgmode client",
   "author": null,
   "main": "main.js",
   "scripts": {
@@ -13,22 +13,25 @@
   "dependencies": {
     "@expo/ex-navigation": "~2.10.0",
     "@expo/samples": "~1.0.3",
+    "babel-preset-expo": "^4.0.0",
     "dropbox": "^2.5.3",
-    "expo": "^19.0.0",
-    "org-parse": "file:///home/marc/Documents/org-parse",
+    "expo": "^21.0.0",
+    "org-parse": "1.0.2",
     "ramda": "^0.24.1",
     "react": "16.0.0-alpha.12",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-19.0.0.tar.gz",
+    "react-native":
+      "https://github.com/expo/react-native/archive/sdk-21.0.2.tar.gz",
     "react-native-check-box": "^2.0.0",
     "react-native-modal-dropdown": "^0.4.4",
     "react-native-swipeout": "^2.2.2",
     "react-navigation": "^1.0.0-beta.11",
     "react-redux": "^5.0.5",
+    "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
     "reselect": "^3.0.1",
     "shortid": "^2.2.8"
   },
   "devDependencies": {
-    "jest-expo": "~19.0.0"
+    "jest-expo": "^21.0.0"
   }
 }
