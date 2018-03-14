@@ -92,9 +92,14 @@ class FileNameInputList extends React.Component {
           path={''}
           type={'branch'}
           getHasKids={(path, cbk) => {
-            dbxds.filesListFolderAsync(path).then(res => {
-              cbk(res.entries.length > 0);
-            });
+            dbxds
+              .filesListFolderAsync(path)
+              .then(res => {
+                cbk(res.entries.length > 0);
+              })
+              .catch(err => {
+                console.log(err);
+              });
           }}
           getItems={(path, cbk) => {
             dbxds.filesListFolderAsync(path).then(res => {
@@ -124,7 +129,8 @@ class FileNameInputList extends React.Component {
                   onClick={() => {
                     if (selectable) onNodeCheckPress(path, orgFiles, dbxds);
                   }}
-                /><Text style={{ flex: 1 }}>{title}</Text>
+                />
+                <Text style={{ flex: 1 }}>{title}</Text>
               </View>
             );
           }}
@@ -255,11 +261,15 @@ class SettingsScreen extends React.Component {
                 );
               }}
             />
-            {this.state.showSpinner ? <View><ActivityIndicator /></View> : null}
+            {this.state.showSpinner ? (
+              <View>
+                <ActivityIndicator />
+              </View>
+            ) : null}
           </View>
-          {this.state.showError
-            ? <Text style={{ color: '#f00' }}>{this.state.error}</Text>
-            : null}
+          {this.state.showError ? (
+            <Text style={{ color: '#f00' }}>{this.state.error}</Text>
+          ) : null}
         </View>
       </View>
     );

@@ -14,9 +14,13 @@ class Tree extends Component {
   }
 
   componentDidMount() {
-    this.props.getHasKids(this.props.path, hasKids =>
-      this.setState({ hasKids })
-    );
+    if (this.props.type === 'branch') {
+      this.props.getHasKids(this.props.path, hasKids =>
+        this.setState({ hasKids })
+      );
+    } else {
+      this.setState({ hasKids: false });
+    }
   }
 
   componentWillReceiveProps() {
@@ -99,9 +103,7 @@ class Tree extends Component {
 
     return (
       <View>
-        <View>
-          {touchableMaybe}
-        </View>
+        <View>{touchableMaybe}</View>
         {items}
       </View>
     );

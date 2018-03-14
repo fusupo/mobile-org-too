@@ -230,20 +230,20 @@ class HomeScreen extends React.Component {
                     animated={false}
                     options={allTags}
                     renderRow={(rowData, sectionID, rowID, highlightRow) => {
-                      const rowStyle = this.state.tagFilters.indexOf(rowData) >
-                        -1
-                        ? { backgroundColor: '#ccc' }
-                        : {};
+                      const rowStyle =
+                        this.state.tagFilters.indexOf(rowData) > -1
+                          ? { backgroundColor: '#ccc' }
+                          : {};
                       return (
-                        <View style={rowStyle}><Text>{rowData}</Text></View>
+                        <View style={rowStyle}>
+                          <Text>{rowData}</Text>
+                        </View>
                       );
                     }}
                     onSelect={idx => {
                       this.toggleTagFilter(allTags[idx]);
                     }}>
-                    <Text style={appStyles.baseText}>
-                      {'tags'}
-                    </Text>
+                    <Text style={appStyles.baseText}>{'tags'}</Text>
                   </ModalDropdown>
                   <TouchableHighlight
                     style={appStyles.container}
@@ -302,9 +302,7 @@ class HomeScreen extends React.Component {
               />
             </View>
           </TouchableHighlight>
-          <ScrollView style={{ flex: 1, margin: 10 }}>
-            {display}
-          </ScrollView>
+          <ScrollView style={{ flex: 1, margin: 10 }}>{display}</ScrollView>
         </View>
       );
     } else {
