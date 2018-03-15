@@ -103,7 +103,9 @@ class OrgAgenda extends React.Component {
           onPress={() => {
             this.props.onNodeTitleClick(d.bufferID, d.nodeID);
           }}>
-          <Text key={idx} style={styles.text}>{d.content}</Text>
+          <Text key={idx} style={styles.text}>
+            {d.content}
+          </Text>
         </TouchableHighlight>
       </View>
     );
@@ -111,31 +113,35 @@ class OrgAgenda extends React.Component {
       const foo = agendaKeys.map((k, kidx) => {
         const listData = data.schedule[k];
         const color = colors[kidx];
-        const list = listData.map((d, idx) => {
-          if (d.nodeID === 'NOW') {
-            return (
-              <View
-                {...this._panResponder.panHandlers}
-                key={idx}
-                style={{
-                  //   flex: 1
-                }}>
-                <Text
-                  style={[styles.text, { color: 'yellow' }]}
-                  key={
-                    idx
-                  }>{`${d.time}...... now - - - - - - - - - - - - - - - - - -`}</Text>
-              </View>
-            );
-          } else {
-            return entry(d, idx);
-          }
-        });
-        const header = k !== agendaKeys[0]
-          ? <View {...this._panResponder.panHandlers}>
+        const list = !listData
+          ? []
+          : listData.map((d, idx) => {
+              if (d.nodeID === 'NOW') {
+                return (
+                  <View
+                    {...this._panResponder.panHandlers}
+                    key={idx}
+                    style={{
+                      //   flex: 1
+                    }}>
+                    <Text
+                      style={[styles.text, { color: 'yellow' }]}
+                      key={
+                        idx
+                      }>{`${d.time}...... now - - - - - - - - - - - - - - - - - -`}</Text>
+                  </View>
+                );
+              } else {
+                return entry(d, idx);
+              }
+            });
+        const header =
+          k !== agendaKeys[0] ? (
+            <View {...this._panResponder.panHandlers}>
               <Text style={styles.text}>{k}</Text>
             </View>
-          : <View {...this._panResponder.panHandlers}>
+          ) : (
+            <View {...this._panResponder.panHandlers}>
               <Text
                 style={[
                   styles.text,
@@ -143,7 +149,8 @@ class OrgAgenda extends React.Component {
                 ]}>
                 {data.headerStr}
               </Text>
-            </View>;
+            </View>
+          );
         return (
           <View
             key={k}
@@ -178,7 +185,7 @@ class OrgAgenda extends React.Component {
       const foo = agendaKeys.map((k, kidx) => {
         const listData = data.schedule[k];
         const color = colors[kidx];
-        const list = listData.map((d, idx) => entry(d, idx));
+        const list = !listData ? [] : listData.map((d, idx) => entry(d, idx));
         return (
           <View
             key={k}
@@ -322,7 +329,9 @@ const mapStateToProps = (state, ownProps) => {
     const nowStr = {
       bufferID: 'NOW',
       nodeID: 'NOW',
-      time: `${padMaybe(now.hour)}:${padMaybe(now.minute)}:${padMaybe(new Date().getSeconds())}`,
+      time: `${padMaybe(now.hour)}:${padMaybe(now.minute)}:${padMaybe(
+        new Date().getSeconds()
+      )}`,
       content: 'NOW'
     };
     const cand = filterRange(candidates, start, end);
@@ -387,7 +396,9 @@ const mapStateToProps = (state, ownProps) => {
   const todStr = '-----++----TODAY--------------';
   const tomStr = '-----++----TOMORROW-----------';
   const dateStr = d =>
-    `-----++----[${d.year}-${padMaybe(d.month)}-${padMaybe(d.date)} ${d.day}]---`;
+    `-----++----[${d.year}-${padMaybe(d.month)}-${padMaybe(
+      d.date
+    )} ${d.day}]---`;
   let targYesStr, targTodStr, targTomStr;
 
   switch (diff) {
