@@ -12,7 +12,18 @@ import {
   View
 } from 'react-native';
 
-const orgTimestampUtils = require('org-parse').OrgTimestamp;
+import {
+  timestampNow,
+  timestampStringNow,
+  momentFromTS,
+  momentToTS,
+  cloneTS,
+  addTS,
+  subTS,
+  diffTS,
+  compareTS
+} from '../utilities/utils';
+/* const orgTimestampUtils = require('org-parse').OrgTimestamp;*/
 
 const styles = StyleSheet.create({
   text: {
@@ -274,7 +285,7 @@ const mapStateToProps = (state, ownProps) => {
 
   let date = ownProps.date;
   let prevDate = ownProps.prevDate;
-  const dx = orgTimestampUtils.diff(date, prevDate, 'days');
+  const dx = diffTS(date, prevDate, 'days');
 
   const nodes = Object.entries(state.orgBuffers).reduce((m, v) => {
     const bufferID = v[0];
@@ -294,11 +305,11 @@ const mapStateToProps = (state, ownProps) => {
     return ns.filter(
       n =>
         (n.scheduled &&
-          orgTimestampUtils.compare(n.scheduled, start) >= 0 &&
-          orgTimestampUtils.compare(n.scheduled, end) < 0) ||
+          compareTS(n.scheduled, start) >= 0 &&
+          compareTS(n.scheduled, end) < 0) ||
         (n.deadline &&
-          orgTimestampUtils.compare(n.deadline, start) >= 0 &&
-          orgTimestampUtils.compare(n.deadline, end) < 0)
+          compareTS(n.deadline, start) >= 0 &&
+          compareTS(n.deadline, end) < 0)
     );
   };
 
@@ -337,22 +348,19 @@ const mapStateToProps = (state, ownProps) => {
     const cand = filterRange(candidates, start, end);
     let agenda = { headerStr, schedule: {} };
     for (let i = 0; i < hours.length - 1; i++) {
-      const a = orgTimestampUtils.add(start, { hours: hours[i] });
-      const b = orgTimestampUtils.add(start, { hours: hours[i + 1] });
+      const a = addTS(start, { hours: hours[i] });
+      const b = addTS(start, { hours: hours[i + 1] });
       let foo = filterRange(cand, a, b);
       let foobar = filterRange(cand, a, b).reduce(bar, []);
 
-      if (
-        orgTimestampUtils.compare(now, a) > 0 &&
-        orgTimestampUtils.compare(now, b) < 0
-      ) {
+      if (compareTS(now, a) > 0 && compareTS(now, b) < 0) {
         if (foo.length > 0) {
           if (
-            orgTimestampUtils.compare(now, foo[0].scheduled) < 0 ||
-            orgTimestampUtils.compare(now, foo[0].deadline < 0)
+            compareTS(now, foo[0].scheduled) < 0 ||
+            compareTS(now, foo[0].deadline < 0)
           ) {
             foobar.unshift(nowStr);
-          } else if (orgTimestampUtils.compare(now, foo[foo.length - 1]) > 0) {
+          } else if (compareTS(now, foo[foo.length - 1]) > 0) {
             foobar.push(nowStr);
           } else {
             const fooFore = filterRange(foo, a, now).reduce(bar, []);
@@ -369,27 +377,25 @@ const mapStateToProps = (state, ownProps) => {
     return agenda;
   };
 
-  let today = orgTimestampUtils.momentToObj(
-    orgTimestampUtils.momentFromObj(date)
-  );
+  let today = momentToTS(momentFromTS(date));
   today.hour -= today.hour;
   today.minute -= today.minute;
 
-  let realToday = orgTimestampUtils.now();
+  let realToday = timestampNow();
   realToday.hour -= realToday.hour;
   realToday.minute -= realToday.minute;
 
-  let diff = orgTimestampUtils.diff(today, realToday, 'days');
+  let diff = diffTS(today, realToday, 'days');
 
-  const yesterday = orgTimestampUtils.sub(today, { days: 1 });
-  const tomorrow = orgTimestampUtils.add(today, { days: 1 });
-  const dayAfterTomorrow = orgTimestampUtils.add(today, { days: 2 });
+  const yesterday = subTS(today, { days: 1 });
+  const tomorrow = addTS(today, { days: 1 });
+  const dayAfterTomorrow = addTS(today, { days: 2 });
 
   candidates = filterRange(nodes, yesterday, dayAfterTomorrow);
   candidates.sort((a, b) => {
     const timeA = !a.scheduled ? a.deadline : a.scheduled;
     const timeB = !b.scheduled ? b.deadline : b.scheduled;
-    return orgTimestampUtils.compare(timeA, timeB);
+    return compareTS(timeA, timeB);
   });
 
   const yesStr = '-----++----YESTERDAY----------';

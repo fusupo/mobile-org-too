@@ -95,8 +95,7 @@ class HomeScreen extends React.Component {
     };
 
     if (Object.entries(buffers).length > 0) {
-      const doKeywordFilter =
-        this.state.keywordFilterIdx !== this.state.keywords.length - 1;
+      const doKeywordFilter = this.state.keywordFilterIdx !== 0; //this.state.keywords.length - 1;
       const doTagFilter = this.state.tagFilters.length > 0;
       const doSearch = this.state.searchStr && this.state.searchStr !== '';
 
@@ -140,6 +139,7 @@ class HomeScreen extends React.Component {
           pool = filterKeywords(pool);
         }
 
+        console.log('WTF?? !!!!!');
         display = R.map(n => {
           return (
             <OrgHeadlineToo
@@ -151,6 +151,7 @@ class HomeScreen extends React.Component {
           );
         }, pool);
       } else {
+        console.log('WTF??');
         display = Object.entries(buffers).map(e => (
           <OrgBuffer
             key={e[0]}
@@ -314,15 +315,14 @@ class HomeScreen extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   if (ownProps.screenProps.currRoute !== 'MainTab') return {};
   const buffers = state.orgBuffers;
-  const allTags = [];
-  //   R.uniq(
-  //     Object.values(buffers).reduce((m, v) => {
-  //       let tags = Object.values(v.orgNodes).reduce((m2, v2) => {
-  //         return m2.concat(v2.headline.tags || []);
-  //       }, []);
-  //       return m.concat(tags);
-  //     }, [])
-  //   );
+  const allTags = R.uniq(
+    Object.values(buffers).reduce((m, v) => {
+      let tags = Object.values(v.orgNodes).reduce((m2, v2) => {
+        return m2.concat(v2.headline.tags || []);
+      }, []);
+      return m.concat(tags);
+    }, [])
+  );
   return {
     buffers,
     allTags,
