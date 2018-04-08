@@ -45,7 +45,7 @@ class OrgHeadline extends Component {
               appStyles.baseText,
               {
                 backgroundColor: keyword
-                  ? OrgHeadlineUtil.colorForKeyword(keyword)
+                  ? '#f00' //OrgHeadlineUtil.colorForKeyword(keyword)
                   : '#fff'
               }
             ]}>
@@ -60,10 +60,11 @@ class OrgHeadline extends Component {
               {node.headline.content}
             </Text>
           </TouchableHighlight>
-          {tags &&
+          {tags && (
             <View>
               <Text style={[appStyles.baseText]}>{tags.join(':')}</Text>
-            </View>}
+            </View>
+          )}
         </View>
       );
     } else {
@@ -114,6 +115,8 @@ class OrgHeadline extends Component {
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
   const node = state.orgBuffers[bufferID].orgNodes[nodeID];
+
+  console.log('ORGHEADLINETOO', bufferID, nodeID);
 
   return {
     node
