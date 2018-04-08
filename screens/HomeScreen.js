@@ -24,6 +24,8 @@ import DropboxDataSource from '../utilities/DropboxDataSource';
 
 import appStyles from '../styles';
 
+const keywords = require('../constants/TodoKeyword').default; // ?;
+
 class HomeScreen extends React.Component {
   state = {
     buffersLoaded: false,
@@ -35,11 +37,9 @@ class HomeScreen extends React.Component {
   };
 
   componentWillMount() {
-    let keywords = OrgHeadlineUtil.keywords().slice(0);
-    keywords.push('none');
     this.setState({
       keywords,
-      keywordFilterIdx: keywords.length - 1
+      keywordFilterIdx: 0
     });
 
     this.props.loadOrgFiles();
@@ -314,14 +314,15 @@ class HomeScreen extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   if (ownProps.screenProps.currRoute !== 'MainTab') return {};
   const buffers = state.orgBuffers;
-  const allTags = R.uniq(
-    Object.values(buffers).reduce((m, v) => {
-      let tags = Object.values(v.orgNodes).reduce((m2, v2) => {
-        return m2.concat(v2.headline.tags || []);
-      }, []);
-      return m.concat(tags);
-    }, [])
-  );
+  const allTags = [];
+  //   R.uniq(
+  //     Object.values(buffers).reduce((m, v) => {
+  //       let tags = Object.values(v.orgNodes).reduce((m2, v2) => {
+  //         return m2.concat(v2.headline.tags || []);
+  //       }, []);
+  //       return m.concat(tags);
+  //     }, [])
+  //   );
   return {
     buffers,
     allTags,
