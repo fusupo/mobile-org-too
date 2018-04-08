@@ -13,10 +13,10 @@ const newPropdrawer = properties => {
   };
 };
 
-const xtractPropdrawer = section => {
-  const propdrawerObj = findInSect(section, 'org.propDrawer');
-  if (propdrawerObj) {
-    const properties = Object.entries(propdrawerObj.props).map(([k, v]) => {
+const xtractPropDrawer = section => {
+  const propDrawerObj = findInSect(section, 'org.propDrawer');
+  if (propDrawerObj) {
+    const properties = Object.entries(propDrawerObj.props).map(([k, v]) => {
       if (isObject(v) && v.type && v.type.startsWith('org.timestamp')) {
         return [k, v.value];
       } else {
@@ -95,7 +95,7 @@ const xtractPlanning = section => {
 const parseHeadlines = (headlines, nodes) => {
   return headlines.map(h => {
     let id = uuid();
-    let propdrawer = null;
+    let propDrawer = null;
     let logbook = null;
     let planning = '??';
     let scheduled = null;
@@ -103,12 +103,12 @@ const parseHeadlines = (headlines, nodes) => {
     let closed = null;
 
     if (h.section) {
-      propdrawer = xtractPropdrawer(h.section);
+      propDrawer = xtractPropDrawer(h.section);
       logbook = xtractLogbook(h.section);
       planning = xtractPlanning(h.section);
 
-      if (propdrawer) {
-        propdrawer.properties.push(['MOTID', id]);
+      if (propDrawer) {
+        propDrawer.properties.push(['MOTID', id]);
       }
 
       if (planning) {
@@ -118,8 +118,8 @@ const parseHeadlines = (headlines, nodes) => {
       }
     }
 
-    if (!propdrawer) {
-      propdrawer = newPropdrawer([['MOTID', id]]);
+    if (!propDrawer) {
+      propDrawer = newPropdrawer([['MOTID', id]]);
     }
 
     const node = {
@@ -134,14 +134,14 @@ const parseHeadlines = (headlines, nodes) => {
       scheduled,
       deadline,
       closed,
-      propdrawer,
+      propDrawer,
       logbook,
       body: null
     };
     nodes[node.id] = node;
     return {
-      nodeId: node.id,
-      children: h.children ? parseHeadlines(h.children, nodes) : null
+      nodeID: node.id,
+      children: h.children ? parseHeadlines(h.children, nodes) : []
     };
   });
 };
