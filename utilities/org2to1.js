@@ -1,14 +1,29 @@
-import { uuid } from './utils';
+import { uuid, isObject } from './utils';
+
 const orgSection = require('org-parse').OrgSection;
 
 const findInSect = (section, targ) => {
   return section.children.find(sectChild => sectChild.type === targ);
 };
 
+const newPropdrawer = properties => {
+  return {
+    name: 'PROPERTIES',
+    properties
+  };
+};
+
 const xtractPropdrawer = section => {
   const propdrawerObj = findInSect(section, 'org.propDrawer');
   if (propdrawerObj) {
-    return { name: 'PROPERTIES' };
+    const properties = Object.entries(propdrawerObj.props).map(([k, v]) => {
+      if (isObject(v) && v.type && v.type.startsWith('org.timestamp')) {
+        return [k, v.value];
+      } else {
+        return [k, v];
+      }
+    });
+    return newPropdrawer(properties);
   } else {
     return null;
   }
@@ -17,14 +32,22 @@ const xtractPropdrawer = section => {
 const xtractLogbook = section => {
   const logbookObj = findInSect(section, 'org.logbook');
   if (logbookObj) {
-    return { entries: [] };
+    const entries = logbookObj.items.map(i => {
+      const o = Object.assign({}, i);
+      if (o.timestamp) o.timestamp = o.timestamp.value;
+      if (o.start) o.start = o.start.value;
+      if (o.end) o.end = o.end.value;
+      return o;
+    });
+    return {
+      entries
+    };
   } else {
     return null;
   }
 };
 
 const xtractTimestamp = ts => {
-  console.log(ts);
   const rep = ts.repeat;
   const repInt = rep ? rep.substr(0, rep.lastIndexOf('+') + 1) : null;
   let repMinMax = rep ? rep.substr(rep.lastIndexOf('+') + 1) : null;
@@ -38,7 +61,6 @@ const xtractTimestamp = ts => {
       ? repMinMax.substr(repMinMax.indexOf('/') + 1)
       : null
     : null;
-  console.log(rep, repInt, repMinMax, repMin, repMax);
   return {
     type: ts.type.substr(ts.type.lastIndexOf('.') + 1),
     date: ts.date.dd, //8,
@@ -70,8 +92,9 @@ const xtractPlanning = section => {
   }
 };
 
-const fuckingShit = (headlines, nodes) => {
+const parseHeadlines = (headlines, nodes) => {
   return headlines.map(h => {
+    let id = uuid();
     let propdrawer = null;
     let logbook = null;
     let planning = '??';
@@ -84,6 +107,10 @@ const fuckingShit = (headlines, nodes) => {
       logbook = xtractLogbook(h.section);
       planning = xtractPlanning(h.section);
 
+      if (propdrawer) {
+        propdrawer.properties.push(['MOTID', id]);
+      }
+
       if (planning) {
         scheduled = planning.scheduled;
         deadline = planning.deadline;
@@ -91,8 +118,12 @@ const fuckingShit = (headlines, nodes) => {
       }
     }
 
+    if (!propdrawer) {
+      propdrawer = newPropdrawer([['MOTID', id]]);
+    }
+
     const node = {
-      id: uuid(),
+      id,
       headline: {
         level: h.stars,
         todoKeyword: h.keyword,
@@ -110,7 +141,7 @@ const fuckingShit = (headlines, nodes) => {
     nodes[node.id] = node;
     return {
       nodeId: node.id,
-      children: h.children ? fuckingShit(h.children, nodes) : null
+      children: h.children ? parseHeadlines(h.children, nodes) : null
     };
   });
 };
@@ -120,7 +151,7 @@ const convert = docObj => {
   const nodes = {};
   const tree = {
     nodeID: 'root',
-    children: fuckingShit(docObj.headlines, nodes)
+    children: parseHeadlines(docObj.headlines, nodes)
   };
   return { settings, tree, nodes };
 };
