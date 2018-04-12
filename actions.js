@@ -1,4 +1,4 @@
-const OrgNodeUtil = require('org-parse').OrgNode;
+import { uuid } from './utilities/utils';
 
 /*
  * action types
@@ -103,7 +103,7 @@ export function addNewNode(bufferID, parentID = 'root', level = 1) {
     type: ADD_NEW_NODE,
     bufferID,
     parentID,
-    nodeID: OrgNodeUtil.newNodeID(),
+    nodeID: uuid(),
     level
   };
 }
