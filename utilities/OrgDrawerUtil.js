@@ -17,33 +17,33 @@ class OrgDrawerUtil {
   //   }
   // }
 
-  // static insert(drawer, keyval) {
-  //   let clone = drawer.properties.slice(0);
-  //   clone.push(keyval);
-  //   return Object.assign({}, drawer, { properties: clone });
-  // }
+  static insert(drawer, keyval) {
+    let clone = drawer.properties.slice(0);
+    clone.push(keyval);
+    return Object.assign({}, drawer, { properties: clone });
+  }
 
-  // static remove(drawer, keyval) {
-  //   const idx = OrgDrawer.indexOfKey(drawer, keyval[0]);
-  //   let clone = drawer.properties.slice(0);
-  //   clone.splice(idx, 1);
-  //   return Object.assign({}, drawer, { properties: clone });
-  // }
+  static remove(drawer, keyval) {
+    const idx = OrgDrawerUtil.indexOfKey(drawer, keyval[0]);
+    let clone = drawer.properties.slice(0);
+    clone.splice(idx, 1);
+    return Object.assign({}, drawer, { properties: clone });
+  }
 
-  // static update(drawer, keyval) {
-  //   const idx = OrgDrawer.indexOfKey(drawer, keyval[0]);
-  //   let clone = drawer.properties.slice(0);
-  //   clone[idx] = keyval;
-  //   return Object.assign({}, drawer, { properties: clone });
-  // }
+  static update(drawer, keyval) {
+    const idx = OrgDrawerUtil.indexOfKey(drawer, keyval[0]);
+    let clone = drawer.properties.slice(0);
+    clone[idx] = keyval;
+    return Object.assign({}, drawer, { properties: clone });
+  }
 
-  // static insertOrUpdate(drawer, keyval) {
-  //   if (OrgDrawer.indexOfKey(drawer, keyval[0]) === -1) {
-  //     return OrgDrawer.insert(drawer, keyval);
-  //   } else {
-  //     return OrgDrawer.update(drawer, keyval);
-  //   }
-  // }
+  static insertOrUpdate(drawer, keyval) {
+    if (OrgDrawerUtil.indexOfKey(drawer, keyval[0]) === -1) {
+      return OrgDrawerUtil.insert(drawer, keyval);
+    } else {
+      return OrgDrawerUtil.update(drawer, keyval);
+    }
+  }
 
   // // static insert(drawer, keyval) {
   // //   drawer.properties.push(keyval);
@@ -74,6 +74,9 @@ class OrgDrawerUtil {
     return i;
   }
 
+  static hasKey(drawer, key) {
+    return OrgDrawerUtil.indexOfKey !== -1;
+  }
   // static serialize(drawer, level = 1) {
   //   let r = '';
   //   const props = drawer.properties.filter(p => p[0] !== 'MOTID');

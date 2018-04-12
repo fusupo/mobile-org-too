@@ -6,6 +6,7 @@ const orgSerialize = require('org-parse').serialize;
 const Dropbox = require('dropbox');
 
 import { convert as convert2to1 } from './org2to1';
+import { convert as convert1to2 } from './org1to2';
 
 export default class DropboxDataSource {
   constructor(config = {}) {
@@ -117,12 +118,18 @@ export default class DropboxDataSource {
   }
 
   serializeAndUpload(nodes, tree, settings, path) {
-    const contents = orgSerialize(nodes, tree, settings);
+    const contentsObj = convert1to2(nodes, tree, settings);
+    console.log('CONTENTS', contentsObj);
+    const contents = orgSerialize(contentsObj);
+
+    // return new Promise((res, rej) => {
+    //   //res(null);
+    // });
     return new Promise((resolve, reject) => {
       this.dbx
         .filesUpload({
           contents,
-          path: path,
+          path: path + '.dummy.org',
           mode: { '.tag': 'overwrite' }
         })
         .then(res => resolve(res))

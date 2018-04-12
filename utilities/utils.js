@@ -60,6 +60,10 @@ export const momentFromTS = obj => {
   });
 };
 
+export const momentFromTSString = tsStr => {
+  return moment(tsStr, 'YYYY-MM-DD ddd HH:mm');
+};
+
 export const momentToTS = mom => {
   return {
     // srcStr: '',
@@ -109,11 +113,8 @@ export const diffTS = (a, b, u = 'milliseconds') => {
 };
 
 export const compareTS = (a, b) => {
-  // a = typeof a === 'string' ? OrgTimestamp.parse(a) : a;
-  // b = typeof b === 'string' ? OrgTimestamp.parse(b) : b;
-
-  const moma = momentFromTS(a);
-  const momb = momentFromTS(b);
+  const moma = typeof a === 'string' ? momentFromTSString(a) : momentFromTS(a);
+  const momb = typeof b === 'string' ? momentFromTSString(b) : momentFromTS(b);
 
   if (moma.isBefore(momb)) {
     return -1;

@@ -28,8 +28,8 @@ import {
   TOGGLE_NODE_TAG
 } from './actions';
 
-const OrgDrawerUtils = require('org-parse').OrgDrawer;
-const OrgTimestampUtils = require('org-parse').OrgTimestamp;
+const OrgDrawerUtil = require('./utilities/OrgDrawerUtil');
+const OrgTimestampUtil = require('./utilities/OrgTimestampUtil');
 
 ///////////////////////////////////////////////////////////////////////  ORG TEXT
 
@@ -55,8 +55,8 @@ function headline(
     level: 1,
     tags: [],
     content: 'new node',
-    todoKeyword: undefined,
-    todoKeywordColor: undefined
+    todoKeyword: undefined
+    // todoKeywordColor: undefined
   },
   action
 ) {
@@ -122,7 +122,7 @@ function opened(state = null, action) {
 function scheduled(state = null, action) {
   let nextState;
   if (action.type === COMPLETE_HABIT) {
-    nextState = OrgTimestampUtils.calcNextRepeat(state, action.timestampStr);
+    nextState = OrgTimestampUtil.calcNextRepeat(state, action.timestampStr);
   } else {
     if (action.timestampType === 'SCHEDULED') {
       switch (action.type) {
@@ -201,14 +201,14 @@ function propDrawer(state = { name: 'properties', properties: [] }, action) {
   switch (action.type) {
     case CYCLE_NODE_COLLAPSE:
       const key = 'collapseStatus';
-      let idx = OrgDrawerUtils.indexOfKey(state, key);
+      let idx = OrgDrawerUtil.indexOfKey(state, key);
       if (idx === -1 || state.properties[idx][1] === 'collapsed') {
-        nextState = OrgDrawerUtils.insertOrUpdate(state, [key, 'expanded']);
+        nextState = OrgDrawerUtil.insertOrUpdate(state, [key, 'expanded']);
       } else if (state.properties[idx][1] === 'expanded') {
-        nextState = OrgDrawerUtils.insertOrUpdate(state, [key, 'collapsed']);
+        nextState = OrgDrawerUtil.insertOrUpdate(state, [key, 'collapsed']);
       }
       // else if (state.properties[idx][1] === 'maximized') {
-      //     return OrgDrawerUtils.insertOrUpdate(state, [key, 'collapsed']);
+      //     return OrgDrawerUtil.insertOrUpdate(state, [key, 'collapsed']);
       //   }
       break;
     case UPDATE_NODE_PROP:
@@ -217,16 +217,17 @@ function propDrawer(state = { name: 'properties', properties: [] }, action) {
       nextState = Object.assign({}, state, { properties: clonedProps });
       break;
     case INSERT_NEW_NODE_PROP:
-      nextState = OrgDrawerUtils.insertOrUpdate(state, ['', '']);
+      nextState = OrgDrawerUtil.insertOrUpdate(state, ['', '']);
       break;
     case REMOVE_NODE_PROP:
-      nextState = OrgDrawerUtils.remove(state, [action.propKey]);
+      nextState = OrgDrawerUtil.remove(state, [action.propKey]);
       break;
     case COMPLETE_HABIT:
-      nextState = OrgDrawerUtils.insertOrUpdate(state, [
-        'LAST_REPEAT',
-        action.timestampStr
-      ]);
+      if (OrgDrawerUtil.hasKey(state, 'LAST_REAT'))
+        nextState = OrgDrawerUtil.update(state, [
+          'LAST_REPEAT',
+          action.timestampStr
+        ]);
       break;
     default:
       return state;
@@ -239,9 +240,10 @@ function logbook(state = { entries: [] }, action) {
   let nextState, clonedEntries;
   switch (action.type) {
     case INSERT_NEW_NODE_LOG_NOTE:
-      clonedEntries = state && state.entries && state.entries.length > 0
-        ? state.entries.slice(0)
-        : [];
+      clonedEntries =
+        state && state.entries && state.entries.length > 0
+          ? state.entries.slice(0)
+          : [];
       clonedEntries.unshift({
         type: 'note',
         timestamp: action.timestampStr,

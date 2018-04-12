@@ -157,3 +157,4 @@ const convert = docObj => {
 };
 
 module.exports.convert = convert;
+module.exports.xtractTimestamp = xtractTimestamp;
