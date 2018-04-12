@@ -35,8 +35,10 @@ import OrgBody from '../components/OrgBody';
 import OrgList from '../components/OrgList';
 import SplitPane from '../components/SplitPane';
 
-const OrgTreeUtil = require('org-parse').OrgTree;
-const OrgTimestampUtil = require('org-parse').OrgTimestamp;
+import { findBranch, timestampStringNow } from '../utilities/utils';
+
+//const OrgTreeUtil = require('org-parse').OrgTree;
+/* const OrgTimestampUtil = require('org-parse').OrgTimestamp;*/
 
 import appStyles from '../styles';
 
@@ -66,7 +68,7 @@ class NodeDetailScreen extends React.Component {
     } = this.props;
     if (node) {
       // childNodes
-      const children = OrgTreeUtil.findBranch(tree, nodeID).children;
+      const children = findBranch(tree, nodeID).children;
       let list = null;
       if (children.length > 0) {
         list = (
@@ -155,7 +157,7 @@ class NodeDetailScreen extends React.Component {
                       size={20}
                       style={{ marginLeft: 5 }}
                     />
-                    {!this.state.childListIsLocked &&
+                    {!this.state.childListIsLocked && (
                       <Button
                         onPress={() => {
                           onAddOnePress(bufferID, nodeID, node);
@@ -163,7 +165,8 @@ class NodeDetailScreen extends React.Component {
                         title="Add Child"
                         color="#841584"
                         accessibilityLabel="add child node"
-                      />}
+                      />
+                    )}
                   </View>
                 </TouchableHighlight>
                 {list}
@@ -190,7 +193,11 @@ class NodeDetailScreen extends React.Component {
         </View>
       );
     } else {
-      return <View><Text>{'node is gone '}</Text></View>;
+      return (
+        <View>
+          <Text>{'node is gone '}</Text>
+        </View>
+      );
     }
   }
 }
@@ -242,7 +249,7 @@ const mapDispatchToProps = dispatch => {
       dispatch(removeNodeProp(bufferID, nodeID, propKey));
     },
     onAddLogNote: (bufferID, nodeID) => () => {
-      const nowStr = OrgTimestampUtil.serialize(OrgTimestampUtil.now());
+      const nowStr = timestampStringNow(); //OrgTimestampUtil.serialize(OrgTimestampUtil.now());
       dispatch(insertNewNodeLogNote(bufferID, nodeID, nowStr));
     },
     onUpdateLogNote: (bufferID, nodeID) => (idx, text) => {

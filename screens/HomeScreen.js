@@ -24,6 +24,8 @@ import DropboxDataSource from '../utilities/DropboxDataSource';
 
 import appStyles from '../styles';
 
+const keywords = require('../constants/TodoKeyword').default; // ?;
+
 class HomeScreen extends React.Component {
   state = {
     buffersLoaded: false,
@@ -35,11 +37,9 @@ class HomeScreen extends React.Component {
   };
 
   componentWillMount() {
-    let keywords = OrgHeadlineUtil.keywords().slice(0);
-    keywords.push('none');
     this.setState({
       keywords,
-      keywordFilterIdx: keywords.length - 1
+      keywordFilterIdx: 0
     });
 
     this.props.loadOrgFiles();
@@ -95,8 +95,7 @@ class HomeScreen extends React.Component {
     };
 
     if (Object.entries(buffers).length > 0) {
-      const doKeywordFilter =
-        this.state.keywordFilterIdx !== this.state.keywords.length - 1;
+      const doKeywordFilter = this.state.keywordFilterIdx !== 0; //this.state.keywords.length - 1;
       const doTagFilter = this.state.tagFilters.length > 0;
       const doSearch = this.state.searchStr && this.state.searchStr !== '';
 
@@ -140,6 +139,7 @@ class HomeScreen extends React.Component {
           pool = filterKeywords(pool);
         }
 
+        console.log('WTF?? !!!!!');
         display = R.map(n => {
           return (
             <OrgHeadlineToo
@@ -151,6 +151,7 @@ class HomeScreen extends React.Component {
           );
         }, pool);
       } else {
+        console.log('WTF??');
         display = Object.entries(buffers).map(e => (
           <OrgBuffer
             key={e[0]}

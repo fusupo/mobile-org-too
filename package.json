@@ -1,6 +1,6 @@
 {
   "name": "mobile-org-too",
-  "version": "0.0.0",
+  "version": "0.3.0",
   "description": "ios orgmode client",
   "author": null,
   "main": "main.js",
@@ -16,11 +16,11 @@
     "babel-preset-expo": "^4.0.0",
     "dropbox": "^2.5.3",
     "expo": "^21.0.0",
-    "org-parse": "1.0.2",
+    "moment": "^2.22.0",
+    "org-parse": "2.0.0",
     "ramda": "^0.24.1",
     "react": "16.0.0-alpha.12",
-    "react-native":
-      "https://github.com/expo/react-native/archive/sdk-21.0.2.tar.gz",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-21.0.2.tar.gz",
     "react-native-check-box": "^2.0.0",
     "react-native-modal-dropdown": "^0.4.4",
     "react-native-swipeout": "^2.2.2",

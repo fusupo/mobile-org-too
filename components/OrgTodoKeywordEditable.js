@@ -10,7 +10,8 @@ import {
   completeTodo
 } from '../actions';
 
-const OrgHeadlineUtil = require('org-parse').OrgHeadline;
+const keywords = require('../constants/TodoKeyword').default; // ?;
+
 const OrgTimestampUtil = require('org-parse').OrgTimestamp;
 
 import appStyles from '../styles';
@@ -18,8 +19,8 @@ import appStyles from '../styles';
 class OrgTodoKeywordEditable extends Component {
   constructor(props) {
     super(props);
-    let keywords = OrgHeadlineUtil.keywords().slice(0);
-    keywords.shift('none');
+    // let keywords = OrgHeadlineUtil.keywords().slice(0);
+    // keywords.shift('none');
     this.state = {
       keywords
     };
@@ -35,6 +36,8 @@ class OrgTodoKeywordEditable extends Component {
     } = this.props;
     const { keywords } = this.state;
 
+    console.log('KEYWORDS', keywords);
+
     const todoKeyword = (
       <ModalDropdown
         options={this.state.keywords}
@@ -49,7 +52,7 @@ class OrgTodoKeywordEditable extends Component {
             appStyles.baseText,
             {
               backgroundColor: keyword
-                ? OrgHeadlineUtil.colorForKeyword(keyword)
+                ? '#f00' //OrgHeadlineUtil.colorForKeyword(keyword)
                 : '#fff'
             }
           ]}>

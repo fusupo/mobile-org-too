@@ -1,7 +1,12 @@
 import { parseLedger, serialize as ledgerSerialize } from './ledger-parse';
-const parseOrg = require('org-parse').parseOrg;
+import { uuid } from './utils';
+
+const parse = require('org-parse').parse;
 const orgSerialize = require('org-parse').serialize;
 const Dropbox = require('dropbox');
+
+import { convert as convert2to1 } from './org2to1';
+import { convert as convert1to2 } from './org1to2';
 
 export default class DropboxDataSource {
   constructor(config = {}) {
@@ -19,15 +24,46 @@ export default class DropboxDataSource {
         .then(res => res.text())
         .then(resText => {
           obj['orgText'] = resText;
-          return parseOrg(resText);
+          return parse(resText);
         })
-        .then(nodesAndTree => {
-          obj['orgTree'] = nodesAndTree.tree;
-          obj['orgNodes'] = nodesAndTree.nodes;
-          obj['orgSettings'] = nodesAndTree.settings;
+        .then(parsedObj => {
+          console.log('FOOO');
+          console.log(parsedObj);
+
+          const converted = convert2to1(parsedObj);
+          console.log(converted);
+
+          obj.orgTree = converted.tree;
+          obj.orgNodes = converted.nodes;
+          obj.orgSettings = converted.settings;
+
+          // obj['orgTree'] = nodesAndTree.tree;
+          // obj['orgNodes'] = nodesAndTree.nodes;
+          // obj['orgSettings'] = nodesAndTree.settings;
+
+          // const hls = {};
+          // const foo = hl => {
+          //   hls[uuid()] = hl;
+          //   if (hl.children) hl.children.forEach(foo);
+          // };
+
+          // nodesAndTree.headlines.forEach(foo);
+
+          // obj['orgTree'] = nodesAndTree;
+          // obj['orgNodes'] = hls;
+          // obj['orgSettings'] = nodesAndTree.section;
+
+          // console.log(nodesAndTree.headlines);
+          // console.log(hls);
+
+          //          console.log(obj);
+
           resolve(obj);
         })
-        .catch(err => reject(err));
+        .catch(err => {
+          console.log(err);
+          reject(err);
+        });
     });
   }
 
@@ -82,12 +118,18 @@ export default class DropboxDataSource {
   }
 
   serializeAndUpload(nodes, tree, settings, path) {
-    const contents = orgSerialize(nodes, tree, settings);
+    const contentsObj = convert1to2(nodes, tree, settings);
+    console.log('CONTENTS', contentsObj);
+    const contents = orgSerialize(contentsObj);
+
+    // return new Promise((res, rej) => {
+    //   //res(null);
+    // });
     return new Promise((resolve, reject) => {
       this.dbx
         .filesUpload({
           contents,
-          path: path,
+          path: path + '.dummy.org',
           mode: { '.tag': 'overwrite' }
         })
         .then(res => resolve(res))

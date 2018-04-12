@@ -34,6 +34,19 @@ export class OrgBuffer extends React.Component {
   }
   render() {
     const { bufferID, tree } = this.props;
+    const { isCollapsed } = this.state;
+    let childList = null;
+
+    if (!isCollapsed) {
+      childList = (
+        <OrgList
+          data={tree.children}
+          bufferID={bufferID}
+          isLocked={this.props.isLocked}
+        />
+      );
+    }
+
     return (
       <View style={{ flexDirection: 'column' }}>
         <View style={{ flexDirection: 'row' }}>
@@ -50,7 +63,7 @@ export class OrgBuffer extends React.Component {
               {bufferID}
             </Text>
           </TouchableHighlight>
-          {!this.props.isLocked &&
+          {!this.props.isLocked && (
             <Button
               onPress={() => {
                 this.props.onAddOne(bufferID);
@@ -58,15 +71,10 @@ export class OrgBuffer extends React.Component {
               title="Add Child"
               color="#841584"
               accessibilityLabel="add child node"
-            />}
+            />
+          )}
         </View>
-        {this.state.isCollapsed
-          ? null
-          : <OrgList
-              data={tree.children}
-              bufferID={bufferID}
-              isLocked={this.props.isLocked}
-            />}
+        {childList}
       </View>
     );
   }

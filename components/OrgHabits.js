@@ -15,8 +15,22 @@ import {
   View
 } from 'react-native';
 
-const OrgDrawerUtil = require('org-parse').OrgDrawer;
-const OrgTimestampUtil = require('org-parse').OrgTimestamp;
+const OrgDrawerUtil = require('../utilities/OrgDrawerUtil');
+
+import {
+  timestampNow,
+  timestampStringNow,
+  momentFromTS,
+  momentToTS,
+  cloneTS,
+  addTS,
+  subTS,
+  diffTS,
+  compareTS,
+  parseDate,
+  serializeTS
+} from '../utilities/utils';
+//const OrgTimestampUtil = require('org-parse').OrgTimestamp;
 
 import { completeHabit, resetHabit } from '../actions';
 
@@ -120,11 +134,9 @@ class OrgHabits extends React.Component {
         },
         idx => {
           if (idx === 0) {
-            const tdate = OrgTimestampUtil.momentToObj(
-              OrgTimestampUtil.momentFromObj(date)
-            );
-            tdate.hour += OrgTimestampUtil.now().hour;
-            tdate.minute += OrgTimestampUtil.now().minute;
+            const tdate = momentToTS(momentFromTS(date));
+            tdate.hour += timestampNow().hour;
+            tdate.minute += timestampNow().minute;
             onHabitPress(nodeID, tdate);
           } else if (idx === 1) {
             showDateModal(nodeID);
@@ -164,9 +176,7 @@ class OrgHabits extends React.Component {
                   onPress={() => {
                     this.setDateModalVisible(!this.state.dateModalVisible);
 
-                    const timestamp = OrgTimestampUtil.parseDate(
-                      this.state.dateModalDate
-                    );
+                    const timestamp = parseDate(this.state.dateModalDate);
                     onHabitPress(
                       this.state.dateModalNodeID,
                       timestamp,
@@ -219,11 +229,9 @@ class OrgHabits extends React.Component {
                   title={'OK'}
                   onPress={() => {
                     this.setNoteModalVisible(!this.state.noteModalVisible);
-                    const tdate = OrgTimestampUtil.momentToObj(
-                      OrgTimestampUtil.momentFromObj(date)
-                    );
-                    tdate.hour += OrgTimestampUtil.now().hour;
-                    tdate.minute += OrgTimestampUtil.now().minute;
+                    const tdate = momentToTS(momentFromTS(date));
+                    tdate.hour += timestampNow().hour;
+                    tdate.minute += timestampNow().minute;
                     onHabitPress(
                       this.state.noteModalNodeID,
                       tdate,
@@ -319,102 +327,99 @@ const mapStateToProps = (state, ownProps) => {
   });
 
   const getRealNow = () => {
-    const now = OrgTimestampUtil.now();
+    const now = timestampNow();
     now.hour -= now.hour;
     now.minute -= now.minute;
     return now;
   };
 
-  const habitData = nodes
-    .filter(n => {
-      const idx = OrgDrawerUtil.indexOfKey(n.propDrawer, 'STYLE');
-      if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
-      return true;
-    })
-    .map(n => {
-      const now = date; //OrgTimestampUtil.now();
-      now.hour -= now.hour;
-      now.minute -= now.minute;
-      const past = OrgTimestampUtil.sub(now, { days: 14 });
-      const fut = OrgTimestampUtil.add(now, { days: 7 });
-      if (n.logbook) {
-        // don't know why there'd be no logbook if passed previous
-        // filter...maybe if completely new habit but not yet logged done in
-        // other words this needs to be caught much earlier...i.e. around the
-        // time the orgfile is parsed to begin with
-        const scheduled = n.scheduled;
-        const { repInt, repMin, repMax } = scheduled;
-        const repMinVal = parseInt(repMin.substr(0, repMin.length - 1));
-        const repMinU = repMin[repMin.length - 1];
-        const repMaxVal = repMax
-          ? parseInt(repMax.substr(0, repMax.length - 1))
-          : null;
-        const repMaxU = repMax ? repMax[repMax.length - 1] : null;
+  let habitData = nodes.filter(n => {
+    const idx = OrgDrawerUtil.indexOfKey(n.propDrawer, 'STYLE');
+    if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
+    return true;
+  });
+  habitData = habitData.map(n => {
+    const now = date; //timestampNow();
+    now.hour -= now.hour;
+    now.minute -= now.minute;
+    const past = subTS(now, { days: 14 });
+    const fut = addTS(now, { days: 7 });
+    if (n.logbook) {
+      // don't know why there'd be no logbook if passed previous
+      // filter...maybe if completely new habit but not yet logged done in
+      // other words this needs to be caught much earlier...i.e. around the
+      // time the orgfile is parsed to begin with
+      const scheduled = n.scheduled;
+      const { repInt, repMin, repMax } = scheduled;
+      const repMinVal = parseInt(repMin.substr(0, repMin.length - 1));
+      const repMinU = repMin[repMin.length - 1];
+      const repMaxVal = repMax
+        ? parseInt(repMax.substr(0, repMax.length - 1))
+        : null;
+      const repMaxU = repMax ? repMax[repMax.length - 1] : null;
 
-        const logData = n.logbook.entries.filter(
-          le =>
-            le.type === 'state' &&
-            le.state === '"DONE"' &&
-            le.from === '"TODO"' &&
-            OrgTimestampUtil.compare(le.timestamp, past) > 0 &&
-            OrgTimestampUtil.compare(le.timestamp, fut) < 0
-        );
+      const logData = n.logbook.entries.filter(
+        le =>
+          le.type === 'state' &&
+          le.state === '"DONE"' &&
+          le.from === '"TODO"' &&
+          compareTS(le.timestamp, past) > 0 &&
+          compareTS(le.timestamp, fut) < 0
+      );
 
-        logData = logData.sort((a, b) =>
-          OrgTimestampUtil.compare(a.timestamp, b.timestamp)
-        );
+      logData = logData.sort((a, b) => compareTS(a.timestamp, b.timestamp));
 
-        let ret = [];
-        let rngMin = 0;
-        let rngMax = 0;
-        if (logData.length > 0) {
-          for (let i = 0; i < 21; i++) {
-            const curr = OrgTimestampUtil.add(past, { days: 1 * i });
-            const next = OrgTimestampUtil.add(curr, { days: 1 });
-            const ts = logData.length > 0 ? logData[0].timestamp : null;
-            if (
-              ts !== null &&
-              OrgTimestampUtil.compare(ts, curr) > 0 &&
-              OrgTimestampUtil.compare(ts, next) < 0
-            ) {
-              logData.shift();
-              ret.push('x');
+      let ret = [];
+      let rngMin = 0;
+      let rngMax = 0;
+      if (logData.length > 0) {
+        for (let i = 0; i < 21; i++) {
+          const curr = addTS(past, { days: 1 * i });
+          const next = addTS(curr, { days: 1 });
+          const ts = logData.length > 0 ? logData[0].timestamp : null;
+          if (
+            ts !== null &&
+            compareTS(ts, curr) > 0 &&
+            compareTS(ts, next) < 0
+          ) {
+            logData.shift();
+            ret.push('x');
 
-              rngMin = repMinVal * { d: 1, w: 7 }[repMinU];
-              rngMax = repMaxVal ? repMaxVal * { d: 1, w: 7 }[repMaxU] : 0;
-              if (rngMax > 0) rngMin--;
-            } else if (OrgTimestampUtil.compare(getRealNow(), curr) === 0) {
-              ret.push('!');
-            } else {
-              if (rngMax && rngMax > 0) {
-                if (rngMin > 0) {
-                  ret.push('b');
-                  rngMin--;
-                } else {
-                  if (rngMax === 1) {
-                    ret.push('y');
-                  } else {
-                    ret.push('g');
-                  }
-                }
-                rngMax--;
-              } else if (rngMin > 0) {
-                if (rngMin === 1) {
-                  ret.push('y');
-                } else {
-                  ret.push('b');
-                }
+            rngMin = repMinVal * { d: 1, w: 7 }[repMinU];
+            rngMax = repMaxVal ? repMaxVal * { d: 1, w: 7 }[repMaxU] : 0;
+            if (rngMax > 0) rngMin--;
+          } else if (compareTS(getRealNow(), curr) === 0) {
+            ret.push('!');
+          } else {
+            if (rngMax && rngMax > 0) {
+              if (rngMin > 0) {
+                ret.push('b');
                 rngMin--;
               } else {
-                ret.push('-');
+                if (rngMax === 1) {
+                  ret.push('y');
+                } else {
+                  ret.push('g');
+                }
               }
+              rngMax--;
+            } else if (rngMin > 0) {
+              if (rngMin === 1) {
+                ret.push('y');
+              } else {
+                ret.push('b');
+              }
+              rngMin--;
+            } else {
+              ret.push('-');
             }
           }
         }
-        return ret;
       }
-      return [];
-    });
+      return ret;
+    }
+    return [];
+  });
 
   return {
     habits,
@@ -433,7 +438,7 @@ const mapDispatchToProps = dispatch => {
 function someAction(nodeID, date, noteText) {
   return (dispatch, getState) => {
     const state = getState();
-    const nowStr = OrgTimestampUtil.serialize(date); //;OrgTimestampUtil.now());
+    const nowStr = serializeTS(date); //;timestampNow());
     // super inefficient way of finding bufferID from nodeID !!!!
     let bufferID = Object.entries(state.orgBuffers).reduce((M, V) => {
       if (M === undefined) {
