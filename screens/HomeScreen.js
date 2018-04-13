@@ -139,7 +139,6 @@ class HomeScreen extends React.Component {
           pool = filterKeywords(pool);
         }
 
-        console.log('WTF?? !!!!!');
         display = R.map(n => {
           return (
             <OrgHeadlineToo
@@ -151,7 +150,6 @@ class HomeScreen extends React.Component {
           );
         }, pool);
       } else {
-        console.log('WTF??');
         display = Object.entries(buffers).map(e => (
           <OrgBuffer
             key={e[0]}
@@ -286,6 +284,7 @@ class HomeScreen extends React.Component {
               </View>
             </View>
           </View>
+
           <TouchableHighlight
             onPress={() => {
               this.setState({ isLocked: !this.state.isLocked });
@@ -303,6 +302,7 @@ class HomeScreen extends React.Component {
               />
             </View>
           </TouchableHighlight>
+
           <ScrollView style={{ flex: 1, margin: 10 }}>{display}</ScrollView>
         </View>
       );
