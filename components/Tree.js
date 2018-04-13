@@ -110,12 +110,14 @@ class Tree extends Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {};
-};
+// const mapStateToProps = (state, ownProps) => {
+//   return {};
+// };
 
-const mapDispatchToProps = dispatch => {
-  return {};
-};
+// const mapDispatchToProps = dispatch => {
+//   return {};
+// };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Tree);
+// export default connect(mapStateToProps, mapDispatchToProps)(Tree);
+
+export default Tree;
