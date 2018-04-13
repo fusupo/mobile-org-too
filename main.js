@@ -8,7 +8,6 @@ import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
 import DropboxDataSource from './utilities/DropboxDataSource.js';
-// import mobileOrgTooApp from './reducers';
 import mobileOrgTooApp from './reducers/main';
 
 import StacksOverTabs from './navigation/StacksOverTabs';
