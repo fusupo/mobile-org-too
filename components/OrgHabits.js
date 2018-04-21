@@ -15,18 +15,14 @@ import {
   View
 } from 'react-native';
 
-const OrgDrawerUtil = require('../utilities/OrgDrawerUtil');
+const OrgNodeUtil = require('../utilities/OrgNodeUtil');
+const OrgTimestampUtil = require('../utilities/OrgTimestampUtil');
+//const OrgPlanningUtil = require('../utilities/OrgPlanningUtil');
+/* const OrgDrawerUtil = require('../utilities/OrgDrawerUtil');*/
 
 import {
-  timestampNow,
-  timestampStringNow,
   momentFromTS,
   momentToTS,
-  cloneTS,
-  addTS,
-  subTS,
-  diffTS,
-  compareTS,
   parseDate,
   serializeTS
 } from '../utilities/utils';
@@ -114,6 +110,7 @@ class OrgHabits extends React.Component {
   }
   render() {
     const { date, habits, habitData, onHabitPress } = this.props;
+
     const showDateModal = nodeID => {
       this.setState({
         dateModalNodeID: nodeID,
@@ -127,6 +124,7 @@ class OrgHabits extends React.Component {
       });
       this.setDateModalVisible(true);
     };
+
     const showOKEditCancelSheet = nodeID => {
       ActionSheetIOS.showActionSheetWithOptions(
         {
@@ -135,8 +133,8 @@ class OrgHabits extends React.Component {
         idx => {
           if (idx === 0) {
             const tdate = momentToTS(momentFromTS(date));
-            tdate.hour += timestampNow().hour;
-            tdate.minute += timestampNow().minute;
+            tdate.hour += OrgTimestampUtil.now().time.hh;
+            tdate.minute += OrgTimestampUtil.now().time.mm;
             onHabitPress(nodeID, tdate);
           } else if (idx === 1) {
             showDateModal(nodeID);
@@ -144,6 +142,7 @@ class OrgHabits extends React.Component {
         }
       );
     };
+
     return (
       <ScrollView style={{ flex: 1, marginBottom: 30 }}>
         <Modal
@@ -230,8 +229,8 @@ class OrgHabits extends React.Component {
                   onPress={() => {
                     this.setNoteModalVisible(!this.state.noteModalVisible);
                     const tdate = momentToTS(momentFromTS(date));
-                    tdate.hour += timestampNow().hour;
-                    tdate.minute += timestampNow().minute;
+                    tdate.hour += OrgTimestampUtil.now().hour;
+                    tdate.minute += OrgTimestampUtil.now().minute;
                     onHabitPress(
                       this.state.noteModalNodeID,
                       tdate,
@@ -244,67 +243,72 @@ class OrgHabits extends React.Component {
           </View>
         </Modal>
 
-        {habits.map((h, idx) => (
-          <View key={h.id} style={{ flexDirection: 'row' }}>
-            <TouchableHighlight
-              underlayColor="#00ff00"
-              style={{ flex: 1 }}
-              onPress={() => {
-                this.setState({ noteModalText: null });
-                const idx = OrgDrawerUtil.indexOfKey(h.propDrawer, 'LOGGING');
-                if (idx >= 0) {
-                  switch (h.propDrawer.properties[idx][1]) {
-                    case 'DONE(@)':
-                      // SHOW NOTE EDITOR
-                      this.setState({ noteModalNodeID: h.id });
-                      this.setNoteModalVisible(!this.state.noteModalVisible);
-                      break;
-                    default:
-                      console.log(
+        {habits.map((h, idx) => {
+          const propDrawer = OrgNodeUtil.getPropDrawer(h);
+          return (
+            <View key={h.id} style={{ flexDirection: 'row' }}>
+              <TouchableHighlight
+                underlayColor="#00ff00"
+                style={{ flex: 1 }}
+                onPress={() => {
+                  this.setState({ noteModalText: null });
+                  if (propDrawer.LOGGING) {
+                    console.log('LOGGING: ', propDrawer.LOGGING);
+                    //{
+                    /* switch (h.propDrawer.properties[idx][1]) {
+                        case 'DONE(@)':
+                        // SHOW NOTE EDITOR
+                        this.setState({ noteModalNodeID: h.id });
+                        this.setNoteModalVisible(!this.state.noteModalVisible);
+                        break;
+                        default:
+                        console.log(
                         'UNHANDLED LOGGING TYPE IN ORGHABITS!! -- ',
                         h.propDrawer.properties[idx][1]
-                      );
-                      break;
+                        );
+                        break;
+                        } */
+                    //}
+                  } else {
+                    // SHOW OK/EDIT/CANCEL SHEET
+                    showOKEditCancelSheet(h.id);
                   }
-                } else {
-                  // SHOW OK/EDIT/CANCEL SHEET
-                  showOKEditCancelSheet(h.id);
-                }
-              }}>
-              <Text style={{ textAlign: 'right', fontSize: 12 }}>
-                {h.headline.content}
-              </Text>
-            </TouchableHighlight>
-
-            <View {...this._panResponder.panHandlers} style={{ flex: 1 }}>
-              <Text
-                style={{
-                  flex: 1,
-                  fontFamily: 'space-mono',
-                  fontSize: 12
                 }}>
-                {habitData[idx].map((c, idx) => {
-                  const color = {
-                    '-': 'red',
-                    b: 'blue',
-                    g: 'green',
-                    y: 'yellow'
-                  }[c];
-                  return (
-                    <Text
-                      key={idx}
-                      style={{
-                        backgroundColor: color,
-                        opacity: idx < 14 ? 1 : 0.5
-                      }}>
-                      {c}
-                    </Text>
-                  );
-                })}
-              </Text>
+                <Text style={{ textAlign: 'right', fontSize: 12 }}>
+                  {h.title}
+                </Text>
+              </TouchableHighlight>
+
+              <View {...this._panResponder.panHandlers} style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    flex: 1,
+                    fontFamily: 'space-mono',
+                    fontSize: 12
+                  }}>
+                  {habitData[idx].map((c, idx) => {
+                    const color = {
+                      '-': 'red',
+                      b: 'blue',
+                      g: 'green',
+                      y: 'yellow'
+                    }[c];
+                    return (
+                      <Text
+                        key={idx}
+                        style={{
+                          backgroundColor: color,
+                          opacity: idx < 14 ? 1 : 0.5
+                        }}>
+                        {c}
+                      </Text>
+                    );
+                  })}
+                </Text>
+              </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
       </ScrollView>
     );
   }
@@ -320,37 +324,43 @@ const mapStateToProps = (state, ownProps) => {
     []
   );
 
-  const habits = nodes.filter(n => {
-    const idx = OrgDrawerUtil.indexOfKey(n.propDrawer, 'STYLE');
-    if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
-    return true;
-  });
+  const filterHabits = () => {
+    return nodes.filter(n => {
+      const propDrawer = OrgNodeUtil.getPropDrawer(n);
+      if (propDrawer && propDrawer.props.STYLE === 'habit') return true;
+      return false;
+    });
+  };
+
+  const habits = filterHabits();
 
   const getRealNow = () => {
-    const now = timestampNow();
+    const now = OrgTimestampUtil.now();
     now.hour -= now.hour;
     now.minute -= now.minute;
     return now;
   };
 
-  let habitData = nodes.filter(n => {
-    const idx = OrgDrawerUtil.indexOfKey(n.propDrawer, 'STYLE');
-    if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
-    return true;
-  });
+  let habitData = filterHabits();
+
   habitData = habitData.map(n => {
-    const now = date; //timestampNow();
+    const now = date; //OrgTimestampUtil.now();
     now.hour -= now.hour;
     now.minute -= now.minute;
-    const past = subTS(now, { days: 14 });
-    const fut = addTS(now, { days: 7 });
-    if (n.logbook) {
+    const past = OrgTimestampUtil.sub(now, { days: 14 });
+    const fut = OrgTimestampUtil.add(now, { days: 7 });
+
+    const logbook = OrgNodeUtil.getLogbook(n);
+    if (logbook) {
       // don't know why there'd be no logbook if passed previous
       // filter...maybe if completely new habit but not yet logged done in
       // other words this needs to be caught much earlier...i.e. around the
       // time the orgfile is parsed to begin with
-      const scheduled = n.scheduled;
-      const { repInt, repMin, repMax } = scheduled;
+      const scheduled = OrgNodeUtil.getScheduled(n);
+      console.log(scheduled);
+      const repMin = OrgTimestampUtil.getRepMin(scheduled);
+      const repMax = OrgTimestampUtil.getRepMax(scheduled);
+
       const repMinVal = parseInt(repMin.substr(0, repMin.length - 1));
       const repMinU = repMin[repMin.length - 1];
       const repMaxVal = repMax
@@ -358,29 +368,31 @@ const mapStateToProps = (state, ownProps) => {
         : null;
       const repMaxU = repMax ? repMax[repMax.length - 1] : null;
 
-      const logData = n.logbook.entries.filter(
+      const logData = logbook.items.filter(
         le =>
           le.type === 'state' &&
           le.state === '"DONE"' &&
           le.from === '"TODO"' &&
-          compareTS(le.timestamp, past) > 0 &&
-          compareTS(le.timestamp, fut) < 0
+          OrgTimestampUtil.compare(le.timestamp, past) > 0 &&
+          OrgTimestampUtil.compare(le.timestamp, fut) < 0
       );
 
-      logData = logData.sort((a, b) => compareTS(a.timestamp, b.timestamp));
+      logData = logData.sort((a, b) =>
+        OrgTimestampUtil.compare(a.timestamp, b.timestamp)
+      );
 
       let ret = [];
       let rngMin = 0;
       let rngMax = 0;
       if (logData.length > 0) {
         for (let i = 0; i < 21; i++) {
-          const curr = addTS(past, { days: 1 * i });
-          const next = addTS(curr, { days: 1 });
+          const curr = OrgTimestampUtil.add(past, { days: 1 * i });
+          const next = OrgTimestampUtil.add(curr, { days: 1 });
           const ts = logData.length > 0 ? logData[0].timestamp : null;
           if (
             ts !== null &&
-            compareTS(ts, curr) > 0 &&
-            compareTS(ts, next) < 0
+            OrgTimestampUtil.compare(ts, curr) > 0 &&
+            OrgTimestampUtil.compare(ts, next) < 0
           ) {
             logData.shift();
             ret.push('x');
@@ -388,7 +400,7 @@ const mapStateToProps = (state, ownProps) => {
             rngMin = repMinVal * { d: 1, w: 7 }[repMinU];
             rngMax = repMaxVal ? repMaxVal * { d: 1, w: 7 }[repMaxU] : 0;
             if (rngMax > 0) rngMin--;
-          } else if (compareTS(getRealNow(), curr) === 0) {
+          } else if (OrgTimestampUtil.compare(getRealNow(), curr) === 0) {
             ret.push('!');
           } else {
             if (rngMax && rngMax > 0) {
@@ -438,7 +450,7 @@ const mapDispatchToProps = dispatch => {
 function someAction(nodeID, date, noteText) {
   return (dispatch, getState) => {
     const state = getState();
-    const nowStr = serializeTS(date); //;timestampNow());
+    const nowStr = serializeTS(date); //;OrgTimestampUtil.now());
     // super inefficient way of finding bufferID from nodeID !!!!
     let bufferID = Object.entries(state.orgBuffers).reduce((M, V) => {
       if (M === undefined) {
