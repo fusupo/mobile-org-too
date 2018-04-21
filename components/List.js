@@ -15,20 +15,18 @@ class List extends Component {
 
     let items = data.map((d, idx) => renderItem(d, idx));
 
-    return (
-      <View style={{ flex: 1 }}>
-        {items}
-      </View>
-    );
+    return <View style={{ flex: 1 }}>{items}</View>;
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {};
-};
+// const mapStateToProps = (state, ownProps) => {
+//   return {};
+// };
 
-const mapDispatchToProps = dispatch => {
-  return {};
-};
+// const mapDispatchToProps = dispatch => {
+//   return {};
+// };
 
-export default connect(mapStateToProps, mapDispatchToProps)(List);
+// export default connect(mapStateToProps, mapDispatchToProps)(List);
+
+export default List;
