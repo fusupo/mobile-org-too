@@ -13,25 +13,25 @@ class OrgHeadlineEditable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      content: props.node.headline.content,
+      title: props.node.title,
       firstEdit: true
     };
   }
 
   render() {
     const { bufferID, node, autoFocus } = this.props;
-    const { firstEdit, content } = this.state;
+    const { firstEdit, title } = this.state;
 
     const endEdit = () => {
       this.setState({ firstEdit: false });
       Keyboard.dismiss();
-      this.props.onHeadlineEndEditing(bufferID, node.id, content);
+      this.props.onHeadlineEndEditing(bufferID, node.id, title);
     };
 
     return (
       <View style={[appStyles.container, { flexDirection: 'row' }]}>
         <OrgTodoKeywordEditable
-          keyword={node.headline.todoKeyword}
+          keyword={node.keyword}
           nodeID={node.id}
           bufferID={bufferID}
         />
@@ -40,13 +40,13 @@ class OrgHeadlineEditable extends Component {
             appStyles.baseText,
             { flex: 4, height: 40, borderColor: 'gray', borderWidth: 1 }
           ]}
-          value={content}
+          value={title}
           autoFocus={autoFocus}
           clearTextOnFocus={autoFocus && firstEdit}
           onSubmitEditing={() => {
             endEdit();
           }}
-          onChangeText={content => this.setState({ content })}
+          onChangeText={title => this.setState({ title })}
           onEndEditing={e => {
             endEdit();
           }}

@@ -7,6 +7,7 @@ const Dropbox = require('dropbox');
 
 import { convert as convert2to1 } from './org2to1';
 import { convert as convert1to2 } from './org1to2';
+import { convert as convert2to2 } from './org2to2';
 
 export default class DropboxDataSource {
   constructor(config = {}) {
@@ -27,11 +28,16 @@ export default class DropboxDataSource {
           return parse(resText);
         })
         .then(parsedObj => {
-          const converted = convert2to1(parsedObj);
+          // const converted = convert2to1(parsedObj);
 
-          obj.orgTree = converted.tree;
-          obj.orgNodes = converted.nodes;
-          obj.orgSettings = converted.settings;
+          // obj.orgTree = converted.tree;
+          // obj.orgNodes = converted.nodes;
+          // obj.orgSettings = converted.settings;
+
+          const convertedToo = convert2to2(parsedObj);
+
+          obj.orgTree = convertedToo.tree;
+          obj.orgNodes = convertedToo.nodes;
 
           resolve(obj);
         })

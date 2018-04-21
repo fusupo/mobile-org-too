@@ -36,8 +36,8 @@ export default class OrgLogbook extends Component {
     } else {
       const listItems =
         this.props.log &&
-        this.props.log.entries &&
-        this.props.log.entries.map((le, idx) => {
+        this.props.log.items &&
+        this.props.log.items.map((le, idx) => {
           return (
             <OrgLogbookItem
               key={idx}
@@ -79,46 +79,9 @@ export default class OrgLogbook extends Component {
               </View>
             </TouchableHighlight>
           </Swipeout>
-          <View className="OrgDrawerProperties">
-            {listItems}
-          </View>
+          <View className="OrgDrawerProperties">{listItems}</View>
         </View>
       );
     }
   }
 }
-
-// <View className="OrgLogbook">
-//   <View
-//     style={{
-//       flexDirection: 'row',
-//       backgroundColor: '#cccccc'
-//     }}>
-//     <Ionicons name={'ios-recording-outline'} size={20} />
-//     <View style={{ flex: 1 }}>
-//       <TouchableHighlight onPress={this.props.onAddLogNote}>
-//         <Text
-//           className="OrgDrawerName"
-//           style={{
-//             fontFamily: 'space-mono',
-//             fontSize: 12
-//           }}>
-//           {'+'}
-//         </Text>
-//       </TouchableHighlight>
-//     </View>
-//     <View style={{ flex: 16 }}>
-//       <Text
-//         style={{
-//           fontFamily: 'space-mono',
-//           fontSize: 12
-//         }}
-//         onPress={this._toggleCollapse.bind(this)}>
-//         {'LOGBOOK'}
-//       </Text>
-//     </View>
-//   </View>
-//   <View>
-//     {listItems}
-//   </View>
-// </View>

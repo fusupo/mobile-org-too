@@ -253,7 +253,6 @@ class OrgHabits extends React.Component {
                 onPress={() => {
                   this.setState({ noteModalText: null });
                   if (propDrawer.LOGGING) {
-                    console.log('LOGGING: ', propDrawer.LOGGING);
                     //{
                     /* switch (h.propDrawer.properties[idx][1]) {
                         case 'DONE(@)':
@@ -357,7 +356,6 @@ const mapStateToProps = (state, ownProps) => {
       // other words this needs to be caught much earlier...i.e. around the
       // time the orgfile is parsed to begin with
       const scheduled = OrgNodeUtil.getScheduled(n);
-      console.log(scheduled);
       const repMin = OrgTimestampUtil.getRepMin(scheduled);
       const repMax = OrgTimestampUtil.getRepMax(scheduled);
 

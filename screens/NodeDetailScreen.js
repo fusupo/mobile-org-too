@@ -36,6 +36,7 @@ import OrgList from '../components/OrgList';
 import SplitPane from '../components/SplitPane';
 
 import { findBranch, timestampStringNow } from '../utilities/utils';
+const OrgNodeUtil = require('../utilities/OrgNodeUtil');
 
 //const OrgTreeUtil = require('org-parse').OrgTree;
 /* const OrgTimestampUtil = require('org-parse').OrgTimestamp;*/
@@ -68,6 +69,7 @@ class NodeDetailScreen extends React.Component {
     } = this.props;
     if (node) {
       // childNodes
+      console.log('?????? ', tree, nodeID, findBranch(tree, nodeID));
       const children = findBranch(tree, nodeID).children;
       let list = null;
       if (children.length > 0) {
@@ -112,7 +114,7 @@ class NodeDetailScreen extends React.Component {
                 </View>
                 <View style={[appStyles.container, appStyles.border]}>
                   <OrgDrawer
-                    drawer={node.propDrawer}
+                    drawer={OrgNodeUtil.getPropDrawer(node)}
                     isCollapsed={true}
                     onAddProp={onAddProp(bufferID, nodeID)}
                     onUpdateProp={onUpdateProp(bufferID, nodeID)}
@@ -121,7 +123,7 @@ class NodeDetailScreen extends React.Component {
                 </View>
                 <View style={[appStyles.container, appStyles.border]}>
                   <OrgLogbook
-                    log={node.logbook}
+                    log={OrgNodeUtil.getLogbook(node)}
                     isCollapsed={true}
                     onAddLogNote={onAddLogNote(bufferID, nodeID)}
                     onUpdateLogNote={onUpdateLogNote(bufferID, nodeID)}

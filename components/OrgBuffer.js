@@ -40,7 +40,7 @@ export class OrgBuffer extends React.Component {
     if (!isCollapsed) {
       childList = (
         <OrgList
-          data={tree.children}
+          data={tree.children || tree.headlines}
           bufferID={bufferID}
           isLocked={this.props.isLocked}
         />

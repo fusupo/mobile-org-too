@@ -17,8 +17,8 @@ export default class OrgList extends Component {
           if (d.children && d.children.length > 0) {
             return (
               <Tree
-                key={d.nodeID}
-                title={d.nodeID}
+                key={d.id}
+                title={d.id}
                 path={[]}
                 type={'branch'}
                 getHasKids={(path, cbk) => {
@@ -35,9 +35,12 @@ export default class OrgList extends Component {
                       newPath.push('children');
                       newPath.push(idx);
                       return {
-                        title: c.nodeID,
+                        title: c.id,
                         path: newPath,
-                        type: c.children.length > 0 ? 'branch' : 'leaf'
+                        type:
+                          c.children && c.children.length > 0
+                            ? 'branch'
+                            : 'leaf'
                       };
                     })
                   );
@@ -47,7 +50,7 @@ export default class OrgList extends Component {
                   const branch = R.view(lens, this.props.data[idx]);
                   return (
                     <View
-                      key={d.nodeID}
+                      key={d.id}
                       style={{
                         flexDirection: 'row',
                         paddingLeft: 8 * (path.length / 1)
@@ -93,7 +96,7 @@ export default class OrgList extends Component {
                         </TouchableHighlight>
                         <OrgHeadline
                           bufferID={this.props.bufferID}
-                          nodeID={title}
+                          nodeID={branch.id}
                           isLocked={this.props.isLocked}
                         />
                       </View>
@@ -105,15 +108,15 @@ export default class OrgList extends Component {
           } else {
             return (
               <View
-                key={d.nodeID}
+                key={d.id}
                 style={{
                   flexDirection: 'row',
                   paddingLeft: 11
                 }}>
                 <OrgHeadline
-                  key={d.nodeID}
+                  key={d.id}
                   bufferID={this.props.bufferID}
-                  nodeID={d.nodeID}
+                  nodeID={d.id}
                   isLocked={this.props.isLocked}
                 />
               </View>

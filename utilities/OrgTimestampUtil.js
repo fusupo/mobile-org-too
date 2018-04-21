@@ -49,6 +49,7 @@ class OrgTimestampUtil {
   //     repMax: repeat && repeat[3] ? repeat[3] : null
   //   };
   // }
+
   // static parseDate(srcDate) {
   //   const mom = srcDate === undefined ? moment() : moment(srcDate);
   //   return {
@@ -65,35 +66,70 @@ class OrgTimestampUtil {
   //     repMax: null
   //   };
   // }
-  // static now() {
-  //   return OrgTimestamp.parseDate();
-  // }
+
+  static now() {
+    return OrgTimestampUtil.momentToObj(moment());
+  }
+
   static momentFromObj(obj) {
     return moment({
-      year: obj.year,
-      month: obj.month - 1,
-      date: obj.date,
-      hour: obj.hour,
-      minute: obj.minute
+      year: obj.date.yyyy,
+      month: obj.date.mm - 1,
+      date: obj.date.dd,
+      hour: obj.time.hh,
+      minute: obj.time.mm
     });
   }
+
   static momentFromString(str) {
     return moment(str, 'YYYY-MM-DD ddd HH:mm');
   }
+
+  static momentToString(mom) {
+    return `[${mom.format('YYYY-MM-DD ddd HH:mm')}]`;
+  }
+
   static momentToObj(mom) {
     return {
-      // srcStr: '',
-      type: 'inactive',
-      year: mom.year(),
-      month: mom.month() + 1,
-      date: mom.date(),
-      day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][mom.day()],
-      hour: mom.hour(),
-      minute: mom.minute(),
-      repInt: null,
-      repMin: null,
-      repMax: null
+      date: {
+        type: 'org.date',
+        yyyy: mom.year(),
+        mm: mom.month() + 1,
+        dd: mom.date(),
+        dayName: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][mom.day()]
+      },
+      dateEnd: null,
+      dateStart: null,
+      delay: null,
+      delayEnd: null,
+      delayStart: null,
+      // repeat: '.+1d',
+      // repeatEnd: null,
+      // repeatStart: null,
+      time: {
+        type: 'org.time',
+        hh: mom.hour(),
+        mm: mom.minute()
+      },
+      timeEnd: null,
+      timeStart: null,
+      type: 'org.timestamp.inactive' //active?
+      // value: '<2018-04-21 Sat 00:00 .+1d>';
     };
+
+    // return {
+    //   // srcStr: '',
+    //   type: 'inactive',
+    //   year: mom.year(),
+    //   month: mom.month() + 1,
+    //   date: mom.date(),
+    //   day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][mom.day()],
+    //   hour: mom.hour(),
+    //   minute: mom.minute(),
+    //   repInt: null,
+    //   repMin: null,
+    //   repMax: null
+    // };
   }
   static clone(obj) {
     return OrgTimestampUtil.momentToObj(OrgTimestampUtil.momentFromObj(obj));
@@ -103,9 +139,10 @@ class OrgTimestampUtil {
     const res = mom.add(b);
     let ret = OrgTimestampUtil.momentToObj(res);
     ret.type = a.type;
-    ret.repInt = a.repInt;
-    ret.repMin = a.repMin;
-    ret.repMax = a.repMax;
+    ret.repeat = a.repeat;
+    ret.repeatStart = a.repeatStart;
+    ret.repeatEnd = a.repeatEnd;
+    ret.value = a.value;
     return ret;
   }
   static sub(a, b) {
@@ -113,9 +150,10 @@ class OrgTimestampUtil {
     const res = mom.subtract(b);
     let ret = OrgTimestampUtil.momentToObj(res);
     ret.type = a.type;
-    ret.repInt = a.repInt;
-    ret.repMin = a.repMin;
-    ret.repMax = a.repMax;
+    ret.repeat = a.repeat;
+    ret.repeatStart = a.repeatStart;
+    ret.repeatEnd = a.repeatEnd;
+    ret.value = a.value;
     return ret;
   }
   static diff(a, b, u = 'milliseconds') {
@@ -124,6 +162,14 @@ class OrgTimestampUtil {
     return momA.diff(momB, u);
   }
   static compare(a, b) {
+    if (!a && b) {
+      return 1;
+    } else if (a && !b) {
+      return -1;
+    } else if (!a && !b) {
+      return 0;
+    }
+
     const moma =
       typeof a === 'string'
         ? OrgTimestampUtil.momentFromString(a)
@@ -140,18 +186,8 @@ class OrgTimestampUtil {
     } else if (moma.isAfter(momb)) {
       return 1;
     }
-    // a = typeof a === 'string' ? OrgTimestamp.parse(a) : a;
-    // b = typeof b === 'string' ? OrgTimestamp.parse(b) : b;
-    // const moma = OrgTimestampUtil.momentFromObj(a);
-    // const momb = OrgTimestampUtil.momentFromObj(b);
-    // if (moma.isBefore(momb)) {
-    //   return -1;
-    // } else if (moma.isSame(momb)) {
-    //   return 0;
-    // } else if (moma.isAfter(momb)) {
-    //   return 1;
-    // }
   }
+
   static calcNextRepeat(base, x) {
     base =
       typeof base === 'string'
@@ -225,6 +261,50 @@ class OrgTimestampUtil {
   //   //
   //   r += closetag;
   //   return r;
+  // }
+
+  ////////////////////////////////////////////////////////////////////////////////
+
+  static getRepMin(ts) {
+    const rep = ts.repeat;
+    const repInt = rep ? rep.substr(0, rep.lastIndexOf('+') + 1) : null;
+    let repMinMax = rep ? rep.substr(rep.lastIndexOf('+') + 1) : null;
+    let repMin = repMinMax
+      ? repMinMax.indexOf('/') !== -1
+        ? repMinMax.substr(0, repMinMax.indexOf('/'))
+        : repMinMax
+      : null;
+    let repMax = repMinMax
+      ? repMinMax.indexOf('/') !== -1
+        ? repMinMax.substr(repMinMax.indexOf('/') + 1)
+        : null
+      : null;
+    return repMin;
+  }
+
+  // static getRepMinUnit(ts){
+
+  // }
+
+  static getRepMax(ts) {
+    const rep = ts.repeat;
+    const repInt = rep ? rep.substr(0, rep.lastIndexOf('+') + 1) : null;
+    let repMinMax = rep ? rep.substr(rep.lastIndexOf('+') + 1) : null;
+    let repMin = repMinMax
+      ? repMinMax.indexOf('/') !== -1
+        ? repMinMax.substr(0, repMinMax.indexOf('/'))
+        : repMinMax
+      : null;
+    let repMax = repMinMax
+      ? repMinMax.indexOf('/') !== -1
+        ? repMinMax.substr(repMinMax.indexOf('/') + 1)
+        : null
+      : null;
+    return repMax;
+  }
+
+  // static getRepMaxUnit(ts){
+
   // }
 }
 

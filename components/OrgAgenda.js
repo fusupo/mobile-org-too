@@ -346,8 +346,6 @@ const mapStateToProps = (state, ownProps) => {
     };
     const cand = filterRange(candidates, start, end);
 
-    console.log('condditatds', cand, now);
-
     let agenda = { headerStr, schedule: {} };
     for (let i = 0; i < hours.length - 1; i++) {
       const a = OrgTimestampUtil.add(start, { hours: hours[i] });

@@ -35,28 +35,29 @@ class OrgTagsEditable extends Component {
 
   render() {
     const { bufferID, nodeID, tags, allTags, onToggleTag } = this.props;
-    const tagItems = tags.length > 0
-      ? tags.map((tag, idx) => {
-          return (
-            <View key={idx} style={appStyles.container}>
-              <Text
-                style={[
-                  appStyles.baseText,
-                  {
-                    backgroundColor: '#cccccc',
-                    fontSize: 10
-                  }
-                ]}>
-                {tag}
-              </Text>
-            </View>
-          );
-        })
-      : null;
+    const tagItems =
+      tags.length > 0
+        ? tags.map((tag, idx) => {
+            return (
+              <View key={idx} style={appStyles.container}>
+                <Text
+                  style={[
+                    appStyles.baseText,
+                    {
+                      backgroundColor: '#cccccc',
+                      fontSize: 10
+                    }
+                  ]}>
+                  {tag}
+                </Text>
+              </View>
+            );
+          })
+        : null;
 
-    const tagList = tagItems
-      ? <View style={appStyles.container}>{tagItems}</View>
-      : null;
+    const tagList = tagItems ? (
+      <View style={appStyles.container}>{tagItems}</View>
+    ) : null;
 
     return (
       <View style={appStyles.container}>
@@ -96,61 +97,59 @@ class OrgTagsEditable extends Component {
               ))}
             </View>
             <ScrollView style={{ flex: 8, backgroundColor: '#eee' }}>
-              {this.state.freeformVisible
-                ? <View>
-                    <TextInput
-                      style={appStyles.baseText}
-                      value={this.state.freeformText}
-                      onChangeText={freeformText =>
-                        this.setState({ freeformText })}
-                    />
-                    <View style={{ flexDirection: 'row' }}>
-                      <View style={appStyles.container}>
-                        <Button
-                          title={'CANCEL'}
-                          onPress={() => {
-                            this.setFreeformVisible(
-                              !this.state.freeformVisible
-                            );
-                            this.setState({ freeformText: null });
-                          }}
-                        />
-                      </View>
-                      <View style={appStyles.container}>
-                        <Button
-                          title={'OK'}
-                          onPress={() => {
-                            this.setFreeformVisible(
-                              !this.state.freeformVisible
-                            );
-                            onToggleTag(
-                              bufferID,
-                              nodeID,
-                              this.state.freeformText
-                            );
-                            this.setState({ freeformText: null });
-                          }}
-                        />
-                      </View>
+              {this.state.freeformVisible ? (
+                <View>
+                  <TextInput
+                    style={appStyles.baseText}
+                    value={this.state.freeformText}
+                    onChangeText={freeformText =>
+                      this.setState({ freeformText })}
+                  />
+                  <View style={{ flexDirection: 'row' }}>
+                    <View style={appStyles.container}>
+                      <Button
+                        title={'CANCEL'}
+                        onPress={() => {
+                          this.setFreeformVisible(!this.state.freeformVisible);
+                          this.setState({ freeformText: null });
+                        }}
+                      />
+                    </View>
+                    <View style={appStyles.container}>
+                      <Button
+                        title={'OK'}
+                        onPress={() => {
+                          this.setFreeformVisible(!this.state.freeformVisible);
+                          onToggleTag(
+                            bufferID,
+                            nodeID,
+                            this.state.freeformText
+                          );
+                          this.setState({ freeformText: null });
+                        }}
+                      />
                     </View>
                   </View>
-                : <TouchableHighlight
-                    style={appStyles.container}
-                    onPress={() => {
-                      this.setFreeformVisible(!this.state.freeformVisible);
-                    }}>
-                    <Text
-                      style={[
-                        appStyles.baseText,
-                        {
-                          backgroundColor: '#cccccc',
-                          fontSize: 10,
-                          padding: 10
-                        }
-                      ]}>
-                      {'add new'}
-                    </Text>
-                  </TouchableHighlight>}
+                </View>
+              ) : (
+                <TouchableHighlight
+                  style={appStyles.container}
+                  onPress={() => {
+                    this.setFreeformVisible(!this.state.freeformVisible);
+                  }}>
+                  <Text
+                    style={[
+                      appStyles.baseText,
+                      {
+                        backgroundColor: '#cccccc',
+                        fontSize: 10,
+                        padding: 10
+                      }
+                    ]}>
+                    {'add new'}
+                  </Text>
+                </TouchableHighlight>
+              )}
               {allTags.map((tag, idx) => (
                 <View key={idx} style={{ flex: 0 }}>
                   <TouchableHighlight
@@ -201,13 +200,13 @@ const mapStateToProps = (state, ownProps) => {
   const node = state.orgBuffers[bufferID].orgNodes[nodeID];
   let allTags = Object.values(state.orgBuffers).reduce((m, v) => {
     let tags = Object.values(v.orgNodes).reduce((m2, v2) => {
-      return m2.concat(v2.headline.tags || []);
+      return m2.concat(v2.tags || []);
     }, []);
     return m.concat(tags);
   }, []);
   allTags = R.uniq(allTags);
   return {
-    tags: node.headline.tags || [],
+    tags: node.tags || [],
     allTags
   };
 };

@@ -12,6 +12,7 @@ import {
 import OrgTimestamp from './OrgTimestamp';
 
 const OrgTimestampUtil = require('org-parse').OrgTimestamp;
+const OrgNodeUtil = require('../utilities/OrgNodeUtil');
 
 const timestampTypes = ['OPENED', 'SCHEDULED', 'DEADLINE', 'CLOSED'];
 
@@ -54,13 +55,14 @@ class OrgScheduling extends Component {
         onTimestampRepIntUpdate,
         onTimestampClear
       } = this.props;
+      const planning = OrgNodeUtil.getPlanning(node);
       const timings = timestampTypes.map(t => (
         <OrgTimestamp
           key={t}
           onTimestampUpdate={onTimestampUpdate(bufferID, nodeID, t)}
           onTimestampRepIntUpdate={onTimestampRepIntUpdate(bufferID, nodeID, t)}
           onTimestampClear={onTimestampClear(bufferID, nodeID, t)}
-          timestamp={node[t.toLowerCase()]}
+          timestamp={planning ? planning[t.toLowerCase()] : null}
           label={t}
         />
       ));

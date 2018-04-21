@@ -34,8 +34,8 @@ class OrgHeadline extends Component {
       onDeleteNodePress,
       onAddOnePress
     } = this.props;
-    const keyword = node.headline.todoKeyword;
-    const tags = node.headline.tags;
+    const keyword = node.keyword;
+    const tags = node.tags;
 
     if (isLocked) {
       return (
@@ -57,7 +57,7 @@ class OrgHeadline extends Component {
               onNodeTitlePress(bufferID, nodeID);
             }}>
             <Text style={[appStyles.baseText, { fontSize: 12, color: '#000' }]}>
-              {node.headline.content}
+              {node.title}
             </Text>
           </TouchableHighlight>
           {tags && (
@@ -99,7 +99,7 @@ class OrgHeadline extends Component {
                 onNodeTitlePress(bufferID, nodeID);
               }}>
               <Text style={[appStyles.baseText, { color: '#000' }]}>
-                {node.headline.content}
+                {node.title}
               </Text>
             </TouchableHighlight>
             <View style={{ flex: 1 }}>
@@ -115,9 +115,6 @@ class OrgHeadline extends Component {
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
   const node = state.orgBuffers[bufferID].orgNodes[nodeID];
-
-  console.log('ORGHEADLINETOO', bufferID, nodeID);
-
   return {
     node
   };
@@ -140,7 +137,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       dispatch(deleteNode(bufferID, nodeID));
     },
     onAddOnePress: (bufferID, nodeID, node) => {
-      dispatch(addNewNode(bufferID, nodeID, node.headline.level + 1));
+      dispatch(addNewNode(bufferID, nodeID, node.stars + 1));
     },
     onNodeArrowPress: (bufferID, nodeID) => {
       dispatch(cycleNodeCollapse(bufferID, nodeID));

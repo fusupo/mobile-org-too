@@ -35,9 +35,6 @@ class OrgTodoKeywordEditable extends Component {
       nodeID
     } = this.props;
     const { keywords } = this.state;
-
-    console.log('KEYWORDS', keywords);
-
     const todoKeyword = (
       <ModalDropdown
         options={this.state.keywords}
@@ -68,7 +65,7 @@ class OrgTodoKeywordEditable extends Component {
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
   return {
-    keyword: state.orgBuffers[bufferID].orgNodes[nodeID].headline.todoKeyword
+    keyword: state.orgBuffers[bufferID].orgNodes[nodeID].keyword
   };
 };
 
