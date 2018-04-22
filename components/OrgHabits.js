@@ -335,17 +335,23 @@ const mapStateToProps = (state, ownProps) => {
 
   const getRealNow = () => {
     const now = OrgTimestampUtil.now();
-    now.hour -= now.hour;
-    now.minute -= now.minute;
+    now.time = {
+      type: 'org.time',
+      hh: 0,
+      mm: 0
+    };
+    /* now.hour -= now.hour;
+     * now.minute -= now.minute;*/
     return now;
   };
 
   let habitData = filterHabits();
 
   habitData = habitData.map(n => {
-    const now = date; //OrgTimestampUtil.now();
-    now.hour -= now.hour;
-    now.minute -= now.minute;
+    const now = Object.assign({}, date, {
+      time: { type: 'org.time', hh: 0, mm: 0 }
+    }); //OrgTimestampUtil.now();
+
     const past = OrgTimestampUtil.sub(now, { days: 14 });
     const fut = OrgTimestampUtil.add(now, { days: 7 });
 
@@ -358,14 +364,12 @@ const mapStateToProps = (state, ownProps) => {
       const scheduled = OrgNodeUtil.getScheduled(n);
       const repMin = OrgTimestampUtil.getRepMin(scheduled);
       const repMax = OrgTimestampUtil.getRepMax(scheduled);
-
       const repMinVal = parseInt(repMin.substr(0, repMin.length - 1));
       const repMinU = repMin[repMin.length - 1];
       const repMaxVal = repMax
         ? parseInt(repMax.substr(0, repMax.length - 1))
         : null;
       const repMaxU = repMax ? repMax[repMax.length - 1] : null;
-
       const logData = logbook.items.filter(
         le =>
           le.type === 'state' &&
@@ -387,6 +391,7 @@ const mapStateToProps = (state, ownProps) => {
           const curr = OrgTimestampUtil.add(past, { days: 1 * i });
           const next = OrgTimestampUtil.add(curr, { days: 1 });
           const ts = logData.length > 0 ? logData[0].timestamp : null;
+
           if (
             ts !== null &&
             OrgTimestampUtil.compare(ts, curr) > 0 &&
@@ -399,6 +404,8 @@ const mapStateToProps = (state, ownProps) => {
             rngMax = repMaxVal ? repMaxVal * { d: 1, w: 7 }[repMaxU] : 0;
             if (rngMax > 0) rngMin--;
           } else if (OrgTimestampUtil.compare(getRealNow(), curr) === 0) {
+            if (rngMin > 0) rngMin--;
+            if (rngMax && rngMax > 0) rngMax--;
             ret.push('!');
           } else {
             if (rngMax && rngMax > 0) {
