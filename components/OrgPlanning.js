@@ -11,14 +11,14 @@ import {
 
 import OrgTimestamp from './OrgTimestamp';
 
-const OrgTimestampUtil = require('org-parse').OrgTimestamp;
+const OrgTimestampUtil = require('../utilities/OrgTimestampUtil');
 const OrgNodeUtil = require('../utilities/OrgNodeUtil');
 
 const timestampTypes = ['OPENED', 'SCHEDULED', 'DEADLINE', 'CLOSED'];
 
 import appStyles from '../styles';
 
-class OrgScheduling extends Component {
+class OrgPlanning extends Component {
   constructor(props) {
     super(props);
     this.state = { isCollapsed: this.props.isCollapsed };
@@ -33,7 +33,7 @@ class OrgScheduling extends Component {
       return (
         <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
           <View
-            className="OrgScheduling"
+            className="OrgPlanning"
             style={{
               flexDirection: 'row',
               backgroundColor: '#cccccc'
@@ -71,7 +71,7 @@ class OrgScheduling extends Component {
         <View style={appStyles.container}>
           <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
             <View
-              className="OrgScheduling"
+              className="OrgPlanning"
               style={{
                 flexDirection: 'row',
                 backgroundColor: '#cccccc'
@@ -104,8 +104,9 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = dispatch => {
   return {
     onTimestampUpdate: (bufferID, nodeID, timestampType) => date => {
-      const timestamp = OrgTimestampUtil.parseDate(date);
-      timestamp.type = 'active';
+      let timestamp = OrgTimestampUtil.parseDate(date);
+      timestamp.type = 'org.timestamp.active';
+      timestamp = OrgTimestampUtil.updateValue(timestamp);
       dispatch(updateNodeTimestamp(bufferID, nodeID, timestampType, timestamp));
     },
     onTimestampRepIntUpdate: (bufferID, nodeID, timestampType) => (
@@ -130,4 +131,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrgScheduling);
+export default connect(mapStateToProps, mapDispatchToProps)(OrgPlanning);

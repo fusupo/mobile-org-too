@@ -22,6 +22,7 @@ class OrgTimestampUtil {
   //     return OrgTimestamp.parseStr(src);
   //   }
   // }
+
   // static parseStr(srcStr) {
   //   // todo: parse timestamps without hour:minute parts without error
   //   const matchRes = srcStr.match(org_ts_re);
@@ -50,22 +51,9 @@ class OrgTimestampUtil {
   //   };
   // }
 
-  // static parseDate(srcDate) {
-  //   const mom = srcDate === undefined ? moment() : moment(srcDate);
-  //   return {
-  //     // srcStr: '',
-  //     type: 'inactive',
-  //     year: mom.year(),
-  //     month: mom.month() + 1,
-  //     date: mom.date(),
-  //     day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][mom.day()],
-  //     hour: mom.hour(),
-  //     minute: mom.minute(),
-  //     repInt: null,
-  //     repMin: null,
-  //     repMax: null
-  //   };
-  // }
+  static parseDate(srcDate) {
+    return OrgTimestampUtil.momentToObj(moment(srcDate));
+  }
 
   static now() {
     return OrgTimestampUtil.momentToObj(moment());
@@ -292,51 +280,49 @@ class OrgTimestampUtil {
     return newTs;
   }
 
-  static serialize(timestamp) {
-    return timestamp.value;
-  }
-
   ////////////////////////////////////////////////////////////////////////////////
 
   static getRepMin(ts) {
-    const rep = ts.repeat;
-    const repInt = rep ? rep.substr(0, rep.lastIndexOf('+') + 1) : null;
-    let repMinMax = rep ? rep.substr(rep.lastIndexOf('+') + 1) : null;
-    let repMin = repMinMax
-      ? repMinMax.indexOf('/') !== -1
-        ? repMinMax.substr(0, repMinMax.indexOf('/'))
-        : repMinMax
-      : null;
-    let repMax = repMinMax
-      ? repMinMax.indexOf('/') !== -1
-        ? repMinMax.substr(repMinMax.indexOf('/') + 1)
-        : null
-      : null;
-    return repMin;
+    if (ts.repeat === null) return null;
+    const match = /([.+][+]?){1}(?:([1-9]+)([dwmy])){1}(?:\/(?:([1-9]+)([dwmy]))){0,1}/.exec(
+      ts.repeat
+    );
+
+    return match[2] && match[3] ? match[2] + match[3] : null;
   }
 
   static getRepMax(ts) {
-    const rep = ts.repeat;
-    const repInt = rep ? rep.substr(0, rep.lastIndexOf('+') + 1) : null;
-    let repMinMax = rep ? rep.substr(rep.lastIndexOf('+') + 1) : null;
-    let repMin = repMinMax
-      ? repMinMax.indexOf('/') !== -1
-        ? repMinMax.substr(0, repMinMax.indexOf('/'))
-        : repMinMax
-      : null;
-    let repMax = repMinMax
-      ? repMinMax.indexOf('/') !== -1
-        ? repMinMax.substr(repMinMax.indexOf('/') + 1)
-        : null
-      : null;
-    return repMax;
+    if (ts.repeat === null) return null;
+    const match = /([.+][+]?){1}(?:([1-9]+)([dwmy])){1}(?:\/(?:([1-9]+)([dwmy]))){0,1}/.exec(
+      ts.repeat
+    );
+
+    return match[4] && match[5] ? match[4] + match[5] : null;
+  }
+
+  static parseRep(rep) {
+    if (!rep) return null;
+    const match = /([.+][+]?){1}(?:([1-9]+)([dwmy])){1}(?:\/(?:([1-9]+)([dwmy]))){0,1}/.exec(
+      rep
+    );
+    return {
+      repInt: match[1],
+      repMinVal: match[2],
+      repMinU: match[3] ? match[3] : null,
+      repMaxVal: match[4] ? match[4] : null,
+      repMaxU: match[5] ? match[5] : null
+    };
   }
 
   // static getRepMaxUnit(ts){
-
   // }
+
   static parse(tsStr) {
     return orgTimestamp.parse(tsStr);
+  }
+
+  static serialize(timestamp) {
+    return timestamp.value;
   }
 }
 

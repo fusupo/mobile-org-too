@@ -28,7 +28,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import OrgHeadlineEditable from '../components/OrgHeadlineEditable';
-import OrgScheduling from '../components/OrgScheduling';
+import OrgPlanning from '../components/OrgPlanning';
 import OrgDrawer from '../components/OrgDrawer';
 import OrgLogbook from '../components/OrgLogbook';
 import OrgBody from '../components/OrgBody';
@@ -106,7 +106,7 @@ class NodeDetailScreen extends React.Component {
                   />
                 </View>
                 <View style={[appStyles.container, appStyles.border]}>
-                  <OrgScheduling
+                  <OrgPlanning
                     bufferID={bufferID}
                     nodeID={nodeID}
                     isCollapsed={true}

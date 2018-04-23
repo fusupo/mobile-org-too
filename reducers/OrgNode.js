@@ -80,6 +80,33 @@ function planning(state = null, action) {
       });
       return newState;
       break;
+    case UPDATE_NODE_TIMESTAMP:
+      var targType = action.timestampType.toLowerCase();
+      var nextTs = OrgTimestampUtil.clone(action.timestamp);
+      nextTs.repeat = state[targType] ? state[targType].repeat : null;
+      nextTs = OrgTimestampUtil.updateValue(nextTs);
+      var nextState = Object.assign({}, state);
+      nextState[targType] = nextTs;
+      return nextState;
+      break;
+    case UPDATE_NODE_TIMESTAMP_REP_INT:
+      var targType = action.timestampType.toLowerCase();
+      var nextTs = OrgTimestampUtil.clone(state[targType]);
+      var nextRep =
+        action.repInt && action.repMin ? action.repInt + action.repMin : null;
+      if (nextRep && action.repMax) nextRep += '/' + action.repMax;
+      nextTs.repeat = nextRep;
+      nextTs = OrgTimestampUtil.updateValue(nextTs);
+      var nextState = Object.assign({}, state);
+      nextState[targType] = nextTs;
+      return nextState;
+      break;
+    case CLEAR_NODE_TIMESTAMP:
+      var targType = action.timestampType.toLowerCase();
+      var nextState = Object.assign({}, state);
+      nextState[targType] = null;
+      return nextState;
+      break;
     default:
       return state;
       break;
@@ -126,7 +153,7 @@ function logbook(state = null, action) {
 function section(state = null, action) {
   switch (action.type) {
     case COMPLETE_HABIT:
-      const nextChildren = state.children.map(c => {
+      var nextChildren = state.children.map(c => {
         switch (c.type) {
           case 'org.planning':
             return planning(c, action);
@@ -142,16 +169,22 @@ function section(state = null, action) {
             break;
         }
       });
-      const newState = Object.assign({}, state, { children: nextChildren });
-      //     const planningIdx = state.children.reduce((m, i, idx) => {
-      //       if (!m) {
-      //         if (i.type === 'org.planning') return idx;
-      //       }
-      //       return m;
-      //     }, null);
-
-      //     if (typeof planningIdx === 'number') {
-      return newState;
+      return Object.assign({}, state, { children: nextChildren });
+      break;
+    case CLEAR_NODE_TIMESTAMP:
+    case UPDATE_NODE_TIMESTAMP:
+    case UPDATE_NODE_TIMESTAMP_REP_INT:
+      var nextChildren = state.children.map(c => {
+        switch (c.type) {
+          case 'org.planning':
+            return planning(c, action);
+            break;
+          default:
+            return c;
+            break;
+        }
+      });
+      return Object.assign({}, state, { children: nextChildren });
       break;
     default:
       return state;

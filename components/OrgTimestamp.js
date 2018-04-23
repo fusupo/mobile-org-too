@@ -13,27 +13,32 @@ import {
   View
 } from 'react-native';
 
-const orgHeadlineUtil = require('org-parse').OrgHeadline;
+const OrgTimestampUtil = require('../utilities/OrgTimestampUtil');
 
 import appStyles from '../styles';
 
 class OrgTimestamp extends Component {
   constructor(props) {
     super(props);
+
+    const date = props.timestamp ? new Date() : new Date();
+    const parsedRep = props.timestamp
+      ? OrgTimestampUtil.parseRep(props.timestamp.repeat)
+      : null;
     this.state = {
-      date: new Date(),
+      date,
       showDatePicker: false,
       showRepIntPicker: false,
-      repInt: '--',
-      repMinVal: '-',
-      repMinU: '-',
-      repMaxVal: '-',
-      repMaxU: '-'
+      repInt: parsedRep && parsedRep.repInt ? parsedRep.repInt : '--',
+      repMinVal: parsedRep && parsedRep.repMinVal ? parsedRep.repMinVal : '-',
+      repMinU: parsedRep && parsedRep.repMinU ? parsedRep.repMinU : '-',
+      repMaxVal: parsedRep && parsedRep.repMaxVal ? parsedRep.repMaxVal : '-',
+      repMaxU: parsedRep && parsedRep.repMaxU ? parsedRep.repMaxU : '-'
     };
   }
 
   render() {
-    const timestamp = this.props.timestamp;
+    const { timestamp } = this.props;
 
     const okCancel = (onCancelPress, onOkPress) => {
       return (
@@ -83,76 +88,76 @@ class OrgTimestamp extends Component {
         </Picker>
       );
     };
-    var showRepIntPicker = this.state.showRepIntPicker ? (
-      <View>
-        {okCancel(
-          () => {
-            this.setState({ showRepIntPicker: !this.state.showRepIntPicker });
-          },
-          () => {
-            const {
-              repInt,
-              repMaxVal,
-              repMaxU,
-              repMinVal,
-              repMinU
-            } = this.state;
-            if (repInt !== '--') {
-              if (
-                repMaxVal !== '-' &&
-                repMaxU !== '-' &&
-                repMinVal !== '-' &&
-                repMinU !== '-' &&
-                parseInt(repMinVal) < parseInt(repMaxVal)
-                // you would also want to make sure the repMaxU is >= repMinU
-              ) {
-                // case has min and max repeat rates defined
-                this.props.onTimestampRepIntUpdate(
-                  repInt,
-                  repMinVal + repMinU,
-                  repMaxVal + repMaxU
-                );
-              } else if (repMinVal !== '-' && repMinU !== '-') {
-                // case has only min repeat rate defined
-                this.props.onTimestampRepIntUpdate(
-                  repInt,
-                  repMinVal + repMinU,
-                  null
-                );
-              }
-            } else {
-              if (
-                repMaxVal === '-' &&
-                repMaxU === '-' &&
-                repMinVal === '-' &&
-                repMinU === '-'
-              ) {
-                this.props.onTimestampRepIntUpdate(null, null, null);
-              }
-            }
-            this.setState({ showRepIntPicker: !this.state.showRepIntPicker });
-          }
-        )}
-        <View style={{ flexDirection: 'row' }}>
-          <Picker
-            style={appStyles.container}
-            selectedValue={this.state.repInt}
-            onValueChange={(itemValue, itemIndex) =>
-              this.setState({ repInt: itemValue })}>
-            <Picker.Item label="--" value="--" />
-            <Picker.Item label="+" value="+" />
-            <Picker.Item label="++" value="++" />
-            <Picker.Item label=".+" value=".+" />
-          </Picker>
-          {repValPicker('repMinVal')}
-          {repUnitsPicker('repMinU')}
-          {repValPicker('repMaxVal')}
-          {repUnitsPicker('repMaxU')}
-        </View>
-      </View>
-    ) : (
-      <View />
-    );
+    // var showRepIntPicker = this.state.showRepIntPicker ? (
+    //   <View>
+    //     {okCancel(
+    //       () => {
+    //         this.setState({ showRepIntPicker: !this.state.showRepIntPicker });
+    //       },
+    //       () => {
+    //         const {
+    //           repInt,
+    //           repMaxVal,
+    //           repMaxU,
+    //           repMinVal,
+    //           repMinU
+    //         } = this.state;
+    //         if (repInt !== '--') {
+    //           if (
+    //             repMaxVal !== '-' &&
+    //             repMaxU !== '-' &&
+    //             repMinVal !== '-' &&
+    //             repMinU !== '-' &&
+    //             parseInt(repMinVal) < parseInt(repMaxVal)
+    //             // you would also want to make sure the repMaxU is >= repMinU
+    //           ) {
+    //             // case has min and max repeat rates defined
+    //             this.props.onTimestampRepIntUpdate(
+    //               repInt,
+    //               repMinVal + repMinU,
+    //               repMaxVal + repMaxU
+    //             );
+    //           } else if (repMinVal !== '-' && repMinU !== '-') {
+    //             // case has only min repeat rate defined
+    //             this.props.onTimestampRepIntUpdate(
+    //               repInt,
+    //               repMinVal + repMinU,
+    //               null
+    //             );
+    //           }
+    //         } else {
+    //           if (
+    //             repMaxVal === '-' &&
+    //             repMaxU === '-' &&
+    //             repMinVal === '-' &&
+    //             repMinU === '-'
+    //           ) {
+    //             this.props.onTimestampRepIntUpdate(null, null, null);
+    //           }
+    //         }
+    //         this.setState({ showRepIntPicker: !this.state.showRepIntPicker });
+    //       }
+    //     )}
+    //     <View style={{ flexDirection: 'row' }}>
+    //       <Picker
+    //         style={appStyles.container}
+    //         selectedValue={this.state.repInt}
+    //         onValueChange={(itemValue, itemIndex) =>
+    //           this.setState({ repInt: itemValue })}>
+    //         <Picker.Item label="--" value="--" />
+    //         <Picker.Item label="+" value="+" />
+    //         <Picker.Item label="++" value="++" />
+    //         <Picker.Item label=".+" value=".+" />
+    //       </Picker>
+    //       {repValPicker('repMinVal')}
+    //       {repUnitsPicker('repMinU')}
+    //       {repValPicker('repMaxVal')}
+    //       {repUnitsPicker('repMaxU')}
+    //     </View>
+    //   </View>
+    // ) : (
+    //   <View />
+    // );
 
     const showDatePicker = this.state.showDatePicker ? (
       <View>
@@ -172,6 +177,7 @@ class OrgTimestamp extends Component {
               repMinVal,
               repMinU
             } = this.state;
+
             if (repInt !== '--') {
               if (
                 repMaxVal !== '-' &&
@@ -239,9 +245,15 @@ class OrgTimestamp extends Component {
     const labelStr = `${this.props.label}:`;
     let timestampStr, repIntStr;
     if (timestamp) {
-      timestampStr = `${timestamp.year}-${timestamp.month}-${timestamp.date} ${timestamp.day} ${timestamp.hour}:${timestamp.minute}`;
-      repIntStr = `${timestamp.repInt || '--'}${timestamp.repMin ||
-        '--'}/${timestamp.repMax || '--'}`;
+      timestampStr = `${timestamp.date.yyyy}-${('' + timestamp.date.mm
+      ).padStart(2, '0')}-${('' + timestamp.date.dd).padStart(
+        2,
+        '0'
+      )} ${timestamp.date.dayName} ${('' + timestamp.time.hh).padStart(
+        2,
+        '0'
+      )}:${('' + timestamp.time.mm).padStart(2, '0')}`;
+      repIntStr = timestamp.repeat; //`${timestamp.repInt || '--'}${timestamp.repMin ||'--'}/${timestamp.repMax || '--'}`;
     } else {
       timestampStr = '----------------------';
       repIntStr = '------';
