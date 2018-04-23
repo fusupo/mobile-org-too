@@ -44,7 +44,7 @@ class OrgDrawer extends Component {
                   key={idx}
                   idx={idx}
                   propKey={key}
-                  propVal={val}
+                  propVal={typeof val === 'object' ? val.value : val}
                   onRemoveProp={this.props.onRemoveProp}
                   onUpdateProp={this.props.onUpdateProp}
                 />

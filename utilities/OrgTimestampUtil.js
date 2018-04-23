@@ -86,11 +86,33 @@ class OrgTimestampUtil {
   }
 
   static momentToString(mom) {
-    return `[${mom.format('YYYY-MM-DD ddd HH:mm')}]`;
+    return `${mom.format('YYYY-MM-DD ddd HH:mm')}`;
   }
 
-  static momentToObj(mom) {
-    return {
+  static toString(ts) {
+    const { date, time } = ts;
+
+    return `${date.yyyy}-${(date.mm + '').padStart(2, '0')}-${(date.dd + ''
+    ).padStart(2, '0')} ${date.dayName} ${('' + time.hh).padStart(
+      2,
+      '0'
+    )}:${('' + time.mm).padStart(2, '0')}${ts.repeat ? ' ' + ts.repeat : ''}`;
+  }
+
+  static updateValue(ts) {
+    const ret = OrgTimestampUtil.clone(ts);
+    let valStr = OrgTimestampUtil.toString(ts);
+    if (ret.type === 'org.timestamp.inactive') {
+      valStr = `[${valStr}]`;
+    } else if (ret.type === 'org.timestamp.active') {
+      valStr = `<${valStr}>`;
+    }
+    ret.value = valStr;
+    return ret;
+  }
+
+  static momentToObj(mom, type = 'inactive') {
+    return OrgTimestampUtil.updateValue({
       date: {
         type: 'org.date',
         yyyy: mom.year(),
@@ -113,9 +135,8 @@ class OrgTimestampUtil {
       },
       timeEnd: null,
       timeStart: null,
-      type: 'org.timestamp.inactive' //active?
-      // value: '<2018-04-21 Sat 00:00 .+1d>';
-    };
+      type: `org.timestamp.${type}` //active?
+    });
 
     // return {
     //   // srcStr: '',
@@ -131,9 +152,41 @@ class OrgTimestampUtil {
     //   repMax: null
     // };
   }
+
   static clone(obj) {
-    return OrgTimestampUtil.momentToObj(OrgTimestampUtil.momentFromObj(obj));
+    let date = obj.date ? Object.assign({}, obj.date) : null;
+    let dateStart = obj.dateStart ? Object.assign({}, obj.dateStart) : null;
+    let dateEnd = obj.dateEnd ? Object.assign({}, obj.dateEnd) : null;
+    let delay = obj.delay || null;
+    let delayStart = obj.delayStart || null;
+    let delayEnd = obj.delayEnd || null;
+    let repeat = obj.repeat || null;
+    let repeatStart = obj.repeatStart || null;
+    let repeatEnd = obj.repeatEnd || null;
+    let time = obj.time ? Object.assign({}, obj.time) : null;
+    let timeStart = obj.timeStart ? Object.assign({}, obj.timeStart) : null;
+    let timeEnd = obj.timeEnd ? Object.assign({}, obj.timeEnd) : null;
+    let type = obj.type;
+    let value = obj.value || null;
+
+    return {
+      date,
+      dateStart,
+      dateEnd,
+      delay,
+      delayStart,
+      delayEnd,
+      repeat,
+      repeatStart,
+      repeatEnd,
+      time,
+      timeStart,
+      timeEnd,
+      type,
+      value
+    };
   }
+
   static add(a, b) {
     const mom = OrgTimestampUtil.momentFromObj(a);
     const res = mom.add(b);
@@ -189,24 +242,29 @@ class OrgTimestampUtil {
   }
 
   static calcNextRepeat(base, x) {
-    base =
-      typeof base === 'string'
-        ? xtractTimestamp(orgTimestamp.parse(base))
-        : base;
-    x = typeof x === 'string' ? xtractTimestamp(orgTimestamp.parse(x)) : x;
+    base = typeof base === 'string' ? orgTimestamp.parse(base) : base;
+    console.log(x);
+    x = typeof x === 'string' ? orgTimestamp.parse(x) : x;
 
-    const repVal = base.repMin.substr(0, base.repMin.length - 1);
+    const match = /([.+][+]?){1}(?:([1-9]+)([dwmy])){1}(?:\/(?:([1-9]+)([dwmy]))){0,1}/.exec(
+      base.repeat
+    );
+
+    const repInt = match[1];
+    const repVal = match[2];
     const repUnit = {
       y: 'years',
       m: 'months',
       w: 'weeks',
       d: 'days',
       h: 'hours'
-    }[base.repMin[base.repMin.length - 1]];
-    let newTs,
-      updateObj = {};
+    }[match[3]];
+
+    let newTs = {};
+    let updateObj = {};
     updateObj[repUnit] = repVal;
-    switch (base.repInt) {
+
+    switch (repInt) {
       case '+':
         newTs = OrgTimestampUtil.add(base, updateObj);
         break;
@@ -217,51 +275,26 @@ class OrgTimestampUtil {
         } while (OrgTimestampUtil.compare(newTs, x) < 0);
         break;
       case '.+':
-        x.hour = base.hour;
-        x.minute = base.minute;
-        newTs = OrgTimestampUtil.add(x, updateObj);
+        newTs = OrgTimestampUtil.clone(x);
+        console.log(newTs);
+        newTs.time = Object.assign({}, base.time);
+        console.log('updObj', updateObj);
+        newTs = OrgTimestampUtil.add(newTs, updateObj);
+        console.log(newTs);
         newTs.type = base.type;
-        newTs.repInt = base.repInt;
-        newTs.repMin = base.repMin;
-        newTs.repMax = base.repMax;
+        newTs.repeat = base.repeat;
         break;
       default:
         console.log('REPEAT INTERVAL CALCULATION ERROR');
         break;
     }
+    newTs = OrgTimestampUtil.updateValue(newTs);
     return newTs;
   }
-  // static serialize(timestamp) {
-  //   const padMaybe = n => (n.toString().length === 1 ? '0' + n : n);
-  //   let r = '';
-  //   let closetag, opentag;
-  //   if (timestamp.type && timestamp.type === 'active') {
-  //     opentag = '<';
-  //     closetag = '>';
-  //   } else {
-  //     opentag = '[';
-  //     closetag = ']';
-  //   }
-  //   r += opentag;
-  //   r +=
-  //     timestamp.year +
-  //     '-' +
-  //     padMaybe(timestamp.month) +
-  //     '-' +
-  //     padMaybe(timestamp.date) +
-  //     ' ';
-  //   r += timestamp.day + ' ';
-  //   r += padMaybe(timestamp.hour) + ':' + padMaybe(timestamp.minute);
-  //   // REPEAT
-  //   if (timestamp.repInt) {
-  //     r += ' ';
-  //     r += timestamp.repInt + timestamp.repMin;
-  //     r += timestamp.repMax ? '/' + timestamp.repMax : '';
-  //   }
-  //   //
-  //   r += closetag;
-  //   return r;
-  // }
+
+  static serialize(timestamp) {
+    return timestamp.value;
+  }
 
   ////////////////////////////////////////////////////////////////////////////////
 
@@ -281,10 +314,6 @@ class OrgTimestampUtil {
       : null;
     return repMin;
   }
-
-  // static getRepMinUnit(ts){
-
-  // }
 
   static getRepMax(ts) {
     const rep = ts.repeat;
@@ -306,6 +335,9 @@ class OrgTimestampUtil {
   // static getRepMaxUnit(ts){
 
   // }
+  static parse(tsStr) {
+    return orgTimestamp.parse(tsStr);
+  }
 }
 
 module.exports = OrgTimestampUtil;

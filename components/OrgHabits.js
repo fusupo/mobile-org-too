@@ -115,9 +115,9 @@ class OrgHabits extends React.Component {
       this.setState({
         dateModalNodeID: nodeID,
         dateModalDate: new Date(
-          date.year,
-          date.month - 1,
-          date.date,
+          date.date.yyyy,
+          date.date.mm - 1,
+          date.date.dd,
           new Date().getHours(),
           new Date().getMinutes()
         )
@@ -132,9 +132,9 @@ class OrgHabits extends React.Component {
         },
         idx => {
           if (idx === 0) {
-            const tdate = momentToTS(momentFromTS(date));
-            tdate.hour += OrgTimestampUtil.now().time.hh;
-            tdate.minute += OrgTimestampUtil.now().time.mm;
+            const tdate = OrgTimestampUtil.clone(date);
+            /* tdate.time.hh += OrgTimestampUtil.now().time.hh;
+             * tdate.time.mm += OrgTimestampUtil.now().time.mm;*/
             onHabitPress(nodeID, tdate);
           } else if (idx === 1) {
             showDateModal(nodeID);
@@ -228,9 +228,9 @@ class OrgHabits extends React.Component {
                   title={'OK'}
                   onPress={() => {
                     this.setNoteModalVisible(!this.state.noteModalVisible);
-                    const tdate = momentToTS(momentFromTS(date));
-                    tdate.hour += OrgTimestampUtil.now().hour;
-                    tdate.minute += OrgTimestampUtil.now().minute;
+                    const tdate = OrgTimestampUtil.clone(date);
+                    tdate.time.hh += OrgTimestampUtil.now().time.hh;
+                    tdate.time.mm += OrgTimestampUtil.now().time.mm;
                     onHabitPress(
                       this.state.noteModalNodeID,
                       tdate,
@@ -455,7 +455,7 @@ const mapDispatchToProps = dispatch => {
 function someAction(nodeID, date, noteText) {
   return (dispatch, getState) => {
     const state = getState();
-    const nowStr = serializeTS(date); //;OrgTimestampUtil.now());
+    const nowStr = date.value; //;OrgTimestampUtil.now());
     // super inefficient way of finding bufferID from nodeID !!!!
     let bufferID = Object.entries(state.orgBuffers).reduce((M, V) => {
       if (M === undefined) {

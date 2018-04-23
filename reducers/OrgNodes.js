@@ -8,7 +8,7 @@ import {
   ADD_NEW_NODE,
   CYCLE_NODE_COLLAPSE,
   UPDATE_NODE_TODO_KEYWORD,
-  UPDATE_NODE_HEADLINE_CONTENT,
+  UPDATE_NODE_HEADLINE_TITLE,
   UPDATE_NODE_TIMESTAMP,
   UPDATE_NODE_TIMESTAMP_REP_INT,
   CLEAR_NODE_TIMESTAMP,
@@ -35,7 +35,7 @@ const orgNodes = (state = {}, action) => {
     case RESET_HABIT:
     case CYCLE_NODE_COLLAPSE:
     case UPDATE_NODE_TODO_KEYWORD:
-    case UPDATE_NODE_HEADLINE_CONTENT:
+    case UPDATE_NODE_HEADLINE_TITLE:
     case UPDATE_NODE_TIMESTAMP:
     case UPDATE_NODE_TIMESTAMP_REP_INT:
     case CLEAR_NODE_TIMESTAMP:
@@ -49,10 +49,10 @@ const orgNodes = (state = {}, action) => {
     case TOGGLE_NODE_TAG:
       const nodeID = action.nodeID;
       let newNodeObj = {};
-      console.log('MICKEY-FICKEY: ', state[nodeID], action);
       const newNode = orgNode(state[nodeID], action);
       newNodeObj[nodeID] = newNode;
       nextState = Object.assign({}, state, newNodeObj);
+      console.log('nextState!!', nextState);
       break;
     default:
       break;

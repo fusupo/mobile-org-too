@@ -5,7 +5,7 @@ import { Keyboard, StyleSheet, Text, TextInput, View } from 'react-native';
 import OrgTodoKeywordEditable from './OrgTodoKeywordEditable';
 import OrgTags from './OrgTagsEditable';
 
-import { updateNodeHeadlineContent } from '../actions';
+import { updateNodeHeadlineTitle } from '../actions';
 
 import appStyles from '../styles';
 
@@ -19,13 +19,13 @@ class OrgHeadlineEditable extends Component {
   }
 
   render() {
-    const { bufferID, node, autoFocus } = this.props;
+    const { bufferID, node, autoFocus, onHeadlineEndEditing } = this.props;
     const { firstEdit, title } = this.state;
 
     const endEdit = () => {
       this.setState({ firstEdit: false });
       Keyboard.dismiss();
-      this.props.onHeadlineEndEditing(bufferID, node.id, title);
+      onHeadlineEndEditing(bufferID, node.id, title);
     };
 
     return (
@@ -43,13 +43,9 @@ class OrgHeadlineEditable extends Component {
           value={title}
           autoFocus={autoFocus}
           clearTextOnFocus={autoFocus && firstEdit}
-          onSubmitEditing={() => {
-            endEdit();
-          }}
+          onSubmitEditing={endEdit}
           onChangeText={title => this.setState({ title })}
-          onEndEditing={e => {
-            endEdit();
-          }}
+          onEndEditing={endEdit}
         />
         <View style={{ flex: 1 }}>
           <OrgTags bufferID={bufferID} nodeID={node.id} />
@@ -74,7 +70,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     onHeadlineEndEditing: (bufferID, nodeID, text) => {
-      dispatch(updateNodeHeadlineContent(bufferID, nodeID, text));
+      dispatch(updateNodeHeadlineTitle(bufferID, nodeID, text));
     }
   };
 };

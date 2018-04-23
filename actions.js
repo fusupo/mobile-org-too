@@ -7,7 +7,7 @@ import { uuid } from './utilities/utils';
 export const REGISTER_DBX_ACCESS_TOKEN = 'REGISTER_DBX_ACCESS_TOKEN';
 export const CYCLE_NODE_COLLAPSE = 'CYCLE_NODE_COLLAPSE';
 export const UPDATE_NODE_TODO_KEYWORD = 'UPDATE_NODE_TODO_KEYWORD';
-export const UPDATE_NODE_HEADLINE_CONTENT = 'UPDATE_NODE_HEADLINE_CONTENT';
+export const UPDATE_NODE_HEADLINE_TITLE = 'UPDATE_NODE_HEADLINE_TITLE';
 export const UPDATE_NODE_TIMESTAMP = 'UPDATE_NODE_TIMESTAMP';
 export const UPDATE_NODE_TIMESTAMP_REP_INT = 'UPDATE_NODE_TIMESTAMP_REP_INT';
 export const CLEAR_NODE_TIMESTAMP = 'CLEAR_NODE_TIMESTAMP';
@@ -51,8 +51,8 @@ export function updateNodeTodoKeyword(bufferID, nodeID, todoKeyword) {
   return { type: UPDATE_NODE_TODO_KEYWORD, bufferID, nodeID, todoKeyword };
 }
 
-export function updateNodeHeadlineContent(bufferID, nodeID, text) {
-  return { type: UPDATE_NODE_HEADLINE_CONTENT, bufferID, nodeID, text };
+export function updateNodeHeadlineTitle(bufferID, nodeID, text) {
+  return { type: UPDATE_NODE_HEADLINE_TITLE, bufferID, nodeID, text };
 }
 
 export function updateNodeTimestampRepInt(

@@ -17,8 +17,6 @@ import OrgHabits from '../components/OrgHabits';
 import OrgAgenda from '../components/OrgAgenda';
 import SplitPane from '../components/SplitPane';
 
-/* import { momentFromTS, momentToTS } from '../utilities/utils';*/
-
 const orgDrawerUtils = require('org-parse').OrgDrawer;
 
 const OrgTimestampUtil = require('../utilities/OrgTimestampUtil');
