@@ -110,6 +110,14 @@ class OrgHabits extends React.Component {
   }
   render() {
     const { date, habits, habitData, onHabitPress } = this.props;
+    const {
+      dateModalVisible,
+      dateModalNodeID,
+      dateModalDate,
+      noteModalVisible,
+      noteModalNodeID,
+      noteModalText
+    } = this.state;
 
     const showDateModal = nodeID => {
       this.setState({
@@ -133,8 +141,6 @@ class OrgHabits extends React.Component {
         idx => {
           if (idx === 0) {
             const tdate = OrgTimestampUtil.clone(date);
-            /* tdate.time.hh += OrgTimestampUtil.now().time.hh;
-             * tdate.time.mm += OrgTimestampUtil.now().time.mm;*/
             onHabitPress(nodeID, tdate);
           } else if (idx === 1) {
             showDateModal(nodeID);
@@ -148,15 +154,15 @@ class OrgHabits extends React.Component {
         <Modal
           animationType={'fade'}
           transparent={false}
-          visible={this.state.dateModalVisible}
+          visible={dateModalVisible}
           onRequestClose={() => {
             alert('Date Modal has been closed.');
           }}>
           <View style={{ flex: 1, marginTop: 22 }}>
             <DatePickerIOS
               style={{ height: 150, flex: 12 }}
-              date={this.state.dateModalDate}
-              onDateChange={dateModalDate => this.setState({ dateModalDate })}
+              date={dateModalDate}
+              onDateChange={dmd => this.setState({ dateModalDate: dmd })}
               mode="datetime"
             />
 
@@ -165,7 +171,7 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'Cancel'}
                   onPress={() => {
-                    this.setDateModalVisible(!this.state.dateModalVisible);
+                    this.setDateModalVisible(!dateModalVisible);
                   }}
                 />
               </View>
@@ -173,14 +179,9 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'OK'}
                   onPress={() => {
-                    this.setDateModalVisible(!this.state.dateModalVisible);
-
-                    const timestamp = parseDate(this.state.dateModalDate);
-                    onHabitPress(
-                      this.state.dateModalNodeID,
-                      timestamp,
-                      this.state.noteModalText
-                    );
+                    this.setDateModalVisible(!dateModalVisible);
+                    const timestamp = OrgTimestampUtil.parseDate(dateModalDate);
+                    onHabitPress(dateModalNodeID, timestamp, noteModalText);
                   }}
                 />
               </View>
@@ -191,7 +192,7 @@ class OrgHabits extends React.Component {
         <Modal
           animationType={'none'}
           transparent={false}
-          visible={this.state.noteModalVisible}
+          visible={noteModalVisible}
           onRequestClose={() => {
             alert('Note Modal has been closed.');
             console.log('Note Modal has been closed.');
@@ -200,9 +201,9 @@ class OrgHabits extends React.Component {
             <TextInput
               style={{ height: '50%', borderColor: '#ccc', borderWidth: 1 }}
               multiline={true}
-              value={this.state.noteModalText}
-              onChangeText={noteModalText => {
-                this.setState({ noteModalText });
+              value={noteModalText}
+              onChangeText={nmt => {
+                this.setState({ noteModalText: nmt });
               }}
             />
             <View style={{ flex: 1, flexDirection: 'row' }}>
@@ -210,7 +211,7 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'Cancel'}
                   onPress={() => {
-                    this.setNoteModalVisible(!this.state.noteModalVisible);
+                    this.setNoteModalVisible(!noteModalVisible);
                   }}
                 />
               </View>
@@ -218,8 +219,8 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'Edit Date'}
                   onPress={() => {
-                    this.setNoteModalVisible(!this.state.noteModalVisible);
-                    showDateModal(this.state.noteModalNodeID);
+                    this.setNoteModalVisible(!noteModalVisible);
+                    showDateModal(noteModalNodeID);
                   }}
                 />
               </View>
@@ -227,15 +228,11 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'OK'}
                   onPress={() => {
-                    this.setNoteModalVisible(!this.state.noteModalVisible);
+                    this.setNoteModalVisible(!noteModalVisible);
                     const tdate = OrgTimestampUtil.clone(date);
                     tdate.time.hh += OrgTimestampUtil.now().time.hh;
                     tdate.time.mm += OrgTimestampUtil.now().time.mm;
-                    onHabitPress(
-                      this.state.noteModalNodeID,
-                      tdate,
-                      this.state.noteModalText
-                    );
+                    onHabitPress(noteModalNodeID, tdate, noteModalText);
                   }}
                 />
               </View>
@@ -245,6 +242,7 @@ class OrgHabits extends React.Component {
 
         {habits.map((h, idx) => {
           const propDrawer = OrgNodeUtil.getPropDrawer(h);
+          const { LOGGING } = propDrawer.props;
           return (
             <View key={h.id} style={{ flexDirection: 'row' }}>
               <TouchableHighlight
@@ -252,25 +250,21 @@ class OrgHabits extends React.Component {
                 style={{ flex: 1 }}
                 onPress={() => {
                   this.setState({ noteModalText: null });
-                  if (propDrawer.LOGGING) {
-                    //{
-                    /* switch (h.propDrawer.properties[idx][1]) {
-                        case 'DONE(@)':
-                        // SHOW NOTE EDITOR
-                        this.setState({ noteModalNodeID: h.id });
-                        this.setNoteModalVisible(!this.state.noteModalVisible);
-                        break;
-                        default:
+                  switch (LOGGING) {
+                    case 'DONE(@)':
+                      this.setState({ noteModalNodeID: h.id });
+                      this.setNoteModalVisible(!noteModalVisible);
+                      break;
+                    default:
+                      if (LOGGING) {
                         console.log(
-                        'UNHANDLED LOGGING TYPE IN ORGHABITS!! -- ',
-                        h.propDrawer.properties[idx][1]
+                          'UNHANDLED LOGGING TYPE IN ORGHABITS!! -- ',
+                          propDrawer.props.LOGGING
                         );
-                        break;
-                        } */
-                    //}
-                  } else {
-                    // SHOW OK/EDIT/CANCEL SHEET
-                    showOKEditCancelSheet(h.id);
+                      } else {
+                        showOKEditCancelSheet(h.id);
+                      }
+                      break;
                   }
                 }}>
                 <Text style={{ textAlign: 'right', fontSize: 12 }}>
