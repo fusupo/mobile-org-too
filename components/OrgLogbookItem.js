@@ -52,18 +52,22 @@ class OrgDrawerItem extends Component {
   }
 
   render() {
-    let showEditor = <View><Text style={styles.text}>{'editor'}</Text></View>;
+    let showEditor = (
+      <View>
+        <Text style={styles.text}>{'editor'}</Text>
+      </View>
+    );
     let ret;
     let le = this.props.logItem;
-    text = le.text
-      ? <Text
-          style={{
-            flex: 1,
-            fontSize: 10
-          }}>
-          {le.text}
-        </Text>
-      : null;
+    text = le.text ? (
+      <Text
+        style={{
+          flex: 1,
+          fontSize: 10
+        }}>
+        {le.text}
+      </Text>
+    ) : null;
     switch (le.type) {
       case 'state':
         ret = (
@@ -76,110 +80,110 @@ class OrgDrawerItem extends Component {
                 <Text style={styles.text}>{`from ${le.from}`}</Text>
               </View>
               <View style={{ flex: 7 }}>
-                <Text style={styles.text}>{`${le.timestamp}`}</Text>
+                <Text style={styles.text}>{`${le.timestamp.value}`}</Text>
               </View>
             </View>
-            <ScrollView horizontal={true}>
-              {text}
-            </ScrollView>
+            <ScrollView horizontal={true}>{text}</ScrollView>
           </View>
         );
         break;
       case 'clock':
         ret = (
           <View style={{ flex: 16 }}>
-            {le.end !== undefined
-              ? <View style={{ flexDirection: 'row' }}>
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={
-                        styles.text
-                      }>{`CLOCK: ${le.start}--${le.end}`}</Text>
-                  </View>
-                  <View style={{}}>
-                    <Text style={styles.text}>{`=>  ${le.duration}`}</Text>
-                  </View>
+            {le.end !== undefined ? (
+              <View style={{ flexDirection: 'row' }}>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={styles.text}>{`CLOCK: ${le.start}--${le.end}`}</Text>
                 </View>
-              : <View style={{ flexDirection: 'row' }}>
-                  <View style={{ flex: 4 }}>
-                    <Text style={styles.text}>{`CLOCK: ${le.start}`}</Text>
-                  </View>
-                </View>}
+                <View style={{}}>
+                  <Text style={styles.text}>{`=>  ${le.duration}`}</Text>
+                </View>
+              </View>
+            ) : (
+              <View style={{ flexDirection: 'row' }}>
+                <View style={{ flex: 4 }}>
+                  <Text style={styles.text}>{`CLOCK: ${le.start}`}</Text>
+                </View>
+              </View>
+            )}
           </View>
         );
         break;
       case 'note':
-        const showEditor = this.state.isEditing
-          ? <View style={{ flex: 16 }}>
+        const showEditor = this.state.isEditing ? (
+          <View style={{ flex: 16 }}>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ flex: 8 }}>
+                <Text style={styles.text}>{`Note taken on`}</Text>
+              </View>
+              <View style={{ flex: 7 }}>
+                <Text style={styles.text}>{`${le.timestamp.value}`}</Text>
+              </View>
+            </View>
+            <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, flexDirection: 'row' }}>
+                <View style={{ flex: 1 }}>
+                  <Button
+                    style={{ flex: 1 }}
+                    onPress={() => {
+                      this.setState({ isEditing: false });
+                    }}
+                    title="cancel"
+                    color="#aa3333"
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Button
+                    style={{ flex: 1 }}
+                    onPress={() => {
+                      this.props.onUpdateLogNote(
+                        this.props.idx,
+                        this.state.text
+                      );
+                      this.setState({ isEditing: false });
+                    }}
+                    title="ok"
+                    color="#33aa33"
+                  />
+                </View>
+              </View>
+              <TextInput
+                style={{
+                  flex: 1,
+                  borderColor: 'gray',
+                  borderWidth: 1,
+                  height: 80,
+                  fontSize: 10
+                }}
+                multiline={true}
+                autoFocus={true}
+                value={
+                  this.state.text === undefined
+                    ? le.text ? le.text : ''
+                    : this.state.text
+                }
+                onChangeText={text => this.setState({ text })}
+              />
+            </View>
+          </View>
+        ) : (
+          <TouchableHighlight
+            style={{ flex: 16 }}
+            onPress={() => this.setState({ isEditing: true })}>
+            <View style={{ flex: 16 }}>
               <View style={{ flexDirection: 'row' }}>
                 <View style={{ flex: 8 }}>
                   <Text style={styles.text}>{`Note taken on`}</Text>
                 </View>
                 <View style={{ flex: 7 }}>
-                  <Text style={styles.text}>{`${le.timestamp}`}</Text>
+                  <Text style={styles.text}>{`${le.timestamp.value}`}</Text>
                 </View>
               </View>
-              <View style={{ flex: 1 }}>
-                <View style={{ flex: 1, flexDirection: 'row' }}>
-                  <View style={{ flex: 1 }}>
-                    <Button
-                      style={{ flex: 1 }}
-                      onPress={() => {
-                        this.setState({ isEditing: false });
-                      }}
-                      title="cancel"
-                      color="#aa3333"
-                    />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Button
-                      style={{ flex: 1 }}
-                      onPress={() => {
-                        this.props.onUpdateLogNote(
-                          this.props.idx,
-                          this.state.text
-                        );
-                        this.setState({ isEditing: false });
-                      }}
-                      title="ok"
-                      color="#33aa33"
-                    />
-                  </View>
-                </View>
-                <TextInput
-                  style={{
-                    flex: 1,
-                    borderColor: 'gray',
-                    borderWidth: 1,
-                    height: 80,
-                    fontSize: 10
-                  }}
-                  multiline={true}
-                  autoFocus={true}
-                  value={
-                    this.state.text === undefined
-                      ? le.text ? le.text : ''
-                      : this.state.text
-                  }
-                  onChangeText={text => this.setState({ text })}
-                />
-              </View>
+              {text}
             </View>
-          : <TouchableHighlight
-              style={{ flex: 16 }}
-              onPress={() => this.setState({ isEditing: true })}>
-              <View style={{ flex: 16 }}>
-                <View style={{ flexDirection: 'row' }}>
-                  <View style={{ flex: 8 }}>
-                    <Text style={styles.text}>{`Note taken on`}</Text>
-                  </View>
-                  <View style={{ flex: 7 }}>
-                    <Text style={styles.text}>{`${le.timestamp}`}</Text>
-                  </View>
-                </View>
-                {text}
-              </View>
-            </TouchableHighlight>;
+          </TouchableHighlight>
+        );
         ret = showEditor;
         break;
       default:
@@ -204,9 +208,7 @@ class OrgDrawerItem extends Component {
             }
           }
         ]}>
-        <View style={{ flexDirection: 'row', marginLeft: 5 }}>
-          {ret}
-        </View>
+        <View style={{ flexDirection: 'row', marginLeft: 5 }}>{ret}</View>
       </Swipeout>
     );
   }

@@ -153,7 +153,6 @@ function propDrawer(state = null, action) {
       newProp[''] = '';
       var foo = Object.assign({}, state.props, newProp);
       var bar = Object.assign({}, state, { props: foo });
-      console.log(bar);
       return bar;
       break;
     case UPDATE_NODE_PROP:
@@ -176,10 +175,13 @@ function propDrawer(state = null, action) {
   }
 }
 function logbook(state = null, action) {
+  const getClonedItems = () => {
+    return state && state.items ? state.items.slice(0) : [];
+  };
   switch (action.type) {
     case COMPLETE_HABIT:
       // i think I may need to deep copy this stuff
-      const clonedItems = state && state.items ? state.items.slice(0) : [];
+      var clonedItems = getClonedItems();
       clonedItems.unshift({
         type: 'state',
         state: '"DONE"',
@@ -187,8 +189,29 @@ function logbook(state = null, action) {
         timestamp: OrgTimestampUtil.parse(action.timestampStr),
         text: action.noteText || ''
       });
-      const newState = Object.assign({}, state, { items: clonedItems });
-      return newState;
+      return Object.assign({}, state, { items: clonedItems });
+      break;
+    case INSERT_NEW_NODE_LOG_NOTE:
+      var clonedItems = getClonedItems();
+      clonedItems.unshift({
+        type: 'note',
+        timestamp: OrgTimestampUtil.parse(action.timestampStr),
+        text: 'foo'
+      });
+      return Object.assign({}, state, { items: clonedItems });
+      break;
+    case UPDATE_NODE_LOG_NOTE:
+      var clonedItems = getClonedItems();
+      let updatedItem = Object.assign({}, state.items[action.idx], {
+        text: action.text
+      });
+      clonedItems.splice(action.idx, 1, updatedItem);
+      return Object.assign({}, state, { items: clonedItems });
+      break;
+    case REMOVE_NODE_LOG_NOTE:
+      var clonedItems = getClonedItems();
+      clonedItems.splice(action.idx, 1);
+      return Object.assign({}, state, { items: clonedItems });
       break;
     default:
       return state;
@@ -197,6 +220,27 @@ function logbook(state = null, action) {
 }
 function section(state = null, action) {
   console.log(state, action);
+  const initState = (s = null, childType = null) => {
+    let ret = s
+      ? Object.assign({}, s)
+      : { type: 'org.section', children: null };
+
+    if (childType) {
+      if (!ret.children) ret.children = [];
+      if (!ret.children.find(c => c.type === childType)) {
+        switch (childType) {
+          case 'org.propDrawer':
+            ret.children.push({ type: 'org.propDrawer', props: {} });
+            break;
+          case 'org.logbook':
+            ret.children.push({ type: 'org.logbook', items: [] });
+            break;
+        }
+      }
+    }
+    return ret;
+  };
+
   switch (action.type) {
     case COMPLETE_HABIT:
       var nextChildren = state.children.map(c => {
@@ -233,63 +277,29 @@ function section(state = null, action) {
       return Object.assign({}, state, { children: nextChildren });
       break;
     case INSERT_NEW_NODE_PROP:
-      // if (state) {
-      //   if (state.children.find(c => c.type === 'org.propDrawer')) {
-      //     var nextChildren = state.children.map(c => {
-      //       switch (c.type) {
-      //         case 'org.propDrawer':
-      //           return propDrawer(c, action);
-      //           break;
-      //         default:
-      //           return c;
-      //           break;
-      //       }
-      //     });
-      //     return Object.assign({}, state, { children: nextChildren });
-      //   } else {
-      //     var props = {};
-      //     props[action.propKey] = action.propVal;
-      //     return Object.assign({}, state, {
-      //       children: [
-      //         {
-      //           type: 'org.propDrawer',
-      //           props
-      //         }
-      //       ]
-      //     });
-      //   }
-      // } else {
-      //   var props = {};
-      //   props[action.propKey] = action.propVal;
-      //   return {
-      //     type: 'org.section',
-      //     children: [
-      //       {
-      //         type: 'org.propDrawer',
-      //         props
-      //       }
-      //     ]
-      //   };
-      // }
-      if (!state) {
-        state = {
-          type: 'org.section',
-          children: [{ type: 'org.propDrawer', props: {} }]
-        };
-      } else if (
-        !state.children ||
-        !state.children.find(c => c.type === 'org.propDrawer')
-      ) {
-        state = Object.assign({}, state, {
-          children: [{ type: 'org.propDrawer', props: {} }]
-        });
-      }
+      state = initState(state, 'org.propDrawer');
     case UPDATE_NODE_PROP:
     case REMOVE_NODE_PROP:
       var nextChildren = state.children.map(c => {
         switch (c.type) {
           case 'org.propDrawer':
             return propDrawer(c, action);
+            break;
+          default:
+            return c;
+            break;
+        }
+      });
+      return Object.assign({}, state, { children: nextChildren });
+      break;
+    case INSERT_NEW_NODE_LOG_NOTE:
+      state = initState(state, 'org.logbook');
+    case UPDATE_NODE_LOG_NOTE:
+    case REMOVE_NODE_LOG_NOTE:
+      var nextChildren = state.children.map(c => {
+        switch (c.type) {
+          case 'org.logbook':
+            return logbook(c, action);
             break;
           default:
             return c;
