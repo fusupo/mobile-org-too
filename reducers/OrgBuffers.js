@@ -27,6 +27,7 @@ import {
 
 const orgBuffers = (state = {}, action) => {
   let nextState;
+  console.log('ORG BUFFER REDUCER', state, action);
   nextState = Object.assign({}, state);
   switch (action.type) {
     case 'addOrgBuffer':

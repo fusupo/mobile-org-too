@@ -27,6 +27,7 @@ const orgNodes = (state = {}, action) => {
   switch (action.type) {
     case DELETE_NODE:
       nextState = Object.assign({}, state);
+      console.log(nextState, action.nodeID);
       delete nextState[action.nodeID];
       break;
     case ADD_NEW_NODE:

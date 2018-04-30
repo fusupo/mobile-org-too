@@ -69,6 +69,7 @@ class NodeDetailScreen extends React.Component {
     } = this.props;
     if (node) {
       // childNodes
+      console.log('NODE DETAILS RENDER', tree, nodeID);
       const children = findBranch(tree, nodeID).children;
       let list = null;
       if (children && children.length > 0) {
@@ -211,6 +212,7 @@ const mapStateToProps = (state, ownProps) => {
   const nodes = state.orgBuffers[bufferID].orgNodes;
   const tree = state.orgBuffers[bufferID].orgTree;
   const node = nodes[nodeID];
+  console.log('STATE', state);
   return {
     bufferID,
     nodeID,
@@ -265,7 +267,8 @@ const mapDispatchToProps = dispatch => {
       dispatch(updateNodeBody(bufferID, nodeID, text));
     },
     onAddOnePress: (bufferID, nodeID, node) => {
-      dispatch(addNewNode(bufferID, nodeID, node.headline.level + 1));
+      console.log(node);
+      dispatch(addNewNode(bufferID, nodeID, node.stars + 1));
     }
   };
 };
