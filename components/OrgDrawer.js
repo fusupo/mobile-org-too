@@ -8,7 +8,10 @@ import OrgDrawerItem from './OrgDrawerItem';
 class OrgDrawer extends Component {
   constructor(props) {
     super(props);
-    this.state = { isCollapsed: this.props.isCollapsed };
+    this.state = {
+      isCollapsed: this.props.isCollapsed,
+      editIdx: null
+    };
   }
 
   _toggleCollapse() {
@@ -47,6 +50,17 @@ class OrgDrawer extends Component {
                   propVal={typeof val === 'object' ? val.value : val}
                   onRemoveProp={this.props.onRemoveProp}
                   onUpdateProp={this.props.onUpdateProp}
+                  onItemEditBegin={itemIdx => {
+                    this.setState({ editIdx: itemIdx });
+                  }}
+                  onItemEditEnd={() => {
+                    this.setState({ editIdx: null });
+                  }}
+                  disabled={
+                    this.state.editIdx === null || this.state.editIdx === idx
+                      ? false
+                      : true
+                  }
                 />
               );
             })

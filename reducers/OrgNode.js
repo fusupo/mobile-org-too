@@ -5,7 +5,7 @@ import {
   COMPLETE_HABIT,
   COMPLETE_TODO,
   ADD_NEW_NODE,
-  CYCLE_NODE_COLLAPSE,
+  //  CYCLE_NODE_COLLAPSE,
   UPDATE_NODE_TODO_KEYWORD,
   UPDATE_NODE_HEADLINE_TITLE,
   UPDATE_NODE_TIMESTAMP,
@@ -44,7 +44,17 @@ function stars(state = null, action) {
 }
 
 function keyword(state = null, action) {
-  return state;
+  switch (action.type) {
+    case UPDATE_NODE_TODO_KEYWORD:
+      if (action.todoKeyword === 'none') {
+        return null;
+      }
+      return action.todoKeyword;
+      break;
+    default:
+      return state;
+      break;
+  }
 }
 
 function priority(state = null, action) {
@@ -66,7 +76,20 @@ function title(state = null, action) {
 }
 
 function tags(state = null, action) {
-  return state;
+  switch (action.type) {
+    case TOGGLE_NODE_TAG:
+      let tags = state ? state.slice(0) : [];
+      if (R.contains(action.tag, tags)) {
+        tags = R.without(action.tag, tags);
+      } else {
+        tags = R.insert(tags.length, action.tag, tags);
+      }
+      return tags;
+      break;
+    default:
+      return state;
+      break;
+  }
 }
 
 function planning(state = null, action) {
@@ -125,6 +148,28 @@ function propDrawer(state = null, action) {
         return state;
       }
       break;
+    case INSERT_NEW_NODE_PROP:
+      var newProp = {};
+      newProp[''] = '';
+      var foo = Object.assign({}, state.props, newProp);
+      var bar = Object.assign({}, state, { props: foo });
+      console.log(bar);
+      return bar;
+      break;
+    case UPDATE_NODE_PROP:
+      var newProp = {};
+      newProp[action.propKey] = action.propVal;
+      var nextProps = Object.assign({}, state.props, newProp);
+      if (action.propKey !== action.oldPropKey)
+        delete nextProps[action.oldPropKey];
+      var nextState = Object.assign({}, state, { props: nextProps });
+      return nextState;
+      break;
+    case REMOVE_NODE_PROP:
+      var newProps = Object.assign({}, state.props);
+      delete newProps[action.propKey];
+      return Object.assign({}, state, { props: newProps });
+      break;
     default:
       return state;
       break;
@@ -151,6 +196,7 @@ function logbook(state = null, action) {
   }
 }
 function section(state = null, action) {
+  console.log(state, action);
   switch (action.type) {
     case COMPLETE_HABIT:
       var nextChildren = state.children.map(c => {
@@ -186,6 +232,72 @@ function section(state = null, action) {
       });
       return Object.assign({}, state, { children: nextChildren });
       break;
+    case INSERT_NEW_NODE_PROP:
+      // if (state) {
+      //   if (state.children.find(c => c.type === 'org.propDrawer')) {
+      //     var nextChildren = state.children.map(c => {
+      //       switch (c.type) {
+      //         case 'org.propDrawer':
+      //           return propDrawer(c, action);
+      //           break;
+      //         default:
+      //           return c;
+      //           break;
+      //       }
+      //     });
+      //     return Object.assign({}, state, { children: nextChildren });
+      //   } else {
+      //     var props = {};
+      //     props[action.propKey] = action.propVal;
+      //     return Object.assign({}, state, {
+      //       children: [
+      //         {
+      //           type: 'org.propDrawer',
+      //           props
+      //         }
+      //       ]
+      //     });
+      //   }
+      // } else {
+      //   var props = {};
+      //   props[action.propKey] = action.propVal;
+      //   return {
+      //     type: 'org.section',
+      //     children: [
+      //       {
+      //         type: 'org.propDrawer',
+      //         props
+      //       }
+      //     ]
+      //   };
+      // }
+      if (!state) {
+        state = {
+          type: 'org.section',
+          children: [{ type: 'org.propDrawer', props: {} }]
+        };
+      } else if (
+        !state.children ||
+        !state.children.find(c => c.type === 'org.propDrawer')
+      ) {
+        state = Object.assign({}, state, {
+          children: [{ type: 'org.propDrawer', props: {} }]
+        });
+      }
+    case UPDATE_NODE_PROP:
+    case REMOVE_NODE_PROP:
+      var nextChildren = state.children.map(c => {
+        switch (c.type) {
+          case 'org.propDrawer':
+            return propDrawer(c, action);
+            break;
+          default:
+            return c;
+            break;
+        }
+      });
+      return Object.assign({}, state, { children: nextChildren });
+      break;
     default:
       return state;
   }
@@ -212,31 +324,6 @@ function parent(state = null, action) {
 //   switch (action.type) {
 //     case ADD_NEW_NODE:
 //       return Object.assign({}, state, { level: action.level });
-//       break;
-//     case UPDATE_NODE_TODO_KEYWORD:
-//       if (action.todoKeyword === 'none') {
-//         return Object.assign({}, state, {
-//           todoKeyword: undefined
-//           // todoKeywordColor: undefined,
-//         });
-//       }
-//       return Object.assign({}, state, {
-//         todoKeyword: action.todoKeyword
-//         // todoKeywordColor: action.todoKeywordColor,
-//       });
-//       break;
-//     case UPDATE_NODE_HEADLINE_TITLE:
-//       console.log(action);
-//       return Object.assign({}, state, { title: action.text });
-//       break;
-//     case TOGGLE_NODE_TAG:
-//       let tags = state.tags || [];
-//       if (R.contains(action.tag, tags)) {
-//         tags = R.without(action.tag, tags);
-//       } else {
-//         tags = R.insert(tags.length, action.tag, tags);
-//       }
-//       return Object.assign({}, state, { tags });
 //       break;
 //     default:
 //       return state;
@@ -372,13 +459,6 @@ function parent(state = null, action) {
 //     case REMOVE_NODE_PROP:
 //       nextState = OrgDrawerUtil.remove(state, [action.propKey]);
 //       break;
-//     case COMPLETE_HABIT:
-//       if (OrgDrawerUtil.hasKey(state, 'LAST_REAT'))
-//         nextState = OrgDrawerUtil.update(state, [
-//           'LAST_REPEAT',
-//           action.timestampStr
-//         ]);
-//       break;
 //     default:
 //       return state;
 //       break;
@@ -415,18 +495,6 @@ function parent(state = null, action) {
 //       nextState = Object.assign({}, state, { entries: clonedEntries });
 //       break;
 //     case COMPLETE_TODO:
-//     case COMPLETE_HABIT:
-//       // i think I may need to deep copy this stuff
-//       clonedEntries = state && state.entries ? state.entries.slice(0) : [];
-//       clonedEntries.unshift({
-//         type: 'state',
-//         state: '"DONE"',
-//         from: '"TODO"',
-//         timestamp: action.timestampStr,
-//         text: action.noteText || ''
-//       });
-//       nextState = Object.assign({}, state, { entries: clonedEntries });
-//       break;
 //   }
 //   return nextState || state;
 // }
@@ -454,14 +522,6 @@ const orgNode = combineReducers({
   section,
   children,
   parent
-  // headline,
-  // opened,
-  // scheduled,
-  // deadline,
-  // closed,
-  // propDrawer,
-  // logbook,
-  // body
 });
 
 export default orgNode;

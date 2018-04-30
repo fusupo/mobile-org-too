@@ -69,10 +69,9 @@ class NodeDetailScreen extends React.Component {
     } = this.props;
     if (node) {
       // childNodes
-      console.log('?????? ', tree, nodeID, findBranch(tree, nodeID));
       const children = findBranch(tree, nodeID).children;
       let list = null;
-      if (children.length > 0) {
+      if (children && children.length > 0) {
         list = (
           <ScrollView
             style={[
@@ -244,8 +243,10 @@ const mapDispatchToProps = dispatch => {
     onAddProp: (bufferID, nodeID) => () => {
       dispatch(insertNewNodeProp(bufferID, nodeID));
     },
-    onUpdateProp: (bufferID, nodeID) => (idx, propKey, propVal) => {
-      dispatch(updateNodeProp(bufferID, nodeID, idx, propKey, propVal));
+    onUpdateProp: (bufferID, nodeID) => (idx, oldPropKey, propKey, propVal) => {
+      dispatch(
+        updateNodeProp(bufferID, nodeID, idx, oldPropKey, propKey, propVal)
+      );
     },
     onRemoveProp: (bufferID, nodeID) => propKey => {
       dispatch(removeNodeProp(bufferID, nodeID, propKey));

@@ -134,8 +134,23 @@ export function insertNewNodeProp(bufferID, nodeID) {
   return { type: INSERT_NEW_NODE_PROP, bufferID, nodeID };
 }
 
-export function updateNodeProp(bufferID, nodeID, idx, propKey, propVal) {
-  return { type: UPDATE_NODE_PROP, bufferID, nodeID, idx, propKey, propVal };
+export function updateNodeProp(
+  bufferID,
+  nodeID,
+  idx,
+  oldPropKey,
+  propKey,
+  propVal
+) {
+  return {
+    type: UPDATE_NODE_PROP,
+    bufferID,
+    nodeID,
+    idx,
+    oldPropKey,
+    propKey,
+    propVal
+  };
 }
 
 export function removeNodeProp(bufferID, nodeID, propKey) {
