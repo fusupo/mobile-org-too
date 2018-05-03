@@ -234,6 +234,13 @@ function section(state = null, action) {
             break;
           case 'org.logbook':
             ret.children.push({ type: 'org.logbook', items: [] });
+          case 'org.planning':
+            ret.children.push({
+              type: 'org.planning',
+              scheduled: null,
+              deadline: null,
+              closed: null
+            });
             break;
         }
       }
@@ -264,6 +271,7 @@ function section(state = null, action) {
     case CLEAR_NODE_TIMESTAMP:
     case UPDATE_NODE_TIMESTAMP:
     case UPDATE_NODE_TIMESTAMP_REP_INT:
+      state = initState(state, 'org.planning');
       var nextChildren = state.children.map(c => {
         switch (c.type) {
           case 'org.planning':
