@@ -26,6 +26,8 @@ import appStyles from '../styles';
 
 const keywords = require('../constants/TodoKeyword').default; // ?;
 
+import { getAllTags, getFlattenedBufferObj } from '../selectors';
+
 class HomeScreen extends React.Component {
   state = {
     buffersLoaded: false,
@@ -111,15 +113,15 @@ class HomeScreen extends React.Component {
                     {
                       bufferID: b[0],
                       nodeID: n[1].id,
-                      content: n[1].headline.content,
-                      level: n[1].headline.level,
-                      keyword: n[1].headline.todoKeyword,
-                      tags: n[1].headline.tags || []
+                      content: n[1].title,
+                      level: n[1].stars,
+                      keyword: n[1].keyword,
+                      tags: n[1].tags || []
                     },
                     m2
                   ),
                 [],
-                Object.entries(b[1].orgNodes)
+                Object.entries(getFlattenedBufferObj(b[1].orgTree))
               ),
               m
             ),
@@ -150,14 +152,16 @@ class HomeScreen extends React.Component {
           );
         }, pool);
       } else {
-        display = Object.entries(buffers).map(e => (
-          <OrgBuffer
-            key={e[0]}
-            bufferID={e[0]}
-            isLocked={this.state.isLocked}
-            onAddOne={onAddOne}
-          />
-        ));
+        display = Object.entries(buffers).map(e => {
+          return (
+            <OrgBuffer
+              key={e[0]}
+              bufferID={e[0]}
+              isLocked={this.state.isLocked}
+              onAddOne={onAddOne}
+            />
+          );
+        });
       }
 
       return (
@@ -314,18 +318,9 @@ class HomeScreen extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   if (ownProps.screenProps.currRoute !== 'MainTab') return {};
-  const buffers = state.orgBuffers;
-  const allTags = R.uniq(
-    Object.values(buffers).reduce((m, v) => {
-      let tags = Object.values(v.orgNodes).reduce((m2, v2) => {
-        return m2.concat(v2.headline.tags || []);
-      }, []);
-      return m.concat(tags);
-    }, [])
-  );
   return {
-    buffers,
-    allTags,
+    buffers: state.orgBuffers,
+    allTags: getAllTags(state),
     settings: state.settings
   };
 };

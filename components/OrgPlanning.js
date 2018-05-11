@@ -11,13 +11,16 @@ import {
 
 import OrgTimestamp from './OrgTimestamp';
 
-const OrgTimestampUtil = require('org-parse').OrgTimestamp;
+const OrgTimestampUtil = require('../utilities/OrgTimestampUtil');
+const OrgNodeUtil = require('../utilities/OrgNodeUtil');
 
 const timestampTypes = ['OPENED', 'SCHEDULED', 'DEADLINE', 'CLOSED'];
 
 import appStyles from '../styles';
 
-class OrgScheduling extends Component {
+import { getNode } from '../selectors';
+
+class OrgPlanning extends Component {
   constructor(props) {
     super(props);
     this.state = { isCollapsed: this.props.isCollapsed };
@@ -32,7 +35,7 @@ class OrgScheduling extends Component {
       return (
         <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
           <View
-            className="OrgScheduling"
+            className="OrgPlanning"
             style={{
               flexDirection: 'row',
               backgroundColor: '#cccccc'
@@ -54,13 +57,14 @@ class OrgScheduling extends Component {
         onTimestampRepIntUpdate,
         onTimestampClear
       } = this.props;
+      const planning = OrgNodeUtil.getPlanning(node);
       const timings = timestampTypes.map(t => (
         <OrgTimestamp
           key={t}
           onTimestampUpdate={onTimestampUpdate(bufferID, nodeID, t)}
           onTimestampRepIntUpdate={onTimestampRepIntUpdate(bufferID, nodeID, t)}
           onTimestampClear={onTimestampClear(bufferID, nodeID, t)}
-          timestamp={node[t.toLowerCase()]}
+          timestamp={planning ? planning[t.toLowerCase()] : null}
           label={t}
         />
       ));
@@ -69,7 +73,7 @@ class OrgScheduling extends Component {
         <View style={appStyles.container}>
           <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
             <View
-              className="OrgScheduling"
+              className="OrgPlanning"
               style={{
                 flexDirection: 'row',
                 backgroundColor: '#cccccc'
@@ -90,8 +94,7 @@ class OrgScheduling extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
-  const nodes = state.orgBuffers[bufferID].orgNodes;
-  const node = nodes[nodeID];
+  const node = getNode(state, bufferID, nodeID);
   return {
     bufferID,
     nodeID,
@@ -102,8 +105,9 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = dispatch => {
   return {
     onTimestampUpdate: (bufferID, nodeID, timestampType) => date => {
-      const timestamp = OrgTimestampUtil.parseDate(date);
-      timestamp.type = 'active';
+      let timestamp = OrgTimestampUtil.parseDate(date);
+      timestamp.type = 'org.timestamp.active';
+      timestamp = OrgTimestampUtil.updateValue(timestamp);
       dispatch(updateNodeTimestamp(bufferID, nodeID, timestampType, timestamp));
     },
     onTimestampRepIntUpdate: (bufferID, nodeID, timestampType) => (
@@ -128,4 +132,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrgScheduling);
+export default connect(mapStateToProps, mapDispatchToProps)(OrgPlanning);

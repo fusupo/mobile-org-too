@@ -11,7 +11,7 @@ import {
   ADD_NEW_NODE,
   CYCLE_NODE_COLLAPSE,
   UPDATE_NODE_TODO_KEYWORD,
-  UPDATE_NODE_HEADLINE_CONTENT,
+  UPDATE_NODE_HEADLINE_TITLE,
   UPDATE_NODE_TIMESTAMP,
   UPDATE_NODE_TIMESTAMP_REP_INT,
   CLEAR_NODE_TIMESTAMP,
@@ -27,6 +27,7 @@ import {
 
 const orgBuffers = (state = {}, action) => {
   let nextState;
+  console.log('ORG BUFFER REDUCER', state, action);
   nextState = Object.assign({}, state);
   switch (action.type) {
     case 'addOrgBuffer':
@@ -36,13 +37,13 @@ const orgBuffers = (state = {}, action) => {
       nextState = R.dissoc(action.path, state);
       break;
     case DELETE_NODE:
-      nextState[action.bufferID].orgTree = orgTree(
-        nextState[action.bufferID].orgTree,
-        action
-      );
+    // nextstate[action.bufferID].orgTree = orgTree(
+    //   nextState[action.bufferID].orgTree,
+    //   action
+    // );
     // break; is missing on purpose
     case UPDATE_NODE_TODO_KEYWORD:
-    case UPDATE_NODE_HEADLINE_CONTENT:
+    case UPDATE_NODE_HEADLINE_TITLE:
     case UPDATE_NODE_TIMESTAMP:
     case UPDATE_NODE_TIMESTAMP_REP_INT:
     case CLEAR_NODE_TIMESTAMP:
@@ -58,16 +59,16 @@ const orgBuffers = (state = {}, action) => {
     case REMOVE_NODE_LOG_NOTE:
     case UPDATE_NODE_BODY:
     case TOGGLE_NODE_TAG:
-      nextState[action.bufferID].orgNodes = orgNodes(
-        nextState[action.bufferID].orgNodes,
-        action
-      );
-      break;
+    // nextState[action.bufferID].orgNodes = orgNodes(
+    //   nextState[action.bufferID].orgNodes,
+    //   action
+    // );
+    // break;
     case ADD_NEW_NODE:
-      nextState[action.bufferID].orgNodes = orgNodes(
-        nextState[action.bufferID].orgNodes,
-        action
-      );
+      // nextState[action.bufferID].orgNodes = orgNodes(
+      //   nextState[action.bufferID].orgNodes,
+      //   action
+      // );
       nextState[action.bufferID].orgTree = orgTree(
         nextState[action.bufferID].orgTree,
         action

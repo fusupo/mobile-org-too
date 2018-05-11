@@ -24,6 +24,9 @@ class Tree extends Component {
   }
 
   componentWillReceiveProps() {
+    console.log(
+      'WILL RECIEVE PROPS ######################################################'
+    );
     if (!this.state.isCollapsed) {
       const { getItems, path } = this.props;
       getItems(path, itemData => {
@@ -92,11 +95,11 @@ class Tree extends Component {
         isCollapsed,
         this.toggleCollapse.bind(this)
       );
-      if (hasKids) {
-        touchableMaybe = branchItem;
-      } else {
-        touchableMaybe = branchItem;
-      }
+      // if (hasKids) {
+      touchableMaybe = branchItem;
+      // } else {
+      //   touchableMaybe = branchItem;
+      // }
     } else if (type === 'leaf') {
       touchableMaybe = renderLeafItem(title, path, type, hasKids);
     }
@@ -109,15 +112,5 @@ class Tree extends Component {
     );
   }
 }
-
-// const mapStateToProps = (state, ownProps) => {
-//   return {};
-// };
-
-// const mapDispatchToProps = dispatch => {
-//   return {};
-// };
-
-// export default connect(mapStateToProps, mapDispatchToProps)(Tree);
 
 export default Tree;

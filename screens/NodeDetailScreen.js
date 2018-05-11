@@ -28,7 +28,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import OrgHeadlineEditable from '../components/OrgHeadlineEditable';
-import OrgScheduling from '../components/OrgScheduling';
+import OrgPlanning from '../components/OrgPlanning';
 import OrgDrawer from '../components/OrgDrawer';
 import OrgLogbook from '../components/OrgLogbook';
 import OrgBody from '../components/OrgBody';
@@ -36,6 +36,9 @@ import OrgList from '../components/OrgList';
 import SplitPane from '../components/SplitPane';
 
 import { findBranch, timestampStringNow } from '../utilities/utils';
+const OrgNodeUtil = require('../utilities/OrgNodeUtil');
+
+import { getNode } from '../selectors';
 
 //const OrgTreeUtil = require('org-parse').OrgTree;
 /* const OrgTimestampUtil = require('org-parse').OrgTimestamp;*/
@@ -68,9 +71,10 @@ class NodeDetailScreen extends React.Component {
     } = this.props;
     if (node) {
       // childNodes
+      console.log('NODE DETAILS RENDER', tree, nodeID);
       const children = findBranch(tree, nodeID).children;
       let list = null;
-      if (children.length > 0) {
+      if (children && children.length > 0) {
         list = (
           <ScrollView
             style={[
@@ -104,7 +108,7 @@ class NodeDetailScreen extends React.Component {
                   />
                 </View>
                 <View style={[appStyles.container, appStyles.border]}>
-                  <OrgScheduling
+                  <OrgPlanning
                     bufferID={bufferID}
                     nodeID={nodeID}
                     isCollapsed={true}
@@ -112,7 +116,7 @@ class NodeDetailScreen extends React.Component {
                 </View>
                 <View style={[appStyles.container, appStyles.border]}>
                   <OrgDrawer
-                    drawer={node.propDrawer}
+                    drawer={OrgNodeUtil.getPropDrawer(node)}
                     isCollapsed={true}
                     onAddProp={onAddProp(bufferID, nodeID)}
                     onUpdateProp={onUpdateProp(bufferID, nodeID)}
@@ -121,7 +125,7 @@ class NodeDetailScreen extends React.Component {
                 </View>
                 <View style={[appStyles.container, appStyles.border]}>
                   <OrgLogbook
-                    log={node.logbook}
+                    log={OrgNodeUtil.getLogbook(node)}
                     isCollapsed={true}
                     onAddLogNote={onAddLogNote(bufferID, nodeID)}
                     onUpdateLogNote={onUpdateLogNote(bufferID, nodeID)}
@@ -207,9 +211,8 @@ class NodeDetailScreen extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   const params = ownProps.navigation.state.params;
   const { bufferID, nodeID, isNew } = params;
-  const nodes = state.orgBuffers[bufferID].orgNodes;
   const tree = state.orgBuffers[bufferID].orgTree;
-  const node = nodes[nodeID];
+  const node = getNode(state, bufferID, nodeID);
   return {
     bufferID,
     nodeID,
@@ -242,8 +245,10 @@ const mapDispatchToProps = dispatch => {
     onAddProp: (bufferID, nodeID) => () => {
       dispatch(insertNewNodeProp(bufferID, nodeID));
     },
-    onUpdateProp: (bufferID, nodeID) => (idx, propKey, propVal) => {
-      dispatch(updateNodeProp(bufferID, nodeID, idx, propKey, propVal));
+    onUpdateProp: (bufferID, nodeID) => (idx, oldPropKey, propKey, propVal) => {
+      dispatch(
+        updateNodeProp(bufferID, nodeID, idx, oldPropKey, propKey, propVal)
+      );
     },
     onRemoveProp: (bufferID, nodeID) => propKey => {
       dispatch(removeNodeProp(bufferID, nodeID, propKey));
@@ -262,7 +267,8 @@ const mapDispatchToProps = dispatch => {
       dispatch(updateNodeBody(bufferID, nodeID, text));
     },
     onAddOnePress: (bufferID, nodeID, node) => {
-      dispatch(addNewNode(bufferID, nodeID, node.headline.level + 1));
+      console.log(node);
+      dispatch(addNewNode(bufferID, nodeID, node.stars + 1));
     }
   };
 };

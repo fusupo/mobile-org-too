@@ -16,10 +16,13 @@ export const isObject = val => {
 // }
 
 export const findBranch = (tree, nodeID) => {
-  let ret = tree.nodeID === nodeID ? tree : undefined;
+  console.log(tree);
+
+  let ret = tree.id === nodeID ? tree : undefined;
   let i = 0;
-  while (i < tree.children.length && ret === undefined) {
-    ret = findBranch(tree.children[i], nodeID);
+  const kids = tree.children || tree.headlines;
+  while (kids && i < kids.length && ret === undefined) {
+    ret = findBranch(kids[i], nodeID);
     i++;
   }
   return ret;

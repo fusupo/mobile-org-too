@@ -15,24 +15,22 @@ import {
   View
 } from 'react-native';
 
-const OrgDrawerUtil = require('../utilities/OrgDrawerUtil');
+const OrgNodeUtil = require('../utilities/OrgNodeUtil');
+const OrgTimestampUtil = require('../utilities/OrgTimestampUtil');
+//const OrgPlanningUtil = require('../utilities/OrgPlanningUtil');
+/* const OrgDrawerUtil = require('../utilities/OrgDrawerUtil');*/
 
 import {
-  timestampNow,
-  timestampStringNow,
   momentFromTS,
   momentToTS,
-  cloneTS,
-  addTS,
-  subTS,
-  diffTS,
-  compareTS,
   parseDate,
   serializeTS
 } from '../utilities/utils';
 //const OrgTimestampUtil = require('org-parse').OrgTimestamp;
 
 import { completeHabit, resetHabit } from '../actions';
+
+import { getAllNodes, getFlattenedBufferObj } from '../selectors';
 
 const styles = StyleSheet.create({
   container: {
@@ -114,19 +112,29 @@ class OrgHabits extends React.Component {
   }
   render() {
     const { date, habits, habitData, onHabitPress } = this.props;
+    const {
+      dateModalVisible,
+      dateModalNodeID,
+      dateModalDate,
+      noteModalVisible,
+      noteModalNodeID,
+      noteModalText
+    } = this.state;
+
     const showDateModal = nodeID => {
       this.setState({
         dateModalNodeID: nodeID,
         dateModalDate: new Date(
-          date.year,
-          date.month - 1,
-          date.date,
+          date.date.yyyy,
+          date.date.mm - 1,
+          date.date.dd,
           new Date().getHours(),
           new Date().getMinutes()
         )
       });
       this.setDateModalVisible(true);
     };
+
     const showOKEditCancelSheet = nodeID => {
       ActionSheetIOS.showActionSheetWithOptions(
         {
@@ -134,9 +142,7 @@ class OrgHabits extends React.Component {
         },
         idx => {
           if (idx === 0) {
-            const tdate = momentToTS(momentFromTS(date));
-            tdate.hour += timestampNow().hour;
-            tdate.minute += timestampNow().minute;
+            const tdate = OrgTimestampUtil.clone(date);
             onHabitPress(nodeID, tdate);
           } else if (idx === 1) {
             showDateModal(nodeID);
@@ -144,20 +150,21 @@ class OrgHabits extends React.Component {
         }
       );
     };
+
     return (
       <ScrollView style={{ flex: 1, marginBottom: 30 }}>
         <Modal
           animationType={'fade'}
           transparent={false}
-          visible={this.state.dateModalVisible}
+          visible={dateModalVisible}
           onRequestClose={() => {
             alert('Date Modal has been closed.');
           }}>
           <View style={{ flex: 1, marginTop: 22 }}>
             <DatePickerIOS
               style={{ height: 150, flex: 12 }}
-              date={this.state.dateModalDate}
-              onDateChange={dateModalDate => this.setState({ dateModalDate })}
+              date={dateModalDate}
+              onDateChange={dmd => this.setState({ dateModalDate: dmd })}
               mode="datetime"
             />
 
@@ -166,7 +173,7 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'Cancel'}
                   onPress={() => {
-                    this.setDateModalVisible(!this.state.dateModalVisible);
+                    this.setDateModalVisible(!dateModalVisible);
                   }}
                 />
               </View>
@@ -174,14 +181,9 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'OK'}
                   onPress={() => {
-                    this.setDateModalVisible(!this.state.dateModalVisible);
-
-                    const timestamp = parseDate(this.state.dateModalDate);
-                    onHabitPress(
-                      this.state.dateModalNodeID,
-                      timestamp,
-                      this.state.noteModalText
-                    );
+                    this.setDateModalVisible(!dateModalVisible);
+                    const timestamp = OrgTimestampUtil.parseDate(dateModalDate);
+                    onHabitPress(dateModalNodeID, timestamp, noteModalText);
                   }}
                 />
               </View>
@@ -192,7 +194,7 @@ class OrgHabits extends React.Component {
         <Modal
           animationType={'none'}
           transparent={false}
-          visible={this.state.noteModalVisible}
+          visible={noteModalVisible}
           onRequestClose={() => {
             alert('Note Modal has been closed.');
             console.log('Note Modal has been closed.');
@@ -201,9 +203,9 @@ class OrgHabits extends React.Component {
             <TextInput
               style={{ height: '50%', borderColor: '#ccc', borderWidth: 1 }}
               multiline={true}
-              value={this.state.noteModalText}
-              onChangeText={noteModalText => {
-                this.setState({ noteModalText });
+              value={noteModalText}
+              onChangeText={nmt => {
+                this.setState({ noteModalText: nmt });
               }}
             />
             <View style={{ flex: 1, flexDirection: 'row' }}>
@@ -211,7 +213,7 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'Cancel'}
                   onPress={() => {
-                    this.setNoteModalVisible(!this.state.noteModalVisible);
+                    this.setNoteModalVisible(!noteModalVisible);
                   }}
                 />
               </View>
@@ -219,8 +221,8 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'Edit Date'}
                   onPress={() => {
-                    this.setNoteModalVisible(!this.state.noteModalVisible);
-                    showDateModal(this.state.noteModalNodeID);
+                    this.setNoteModalVisible(!noteModalVisible);
+                    showDateModal(noteModalNodeID);
                   }}
                 />
               </View>
@@ -228,15 +230,11 @@ class OrgHabits extends React.Component {
                 <Button
                   title={'OK'}
                   onPress={() => {
-                    this.setNoteModalVisible(!this.state.noteModalVisible);
-                    const tdate = momentToTS(momentFromTS(date));
-                    tdate.hour += timestampNow().hour;
-                    tdate.minute += timestampNow().minute;
-                    onHabitPress(
-                      this.state.noteModalNodeID,
-                      tdate,
-                      this.state.noteModalText
-                    );
+                    this.setNoteModalVisible(!noteModalVisible);
+                    const tdate = OrgTimestampUtil.clone(date);
+                    tdate.time.hh += OrgTimestampUtil.now().time.hh;
+                    tdate.time.mm += OrgTimestampUtil.now().time.mm;
+                    onHabitPress(noteModalNodeID, tdate, noteModalText);
                   }}
                 />
               </View>
@@ -244,67 +242,68 @@ class OrgHabits extends React.Component {
           </View>
         </Modal>
 
-        {habits.map((h, idx) => (
-          <View key={h.id} style={{ flexDirection: 'row' }}>
-            <TouchableHighlight
-              underlayColor="#00ff00"
-              style={{ flex: 1 }}
-              onPress={() => {
-                this.setState({ noteModalText: null });
-                const idx = OrgDrawerUtil.indexOfKey(h.propDrawer, 'LOGGING');
-                if (idx >= 0) {
-                  switch (h.propDrawer.properties[idx][1]) {
+        {habits.map((h, idx) => {
+          const propDrawer = OrgNodeUtil.getPropDrawer(h);
+          const { LOGGING } = propDrawer.props;
+          return (
+            <View key={h.id} style={{ flexDirection: 'row' }}>
+              <TouchableHighlight
+                underlayColor="#00ff00"
+                style={{ flex: 1 }}
+                onPress={() => {
+                  this.setState({ noteModalText: null });
+                  switch (LOGGING) {
                     case 'DONE(@)':
-                      // SHOW NOTE EDITOR
                       this.setState({ noteModalNodeID: h.id });
-                      this.setNoteModalVisible(!this.state.noteModalVisible);
+                      this.setNoteModalVisible(!noteModalVisible);
                       break;
                     default:
-                      console.log(
-                        'UNHANDLED LOGGING TYPE IN ORGHABITS!! -- ',
-                        h.propDrawer.properties[idx][1]
-                      );
+                      if (LOGGING) {
+                        console.log(
+                          'UNHANDLED LOGGING TYPE IN ORGHABITS!! -- ',
+                          propDrawer.props.LOGGING
+                        );
+                      } else {
+                        showOKEditCancelSheet(h.id);
+                      }
                       break;
                   }
-                } else {
-                  // SHOW OK/EDIT/CANCEL SHEET
-                  showOKEditCancelSheet(h.id);
-                }
-              }}>
-              <Text style={{ textAlign: 'right', fontSize: 12 }}>
-                {h.headline.content}
-              </Text>
-            </TouchableHighlight>
-
-            <View {...this._panResponder.panHandlers} style={{ flex: 1 }}>
-              <Text
-                style={{
-                  flex: 1,
-                  fontFamily: 'space-mono',
-                  fontSize: 12
                 }}>
-                {habitData[idx].map((c, idx) => {
-                  const color = {
-                    '-': 'red',
-                    b: 'blue',
-                    g: 'green',
-                    y: 'yellow'
-                  }[c];
-                  return (
-                    <Text
-                      key={idx}
-                      style={{
-                        backgroundColor: color,
-                        opacity: idx < 14 ? 1 : 0.5
-                      }}>
-                      {c}
-                    </Text>
-                  );
-                })}
-              </Text>
+                <Text style={{ textAlign: 'right', fontSize: 12 }}>
+                  {h.title}
+                </Text>
+              </TouchableHighlight>
+
+              <View {...this._panResponder.panHandlers} style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    flex: 1,
+                    fontFamily: 'space-mono',
+                    fontSize: 12
+                  }}>
+                  {habitData[idx].map((c, idx) => {
+                    const color = {
+                      '-': 'red',
+                      b: 'blue',
+                      g: 'green',
+                      y: 'yellow'
+                    }[c];
+                    return (
+                      <Text
+                        key={idx}
+                        style={{
+                          backgroundColor: color,
+                          opacity: idx < 14 ? 1 : 0.5
+                        }}>
+                        {c}
+                      </Text>
+                    );
+                  })}
+                </Text>
+              </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
       </ScrollView>
     );
   }
@@ -315,72 +314,85 @@ class OrgHabits extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   let date = ownProps.date;
 
-  const nodes = Object.values(state.orgBuffers).reduce(
-    (m, v) => m.concat(Object.values(v.orgNodes)),
-    []
-  );
+  const nodes = getAllNodes(state);
+  /* Object.values(state.orgBuffers).reduce(
+     * (m, v) => m.concat(Object.values(v.orgNodes)),
+     * []
+       );*/
 
-  const habits = nodes.filter(n => {
-    const idx = OrgDrawerUtil.indexOfKey(n.propDrawer, 'STYLE');
-    if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
-    return true;
-  });
+  const filterHabits = () => {
+    return nodes.filter(n => {
+      const propDrawer = OrgNodeUtil.getPropDrawer(n);
+      if (propDrawer && propDrawer.props.STYLE === 'habit') return true;
+      return false;
+    });
+  };
+
+  const habits = filterHabits();
 
   const getRealNow = () => {
-    const now = timestampNow();
-    now.hour -= now.hour;
-    now.minute -= now.minute;
+    const now = OrgTimestampUtil.now();
+    now.time = {
+      type: 'org.time',
+      hh: 0,
+      mm: 0
+    };
+    /* now.hour -= now.hour;
+     * now.minute -= now.minute;*/
     return now;
   };
 
-  let habitData = nodes.filter(n => {
-    const idx = OrgDrawerUtil.indexOfKey(n.propDrawer, 'STYLE');
-    if (idx === -1 || n.propDrawer.properties[idx] === 'habit') return false;
-    return true;
-  });
+  let habitData = filterHabits();
+
   habitData = habitData.map(n => {
-    const now = date; //timestampNow();
-    now.hour -= now.hour;
-    now.minute -= now.minute;
-    const past = subTS(now, { days: 14 });
-    const fut = addTS(now, { days: 7 });
-    if (n.logbook) {
+    const now = Object.assign({}, date, {
+      time: { type: 'org.time', hh: 0, mm: 0 }
+    }); //OrgTimestampUtil.now();
+
+    const past = OrgTimestampUtil.sub(now, { days: 14 });
+    const fut = OrgTimestampUtil.add(now, { days: 7 });
+
+    const logbook = OrgNodeUtil.getLogbook(n);
+    if (logbook) {
       // don't know why there'd be no logbook if passed previous
       // filter...maybe if completely new habit but not yet logged done in
       // other words this needs to be caught much earlier...i.e. around the
       // time the orgfile is parsed to begin with
-      const scheduled = n.scheduled;
-      const { repInt, repMin, repMax } = scheduled;
+      const scheduled = OrgNodeUtil.getScheduled(n);
+      const repMin = OrgTimestampUtil.getRepMin(scheduled);
+      const repMax = OrgTimestampUtil.getRepMax(scheduled);
       const repMinVal = parseInt(repMin.substr(0, repMin.length - 1));
       const repMinU = repMin[repMin.length - 1];
       const repMaxVal = repMax
         ? parseInt(repMax.substr(0, repMax.length - 1))
         : null;
       const repMaxU = repMax ? repMax[repMax.length - 1] : null;
-
-      const logData = n.logbook.entries.filter(
+      const logData = logbook.items.filter(
         le =>
           le.type === 'state' &&
           le.state === '"DONE"' &&
           le.from === '"TODO"' &&
-          compareTS(le.timestamp, past) > 0 &&
-          compareTS(le.timestamp, fut) < 0
+          OrgTimestampUtil.compare(le.timestamp, past) > 0 &&
+          OrgTimestampUtil.compare(le.timestamp, fut) < 0
       );
 
-      logData = logData.sort((a, b) => compareTS(a.timestamp, b.timestamp));
+      logData = logData.sort((a, b) =>
+        OrgTimestampUtil.compare(a.timestamp, b.timestamp)
+      );
 
       let ret = [];
       let rngMin = 0;
       let rngMax = 0;
       if (logData.length > 0) {
         for (let i = 0; i < 21; i++) {
-          const curr = addTS(past, { days: 1 * i });
-          const next = addTS(curr, { days: 1 });
+          const curr = OrgTimestampUtil.add(past, { days: 1 * i });
+          const next = OrgTimestampUtil.add(curr, { days: 1 });
           const ts = logData.length > 0 ? logData[0].timestamp : null;
+
           if (
             ts !== null &&
-            compareTS(ts, curr) > 0 &&
-            compareTS(ts, next) < 0
+            OrgTimestampUtil.compare(ts, curr) > 0 &&
+            OrgTimestampUtil.compare(ts, next) < 0
           ) {
             logData.shift();
             ret.push('x');
@@ -388,7 +400,9 @@ const mapStateToProps = (state, ownProps) => {
             rngMin = repMinVal * { d: 1, w: 7 }[repMinU];
             rngMax = repMaxVal ? repMaxVal * { d: 1, w: 7 }[repMaxU] : 0;
             if (rngMax > 0) rngMin--;
-          } else if (compareTS(getRealNow(), curr) === 0) {
+          } else if (OrgTimestampUtil.compare(getRealNow(), curr) === 0) {
+            if (rngMin > 0) rngMin--;
+            if (rngMax && rngMax > 0) rngMax--;
             ret.push('!');
           } else {
             if (rngMax && rngMax > 0) {
@@ -438,11 +452,13 @@ const mapDispatchToProps = dispatch => {
 function someAction(nodeID, date, noteText) {
   return (dispatch, getState) => {
     const state = getState();
-    const nowStr = serializeTS(date); //;timestampNow());
+    const nowStr = date.value; //;OrgTimestampUtil.now());
     // super inefficient way of finding bufferID from nodeID !!!!
     let bufferID = Object.entries(state.orgBuffers).reduce((M, V) => {
       if (M === undefined) {
-        const hasId = Object.keys(V[1].orgNodes).reduce((m, v) => {
+        const hasId = Object.keys(
+          getFlattenedBufferObj(V[1].orgTree)
+        ).reduce((m, v) => {
           return m || v === nodeID;
         }, false);
         if (hasId) {

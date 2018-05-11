@@ -35,12 +35,13 @@ export class OrgBuffer extends React.Component {
   render() {
     const { bufferID, tree } = this.props;
     const { isCollapsed } = this.state;
+    console.log('RENDERE BUFFER ??!!!!', bufferID);
     let childList = null;
 
     if (!isCollapsed) {
       childList = (
         <OrgList
-          data={tree.children}
+          data={tree.headlines}
           bufferID={bufferID}
           isLocked={this.props.isLocked}
         />
@@ -79,17 +80,16 @@ export class OrgBuffer extends React.Component {
     );
   }
 }
+
 const mapStateToProps = (state, ownProps) => {
   if (ownProps.bufferID) {
     const bufferID = ownProps.bufferID;
     return {
       bufferID: bufferID,
-      nodes: state.orgBuffers[bufferID].orgNodes,
       tree: state.orgBuffers[bufferID].orgTree
     };
   } else {
     return {
-      nodes: {},
       tree: {}
     };
   }

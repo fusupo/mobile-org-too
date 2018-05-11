@@ -8,7 +8,10 @@ import OrgDrawerItem from './OrgDrawerItem';
 class OrgDrawer extends Component {
   constructor(props) {
     super(props);
-    this.state = { isCollapsed: this.props.isCollapsed };
+    this.state = {
+      isCollapsed: this.props.isCollapsed,
+      editIdx: null
+    };
   }
 
   _toggleCollapse() {
@@ -34,20 +37,34 @@ class OrgDrawer extends Component {
         </TouchableHighlight>
       );
     } else {
-      const listItems = this.props.drawer.properties.map((keyval, idx) => {
-        const key = keyval[0];
-        const val = keyval[1];
-        return (
-          <OrgDrawerItem
-            key={idx}
-            idx={idx}
-            propKey={key}
-            propVal={val}
-            onRemoveProp={this.props.onRemoveProp}
-            onUpdateProp={this.props.onUpdateProp}
-          />
-        );
-      });
+      const listItems =
+        this.props.drawer && this.props.drawer.props
+          ? Object.entries(this.props.drawer.props).map((keyval, idx) => {
+              const key = keyval[0];
+              const val = keyval[1];
+              return (
+                <OrgDrawerItem
+                  key={idx}
+                  idx={idx}
+                  propKey={key}
+                  propVal={typeof val === 'object' ? val.value : val}
+                  onRemoveProp={this.props.onRemoveProp}
+                  onUpdateProp={this.props.onUpdateProp}
+                  onItemEditBegin={itemIdx => {
+                    this.setState({ editIdx: itemIdx });
+                  }}
+                  onItemEditEnd={() => {
+                    this.setState({ editIdx: null });
+                  }}
+                  disabled={
+                    this.state.editIdx === null || this.state.editIdx === idx
+                      ? false
+                      : true
+                  }
+                />
+              );
+            })
+          : [];
 
       return (
         <View style={{ flexDirection: 'column', flex: 1 }}>
@@ -77,9 +94,7 @@ class OrgDrawer extends Component {
               </View>
             </TouchableHighlight>
           </Swipeout>
-          <View className="OrgDrawerProperties">
-            {listItems}
-          </View>
+          <View className="OrgDrawerProperties">{listItems}</View>
         </View>
       );
     }

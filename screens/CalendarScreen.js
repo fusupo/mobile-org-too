@@ -17,17 +17,9 @@ import OrgHabits from '../components/OrgHabits';
 import OrgAgenda from '../components/OrgAgenda';
 import SplitPane from '../components/SplitPane';
 
-import {
-  timestampNow,
-  momentFromTS,
-  momentToTS,
-  cloneTS,
-  addTS,
-  subTS
-} from '../utilities/utils';
-
 const orgDrawerUtils = require('org-parse').OrgDrawer;
-/* const orgTimestampUtils = require('org-parse').OrgTimestamp;*/
+
+const OrgTimestampUtil = require('../utilities/OrgTimestampUtil');
 
 import { completeHabit, resetHabit } from '../actions';
 
@@ -38,10 +30,10 @@ class CalendarScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    const foo = timestampNow();
+    const nowTS = OrgTimestampUtil.now();
     this.state = {
-      date: foo,
-      prevDate: foo,
+      date: nowTS,
+      prevDate: nowTS,
       percA: 0,
       percB: 0
     };
@@ -50,13 +42,13 @@ class CalendarScreen extends React.Component {
   componentDidMount() {
     // this is likely super inefficient as this initiates a whole bunch of
     // calculations on each update
-    setInterval(() => {
-      let date = cloneTS(this.state.date);
-      let now = timestampNow();
-      date.hour = now.hour;
-      date.minute = now.minute;
-      this.setState({ date });
-    }, 1000);
+    /* setInterval(() => {
+     *   let date = OrgTimestampUtil.clone(this.state.date);
+     *   let now = timestampNow();
+     *   date.hour = now.hour;
+     *   date.minute = now.minute;
+     *   this.setState({ date });
+     * }, 1000);*/
   }
 
   render() {
@@ -65,19 +57,19 @@ class CalendarScreen extends React.Component {
         <SplitPane
           viewA={
             <OrgAgenda
-              prevDate={cloneTS(this.state.prevDate)}
-              date={cloneTS(this.state.date)}
+              prevDate={OrgTimestampUtil.clone(this.state.prevDate)}
+              date={OrgTimestampUtil.clone(this.state.date)}
               incrementDate={() =>
                 this.setState({
-                  prevDate: cloneTS(this.state.date),
-                  date: addTS(this.state.date, {
+                  prevDate: OrgTimestampUtil.clone(this.state.date),
+                  date: OrgTimestampUtil.add(this.state.date, {
                     days: 1
                   })
                 })}
               decrementDate={() =>
                 this.setState({
-                  prevDate: cloneTS(this.state.date),
-                  date: subTS(this.state.date, {
+                  prevDate: OrgTimestampUtil.clone(this.state.date),
+                  date: OrgTimestampUtil.sub(this.state.date, {
                     days: 1
                   })
                 })}
@@ -87,23 +79,23 @@ class CalendarScreen extends React.Component {
           onResizeA={percA => {
             this.setState({
               percA,
-              prevDate: cloneTS(this.state.date)
+              prevDate: OrgTimestampUtil.clone(this.state.date)
             });
           }}
           viewB={
             <OrgHabits
-              date={cloneTS(this.state.date)}
+              date={OrgTimestampUtil.clone(this.state.date)}
               incrementDate={() =>
                 this.setState({
-                  prevDate: cloneTS(this.state.date),
-                  date: addTS(this.state.date, {
+                  prevDate: OrgTimestampUtil.clone(this.state.date),
+                  date: OrgTimestampUtil.add(this.state.date, {
                     days: 1
                   })
                 })}
               decrementDate={() =>
                 this.setState({
-                  prevDate: cloneTS(this.state.date),
-                  date: subTS(this.state.date, {
+                  prevDate: OrgTimestampUtil.clone(this.state.date),
+                  date: OrgTimestampUtil.sub(this.state.date, {
                     days: 1
                   })
                 })}
@@ -112,7 +104,7 @@ class CalendarScreen extends React.Component {
           onResizeB={percB => {
             this.setState({
               percB,
-              prevDate: cloneTS(this.state.date)
+              prevDate: OrgTimestampUtil.clone(this.state.date)
             });
           }}
         />
