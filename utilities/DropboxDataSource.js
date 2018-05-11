@@ -5,8 +5,6 @@ const parse = require('org-parse').parse;
 const orgSerialize = require('org-parse').serialize;
 const Dropbox = require('dropbox');
 
-import { convert as convert2to1 } from './org2to1';
-import { convert as convert1to2 } from './org1to2';
 import { convert as convert2to2 } from './org2to2';
 
 export default class DropboxDataSource {
@@ -37,7 +35,7 @@ export default class DropboxDataSource {
           const convertedToo = convert2to2(parsedObj);
 
           obj.orgTree = convertedToo.tree;
-          obj.orgNodes = convertedToo.nodes;
+          //obj.orgNodes = convertedToo.nodes;
 
           resolve(obj);
         })
@@ -98,14 +96,11 @@ export default class DropboxDataSource {
     });
   }
 
-  serializeAndUpload(nodes, tree, settings, path) {
-    const contentsObj = convert1to2(nodes, tree, settings);
-    console.log('CONTENTS', contentsObj);
-    const contents = orgSerialize(contentsObj);
+  serializeAndUpload(tree, settings, path) {
+    //const contentsObj = convert1to2(nodes, tree, settings);
+    // const contents = orgSerialize(contentsObj);
+    const contents = orgSerialize(tree);
 
-    // return new Promise((res, rej) => {
-    //   //res(null);
-    // });
     return new Promise((resolve, reject) => {
       this.dbx
         .filesUpload({

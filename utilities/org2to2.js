@@ -1,21 +1,17 @@
 import { uuid, isObject } from './utils';
 
-const parseHeadline = (headline, nodes) => {
+const parseHeadline = headline => {
   let id = uuid();
   headline.id = id;
-  nodes[id] = headline;
-  if (headline.children)
-    headline.children.forEach(h => parseHeadline(h, nodes));
+  if (headline.children) headline.children.forEach(h => parseHeadline(h));
 };
 
 const convert = docObj => {
   // const settings = orgSection.serialize(docObj.section);
-  const nodes = {};
-  if (docObj.headlines) docObj.headlines.forEach(h => parseHeadline(h, nodes));
+  if (docObj.headlines) docObj.headlines.forEach(h => parseHeadline(h));
   return {
     // settings,
-    tree: docObj,
-    nodes
+    tree: docObj
   };
 };
 

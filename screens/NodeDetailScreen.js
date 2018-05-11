@@ -38,6 +38,8 @@ import SplitPane from '../components/SplitPane';
 import { findBranch, timestampStringNow } from '../utilities/utils';
 const OrgNodeUtil = require('../utilities/OrgNodeUtil');
 
+import { getNode } from '../selectors';
+
 //const OrgTreeUtil = require('org-parse').OrgTree;
 /* const OrgTimestampUtil = require('org-parse').OrgTimestamp;*/
 
@@ -209,10 +211,8 @@ class NodeDetailScreen extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   const params = ownProps.navigation.state.params;
   const { bufferID, nodeID, isNew } = params;
-  const nodes = state.orgBuffers[bufferID].orgNodes;
   const tree = state.orgBuffers[bufferID].orgTree;
-  const node = nodes[nodeID];
-  console.log('STATE', state);
+  const node = getNode(state, bufferID, nodeID);
   return {
     bufferID,
     nodeID,

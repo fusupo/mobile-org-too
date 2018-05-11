@@ -26,6 +26,8 @@ import appStyles from '../styles';
 
 const keywords = require('../constants/TodoKeyword').default; // ?;
 
+import { getAllTags, getFlattenedBufferObj } from '../selectors';
+
 class HomeScreen extends React.Component {
   state = {
     buffersLoaded: false,
@@ -119,7 +121,7 @@ class HomeScreen extends React.Component {
                     m2
                   ),
                 [],
-                Object.entries(b[1].orgNodes)
+                Object.entries(getFlattenedBufferObj(b[1].orgTree))
               ),
               m
             ),
@@ -316,18 +318,9 @@ class HomeScreen extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   if (ownProps.screenProps.currRoute !== 'MainTab') return {};
-  const buffers = state.orgBuffers;
-  const allTags = R.uniq(
-    Object.values(buffers).reduce((m, v) => {
-      let tags = Object.values(v.orgNodes).reduce((m2, v2) => {
-        return m2.concat(v2.tags || []);
-      }, []);
-      return m.concat(tags);
-    }, [])
-  );
   return {
-    buffers,
-    allTags,
+    buffers: state.orgBuffers,
+    allTags: getAllTags(state),
     settings: state.settings
   };
 };
