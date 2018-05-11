@@ -37,10 +37,10 @@ const orgBuffers = (state = {}, action) => {
       nextState = R.dissoc(action.path, state);
       break;
     case DELETE_NODE:
-      nextState[action.bufferID].orgTree = orgTree(
-        nextState[action.bufferID].orgTree,
-        action
-      );
+    // nextstate[action.bufferID].orgTree = orgTree(
+    //   nextState[action.bufferID].orgTree,
+    //   action
+    // );
     // break; is missing on purpose
     case UPDATE_NODE_TODO_KEYWORD:
     case UPDATE_NODE_HEADLINE_TITLE:
@@ -59,16 +59,16 @@ const orgBuffers = (state = {}, action) => {
     case REMOVE_NODE_LOG_NOTE:
     case UPDATE_NODE_BODY:
     case TOGGLE_NODE_TAG:
-      nextState[action.bufferID].orgNodes = orgNodes(
-        nextState[action.bufferID].orgNodes,
-        action
-      );
-      break;
+    // nextState[action.bufferID].orgNodes = orgNodes(
+    //   nextState[action.bufferID].orgNodes,
+    //   action
+    // );
+    // break;
     case ADD_NEW_NODE:
-      nextState[action.bufferID].orgNodes = orgNodes(
-        nextState[action.bufferID].orgNodes,
-        action
-      );
+      // nextState[action.bufferID].orgNodes = orgNodes(
+      //   nextState[action.bufferID].orgNodes,
+      //   action
+      // );
       nextState[action.bufferID].orgTree = orgTree(
         nextState[action.bufferID].orgTree,
         action

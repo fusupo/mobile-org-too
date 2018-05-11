@@ -186,11 +186,10 @@ export function doCloudUpload(onSucc, onErr) {
 
     const saveNext = (path, succ, err) => {
       try {
-        const orgNodes = orgBuffers[path].orgNodes;
         const orgTree = orgBuffers[path].orgTree;
         const orgSettings = orgBuffers[path].orgSettings;
         let foo = ds
-          .serializeAndUpload(orgNodes, orgTree, orgSettings, path)
+          .serializeAndUpload(orgTree, orgSettings, path)
           .then(succ());
       } catch (e) {
         console.warn(

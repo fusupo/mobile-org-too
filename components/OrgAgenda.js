@@ -12,6 +12,7 @@ import {
   View
 } from 'react-native';
 
+import { getFlattenedBufferObj } from '../selectors';
 /* import { OrgTimestampUtil.momentFromObj, OrgTimestampUtil.momentToObj } from '../utilities/utils';*/
 
 const OrgNodeUtil = require('../utilities/OrgNodeUtil');
@@ -281,7 +282,9 @@ const mapStateToProps = (state, ownProps) => {
 
   const nodes = Object.entries(state.orgBuffers).reduce((m, v) => {
     const bufferID = v[0];
-    const entries = Object.values(v[1].orgNodes).map(n => {
+    const entries = Object.values(
+      getFlattenedBufferObj(v[1].orgTree)
+    ).map(n => {
       const scheduled = OrgNodeUtil.getScheduled(n);
       const deadline = OrgNodeUtil.getDeadline(n);
       return {

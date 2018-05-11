@@ -19,6 +19,8 @@ import OrgTags from './OrgTagsEditable';
 
 import appStyles from '../styles';
 
+import { getNode } from '../selectors';
+
 class OrgHeadline extends Component {
   constructor(props) {
     super(props);
@@ -114,7 +116,9 @@ class OrgHeadline extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
-  const node = state.orgBuffers[bufferID].orgNodes[nodeID];
+  console.log(state, ownProps);
+  const node = getNode(state, bufferID, nodeID);
+  console.log(node);
   return {
     node
   };

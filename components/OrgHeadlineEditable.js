@@ -9,6 +9,8 @@ import { updateNodeHeadlineTitle } from '../actions';
 
 import appStyles from '../styles';
 
+import { getNode } from '../selectors';
+
 class OrgHeadlineEditable extends Component {
   constructor(props) {
     super(props);
@@ -57,8 +59,7 @@ class OrgHeadlineEditable extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID, autoFocus } = ownProps;
-  const nodes = state.orgBuffers[bufferID].orgNodes;
-  const node = nodes[nodeID];
+  const node = getNode(state, bufferID, nodeID);
   return {
     bufferID,
     nodeID,

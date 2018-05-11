@@ -30,6 +30,8 @@ import {
 
 import { completeHabit, resetHabit } from '../actions';
 
+import { getAllNodes, getFlattenedBufferObj } from '../selectors';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -312,10 +314,11 @@ class OrgHabits extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   let date = ownProps.date;
 
-  const nodes = Object.values(state.orgBuffers).reduce(
-    (m, v) => m.concat(Object.values(v.orgNodes)),
-    []
-  );
+  const nodes = getAllNodes(state);
+  /* Object.values(state.orgBuffers).reduce(
+     * (m, v) => m.concat(Object.values(v.orgNodes)),
+     * []
+       );*/
 
   const filterHabits = () => {
     return nodes.filter(n => {
@@ -453,7 +456,9 @@ function someAction(nodeID, date, noteText) {
     // super inefficient way of finding bufferID from nodeID !!!!
     let bufferID = Object.entries(state.orgBuffers).reduce((M, V) => {
       if (M === undefined) {
-        const hasId = Object.keys(V[1].orgNodes).reduce((m, v) => {
+        const hasId = Object.keys(
+          getFlattenedBufferObj(V[1].orgTree)
+        ).reduce((m, v) => {
           return m || v === nodeID;
         }, false);
         if (hasId) {

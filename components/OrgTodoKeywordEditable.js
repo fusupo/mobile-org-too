@@ -16,6 +16,8 @@ const OrgTimestampUtil = require('org-parse').OrgTimestamp;
 
 import appStyles from '../styles';
 
+import { getNode } from '../selectors';
+
 class OrgTodoKeywordEditable extends Component {
   constructor(props) {
     super(props);
@@ -64,8 +66,9 @@ class OrgTodoKeywordEditable extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
+
   return {
-    keyword: state.orgBuffers[bufferID].orgNodes[nodeID].keyword
+    keyword: getNode(state, bufferID, nodeID).keyword
   };
 };
 

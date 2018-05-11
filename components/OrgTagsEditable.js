@@ -15,6 +15,8 @@ import { toggleNodeTag } from '../actions';
 
 import appStyles from '../styles';
 
+import { getNode, getAllTags } from '../selectors';
+
 class OrgTagsEditable extends Component {
   constructor(props) {
     super(props);
@@ -197,14 +199,8 @@ class OrgTagsEditable extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
-  const node = state.orgBuffers[bufferID].orgNodes[nodeID];
-  let allTags = Object.values(state.orgBuffers).reduce((m, v) => {
-    let tags = Object.values(v.orgNodes).reduce((m2, v2) => {
-      return m2.concat(v2.tags || []);
-    }, []);
-    return m.concat(tags);
-  }, []);
-  allTags = R.uniq(allTags);
+  const node = getNode(state, bufferID, nodeID);
+  let allTags = getAllTags(state);
   return {
     tags: node.tags || [],
     allTags

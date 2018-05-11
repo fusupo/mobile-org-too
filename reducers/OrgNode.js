@@ -5,7 +5,6 @@ import {
   COMPLETE_HABIT,
   COMPLETE_TODO,
   ADD_NEW_NODE,
-  //  CYCLE_NODE_COLLAPSE,
   UPDATE_NODE_TODO_KEYWORD,
   UPDATE_NODE_HEADLINE_TITLE,
   UPDATE_NODE_TIMESTAMP,
@@ -68,6 +67,7 @@ function comment(state = null, action) {
 function title(state = null, action) {
   switch (action.type) {
     case UPDATE_NODE_HEADLINE_TITLE:
+      console.log(state, action);
       return action.text;
       break;
     default:
@@ -219,7 +219,6 @@ function logbook(state = null, action) {
   }
 }
 function section(state = null, action) {
-  console.log(state, action);
   const initState = (s = null, childType = null) => {
     let ret = s
       ? Object.assign({}, s)

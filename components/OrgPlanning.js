@@ -18,6 +18,8 @@ const timestampTypes = ['OPENED', 'SCHEDULED', 'DEADLINE', 'CLOSED'];
 
 import appStyles from '../styles';
 
+import { getNode } from '../selectors';
+
 class OrgPlanning extends Component {
   constructor(props) {
     super(props);
@@ -92,8 +94,7 @@ class OrgPlanning extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
-  const nodes = state.orgBuffers[bufferID].orgNodes;
-  const node = nodes[nodeID];
+  const node = getNode(state, bufferID, nodeID);
   return {
     bufferID,
     nodeID,
