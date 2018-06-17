@@ -1,9 +1,16 @@
 import { parseLedger, serialize as ledgerSerialize } from './ledger-parse';
 import { uuid } from './utils';
 
-const parse = require('org-parse').parse;
+const orgParse = require('org-parse');
+import { parseOrg } from 'org-parse';
+console.log(
+  '////////////////////////////////////////ORG-PARSE:',
+  parseOrg,
+  orgParse
+);
+const parse = orgParse.parse;
 const orgSerialize = require('org-parse').serialize;
-const Dropbox = require('dropbox');
+const Dropbox = require('dropbox').Dropbox;
 
 import { convert as convert2to2 } from './org2to2';
 
@@ -13,6 +20,7 @@ export default class DropboxDataSource {
   }
 
   loadParseOrgFilesAsync(filePath) {
+    console.log('FILEPATH:', filePath);
     let obj = {};
     return new Promise((resolve, reject) => {
       this.dbx

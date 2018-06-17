@@ -1,3 +1,5 @@
+import R from 'ramda';
+
 const settings = (
   state = {
     inboxFile: { path: 'insert filepath', isFolder: false, isOk: null },

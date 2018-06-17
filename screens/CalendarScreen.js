@@ -52,66 +52,66 @@ class CalendarScreen extends React.Component {
   }
 
   render() {
-    if (this.props.screenProps.currRoute === 'AgendaTab') {
-      return (
-        <SplitPane
-          viewA={
-            <OrgAgenda
-              prevDate={OrgTimestampUtil.clone(this.state.prevDate)}
-              date={OrgTimestampUtil.clone(this.state.date)}
-              incrementDate={() =>
-                this.setState({
-                  prevDate: OrgTimestampUtil.clone(this.state.date),
-                  date: OrgTimestampUtil.add(this.state.date, {
-                    days: 1
-                  })
-                })}
-              decrementDate={() =>
-                this.setState({
-                  prevDate: OrgTimestampUtil.clone(this.state.date),
-                  date: OrgTimestampUtil.sub(this.state.date, {
-                    days: 1
-                  })
-                })}
-              percH={this.state.percA}
-            />
-          }
-          onResizeA={percA => {
-            this.setState({
-              percA,
-              prevDate: OrgTimestampUtil.clone(this.state.date)
-            });
-          }}
-          viewB={
-            <OrgHabits
-              date={OrgTimestampUtil.clone(this.state.date)}
-              incrementDate={() =>
-                this.setState({
-                  prevDate: OrgTimestampUtil.clone(this.state.date),
-                  date: OrgTimestampUtil.add(this.state.date, {
-                    days: 1
-                  })
-                })}
-              decrementDate={() =>
-                this.setState({
-                  prevDate: OrgTimestampUtil.clone(this.state.date),
-                  date: OrgTimestampUtil.sub(this.state.date, {
-                    days: 1
-                  })
-                })}
-            />
-          }
-          onResizeB={percB => {
-            this.setState({
-              percB,
-              prevDate: OrgTimestampUtil.clone(this.state.date)
-            });
-          }}
-        />
-      );
-    } else {
-      return null;
-    }
+    /* if (this.props.screenProps.currRoute === 'AgendaTab') {*/
+    return (
+      <SplitPane
+        viewA={
+          <OrgAgenda
+            prevDate={OrgTimestampUtil.clone(this.state.prevDate)}
+            date={OrgTimestampUtil.clone(this.state.date)}
+            incrementDate={() =>
+              this.setState({
+                prevDate: OrgTimestampUtil.clone(this.state.date),
+                date: OrgTimestampUtil.add(this.state.date, {
+                  days: 1
+                })
+              })}
+            decrementDate={() =>
+              this.setState({
+                prevDate: OrgTimestampUtil.clone(this.state.date),
+                date: OrgTimestampUtil.sub(this.state.date, {
+                  days: 1
+                })
+              })}
+            percH={this.state.percA}
+          />
+        }
+        onResizeA={percA => {
+          this.setState({
+            percA,
+            prevDate: OrgTimestampUtil.clone(this.state.date)
+          });
+        }}
+        viewB={
+          <OrgHabits
+            date={OrgTimestampUtil.clone(this.state.date)}
+            incrementDate={() =>
+              this.setState({
+                prevDate: OrgTimestampUtil.clone(this.state.date),
+                date: OrgTimestampUtil.add(this.state.date, {
+                  days: 1
+                })
+              })}
+            decrementDate={() =>
+              this.setState({
+                prevDate: OrgTimestampUtil.clone(this.state.date),
+                date: OrgTimestampUtil.sub(this.state.date, {
+                  days: 1
+                })
+              })}
+          />
+        }
+        onResizeB={percB => {
+          this.setState({
+            percB,
+            prevDate: OrgTimestampUtil.clone(this.state.date)
+          });
+        }}
+      />
+    );
+    /* } else {
+       *   return null;
+       * }*/
   }
 }
 

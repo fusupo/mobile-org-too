@@ -75,7 +75,9 @@ const formatAmount = amnt => {
 const AccountLine = ({ account }) => (
   <View style={[styles.container, { flexDirection: 'row' }]}>
     {account.map((a, idx) => (
-      <Text style={styles.text} key={idx}>{a + ' '}</Text>
+      <Text style={styles.text} key={idx}>
+        {a + ' '}
+      </Text>
     ))}
   </View>
 ); //;
@@ -118,41 +120,45 @@ class ListItem extends Component {
           styles.container
           // { borderColor: '#000', borderWidth: 1, padding: 10 }
         ]}>
-        {this.state.isCollapsed
-          ? <TouchableHighlight
-              style={[styles.container]}
+        {this.state.isCollapsed ? (
+          <TouchableHighlight
+            style={[styles.container]}
+            onPress={() => {
+              this.setState({ isCollapsed: !this.state.isCollapsed });
+            }}>
+            <View
+              style={[
+                styles.container,
+                { marginLeft: 5, marginRight: 5, flexDirection: 'row' }
+              ]}>
+              <Text
+                style={[
+                  styles.container,
+                  styles.text
+                ]}>{`${node.date} ${node.consolidated} ${node.payee} `}</Text>
+              <Text style={styles.text}>{`${formatAmount(
+                node.postings.reduce(
+                  (m, p) => m + (p.amount === '' ? 0 : parseFloat(p.amount)),
+                  0
+                )
+              )}`}</Text>
+            </View>
+          </TouchableHighlight>
+        ) : (
+          <View>
+            <TouchableHighlight
               onPress={() => {
                 this.setState({ isCollapsed: !this.state.isCollapsed });
               }}>
-              <View
+              <Text
                 style={[
                   styles.container,
-                  { marginLeft: 5, marginRight: 5, flexDirection: 'row' }
-                ]}>
-                <Text
-                  style={[
-                    styles.container,
-                    styles.text
-                  ]}>{`${node.date} ${node.consolidated} ${node.payee} `}</Text>
-                <Text
-                  style={
-                    styles.text
-                  }>{`${formatAmount(node.postings.reduce((m, p) => m + (p.amount === '' ? 0 : parseFloat(p.amount)), 0))}`}</Text>
-              </View>
+                  styles.text
+                ]}>{`${node.date} ${node.consolidated} ${node.payee}`}</Text>
             </TouchableHighlight>
-          : <View>
-              <TouchableHighlight
-                onPress={() => {
-                  this.setState({ isCollapsed: !this.state.isCollapsed });
-                }}>
-                <Text
-                  style={[
-                    styles.container,
-                    styles.text
-                  ]}>{`${node.date} ${node.consolidated} ${node.payee}`}</Text>
-              </TouchableHighlight>
-              {postingItems}
-            </View>}
+            {postingItems}
+          </View>
+        )}
       </View>
     );
   }
@@ -174,9 +180,10 @@ class LedgerItemDetails extends Component {
   _updatePosting = (idx, account, amnt, currency) => {
     const oldPostings = this.state.postings;
     const amount = formatAmount(amnt);
-    const postings = idx === oldPostings.length
-      ? R.insert(idx, { account, amount, currency }, this.state.postings)
-      : R.update(idx, { account, amount, currency }, this.state.postings);
+    const postings =
+      idx === oldPostings.length
+        ? R.insert(idx, { account, amount, currency }, this.state.postings)
+        : R.update(idx, { account, amount, currency }, this.state.postings);
     this.setState({ postings });
   };
 
@@ -237,9 +244,9 @@ class LedgerItemDetails extends Component {
                 this.setState({ oldDate: date, datePickerIsVisible: true })}>
               <Text
                 style={[styles.container, , styles.border, styles.textInput]}
-                value={
-                  date
-                }>{`${date.getFullYear()}/${padMaybe(date.getMonth() + 1)}/${padMaybe(date.getDate())}`}</Text>
+                value={date}>{`${date.getFullYear()}/${padMaybe(
+                date.getMonth() + 1
+              )}/${padMaybe(date.getDate())}`}</Text>
             </TouchableHighlight>
           </View>
           <Modal visible={datePickerIsVisible}>
@@ -335,7 +342,9 @@ class LedgerItemDetails extends Component {
                 onPress={() => {
                   onSubmit({
                     consolidated: this.state.consolidated,
-                    date: `${this.state.date.getFullYear()}/${padMaybe(this.state.date.getMonth() + 1)}/${padMaybe(this.state.date.getDate())}`,
+                    date: `${this.state.date.getFullYear()}/${padMaybe(
+                      this.state.date.getMonth() + 1
+                    )}/${padMaybe(this.state.date.getDate())}`,
                     id: this.state.id,
                     payee: this.state.payee,
                     postings: this.state.postings
@@ -394,9 +403,7 @@ class TextInputWithModalSelect extends Component {
           onPress={() => {
             this.show();
           }}>
-          <Text style={[styles.textInput]}>
-            {text}
-          </Text>
+          <Text style={[styles.textInput]}>{text}</Text>
         </TouchableHighlight>
         <Modal visible={showModal}>
           <View style={{ flex: 1, paddingTop: 22 }}>
@@ -480,7 +487,7 @@ class LedgerScreen extends Component {
   }
 
   render() {
-    if (this.props.screenProps.currRoute !== 'LedgerTab') return null;
+    // if (this.props.screenProps.currRoute !== 'LedgerTab') return null;
 
     const {
       nodes,
@@ -492,8 +499,9 @@ class LedgerScreen extends Component {
     } = this.props;
     const { isLocked, modalData, modalIsVisible } = this.state;
 
-    const list = nodes.length > 0
-      ? <ScrollView style={styles.container}>
+    const list =
+      nodes.length > 0 ? (
+        <ScrollView style={styles.container}>
           {nodes.map((n, idx) => (
             <ListItem
               key={idx}
@@ -506,7 +514,7 @@ class LedgerScreen extends Component {
             />
           ))}
         </ScrollView>
-      : null;
+      ) : null;
 
     return (
       <View style={[styles.container, styles.border]}>
@@ -558,7 +566,7 @@ class LedgerScreen extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  if (ownProps.screenProps.currRoute !== 'LedgerTab') return {};
+  // if (ownProps.screenProps.currRoute !== 'LedgerTab') return {};
   const ledger = state.data.ledger;
   let nodes = ledger && ledger.ledgerNodes ? ledger.ledgerNodes : [];
   const allPayees = R.uniq(R.map(n => n.payee, nodes));

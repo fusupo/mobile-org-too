@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { NavigationActions } from 'react-navigation';
+import { withNavigation, StackActions } from 'react-navigation';
 
 import {
   Button,
@@ -339,6 +339,7 @@ const mapStateToProps = (state, ownProps) => {
       return m.concat(res);
     };
     let now = date;
+    console.log('DATE', date);
     const nowStr = {
       bufferID: 'NOW',
       nodeID: 'NOW',
@@ -349,6 +350,7 @@ const mapStateToProps = (state, ownProps) => {
     };
     const cand = filterRange(candidates, start, end);
 
+    console.log('FILTER RANGE', cand);
     let agenda = { headerStr, schedule: {} };
     for (let i = 0; i < hours.length - 1; i++) {
       const a = OrgTimestampUtil.add(start, { hours: hours[i] });
@@ -384,20 +386,28 @@ const mapStateToProps = (state, ownProps) => {
   };
 
   let today = OrgTimestampUtil.clone(date);
+  console.log('TODAY', today);
   today.time.hh -= today.time.hh;
   today.time.mm -= today.time.mm;
 
   let realToday = OrgTimestampUtil.now();
+  console.log('REAL-TODAY', realToday);
   realToday.time.hh -= realToday.time.hh;
   realToday.time.mm -= realToday.time.mm;
 
   let diff = OrgTimestampUtil.diff(today, realToday, 'days');
 
+  console.log('GOT THIS FAR ??');
   const yesterday = OrgTimestampUtil.sub(today, { days: 1 });
+  console.log('GOT THIS FAR ?? 1');
   const tomorrow = OrgTimestampUtil.add(today, { days: 1 });
+  console.log('GOT THIS FAR ?? 2');
   const dayAfterTomorrow = OrgTimestampUtil.add(today, { days: 2 });
 
+  console.log('GOT THIS FAR ?? 3');
+
   candidates = filterRange(nodes, yesterday, dayAfterTomorrow);
+  console.log('GOT THIS FAR ?? 4');
   candidates.sort((a, b) => {
     const scheduledA = a.scheduled; //OrgNodeUtil.getScheduled(a);
     const deadlineA = a.deadline; //OrgNodeUtil.getDeadline(a);
@@ -405,6 +415,7 @@ const mapStateToProps = (state, ownProps) => {
     const deadlineB = b.deadline; //OrgNodeUtil.getDeadline(b);
     const timeA = !scheduledA ? deadlineA : scheduledA;
     const timeB = !scheduledB ? deadlineB : scheduledB;
+    console.log(timeA !== null, timeB !== null);
     return OrgTimestampUtil.compare(timeA, timeB);
   });
 
@@ -462,20 +473,22 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     onNodeTitleClick: (bufferID, nodeID) => {
-      dispatch(
-        NavigationActions.navigate({
-          routeName: 'NodeDetail',
-          params: {
-            bufferID,
-            nodeID
-          }
-        })
-      );
+      const pushAction = StackActions.push({
+        routeName: 'NodeDetail',
+        params: {
+          bufferID,
+          nodeID
+        }
+      });
+
+      ownProps.navigation.dispatch(pushAction);
     }
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrgAgenda);
+export default withNavigation(
+  connect(mapStateToProps, mapDispatchToProps)(OrgAgenda)
+);

@@ -71,7 +71,6 @@ class NodeDetailScreen extends React.Component {
     } = this.props;
     if (node) {
       // childNodes
-      console.log('NODE DETAILS RENDER', tree, nodeID);
       const children = findBranch(tree, nodeID).children;
       let list = null;
       if (children && children.length > 0) {
@@ -135,7 +134,7 @@ class NodeDetailScreen extends React.Component {
                 <View style={[appStyles.container, appStyles.border]}>
                   <OrgBody
                     onUpdateNodeBody={onUpdateNodeBody(bufferID, nodeID)}
-                    bodyText={node.body}
+                    section={node.section}
                   />
                 </View>
               </ScrollView>
@@ -264,10 +263,10 @@ const mapDispatchToProps = dispatch => {
       dispatch(removeNodeLogNote(bufferID, nodeID, idx));
     },
     onUpdateNodeBody: (bufferID, nodeID) => text => {
-      dispatch(updateNodeBody(bufferID, nodeID, text));
+      /*       dispatch(updateNodeBody(bufferID, nodeID, text));*/
     },
     onAddOnePress: (bufferID, nodeID, node) => {
-      console.log(node);
+      //console.log(node);
       dispatch(addNewNode(bufferID, nodeID, node.stars + 1));
     }
   };

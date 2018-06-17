@@ -182,7 +182,6 @@ class OrgTimestampUtil {
 
   static calcNextRepeat(base, x) {
     base = typeof base === 'string' ? orgTimestamp.parse(base) : base;
-    console.log(x);
     x = typeof x === 'string' ? orgTimestamp.parse(x) : x;
 
     const match = /([.+][+]?){1}(?:([1-9]+)([dwmy])){1}(?:\/(?:([1-9]+)([dwmy]))){0,1}/.exec(
@@ -215,11 +214,8 @@ class OrgTimestampUtil {
         break;
       case '.+':
         newTs = OrgTimestampUtil.clone(x);
-        console.log(newTs);
         newTs.time = Object.assign({}, base.time);
-        console.log('updObj', updateObj);
         newTs = OrgTimestampUtil.add(newTs, updateObj);
-        console.log(newTs);
         newTs.type = base.type;
         newTs.repeat = base.repeat;
         break;

@@ -90,7 +90,6 @@ export default class OrgList extends Component {
     };
 
     const renderListItem = (d, idx) => {
-      console.log('RENDER LIST ITEM:', d, idx, this.props.data);
       if (d.children && d.children.length > 0) {
         return (
           <Tree

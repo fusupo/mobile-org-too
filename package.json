@@ -1,37 +1,25 @@
 {
-  "name": "mobile-org-too",
-  "version": "0.3.0",
-  "description": "ios orgmode client",
-  "author": null,
   "main": "main.js",
-  "scripts": {
-    "test": "node node_modules/jest/bin/jest.js"
-  },
-  "jest": {
-    "preset": "jest-expo"
-  },
+  "private": true,
   "dependencies": {
-    "@expo/ex-navigation": "~2.10.0",
-    "@expo/samples": "~1.0.3",
-    "babel-preset-expo": "^4.0.0",
-    "dropbox": "^2.5.3",
-    "expo": "^21.0.0",
-    "moment": "^2.22.0",
-    "org-parse": "2.0.0",
-    "ramda": "^0.24.1",
-    "react": "16.0.0-alpha.12",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-21.0.2.tar.gz",
-    "react-native-check-box": "^2.0.0",
-    "react-native-modal-dropdown": "^0.4.4",
-    "react-native-swipeout": "^2.2.2",
-    "react-navigation": "^1.0.0-beta.11",
-    "react-redux": "^5.0.5",
-    "redux": "^3.7.2",
-    "redux-thunk": "^2.2.0",
+    "@expo/ex-navigation": "^4.2.0",
+    "babel-preset-react-native-stage-0": "^1.0.1",
+    "dropbox": "^4.0.7",
+    "expo": "^28.0.0",
+    "moment": "^2.22.2",
+    "org-parse": "2.1.0",
+    "ramda": "^0.25.0",
+    "react": "16.3.1",
+    "react-native":
+      "https://github.com/expo/react-native/archive/sdk-28.0.0.tar.gz",
+    "react-native-check-box": "^2.1.0",
+    "react-native-modal-dropdown": "^0.6.2",
+    "react-native-swipeout": "^2.3.3",
+    "react-navigation": "^2.3.1",
+    "react-redux": "^5.0.7",
+    "redux": "^4.0.0",
+    "redux-thunk": "^2.3.0",
     "reselect": "^3.0.1",
     "shortid": "^2.2.8"
-  },
-  "devDependencies": {
-    "jest-expo": "^21.0.0"
   }
 }

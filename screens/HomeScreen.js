@@ -43,7 +43,6 @@ class HomeScreen extends React.Component {
       keywords,
       keywordFilterIdx: 0
     });
-
     this.props.loadOrgFiles();
   }
 
@@ -58,7 +57,8 @@ class HomeScreen extends React.Component {
   }
 
   render() {
-    if (this.props.screenProps.currRoute !== 'MainTab') return null;
+    // console.log('FOOOO -> ', this.props);
+    // if (this.props.screenProps.currRoute !== 'MainTab') return null;
 
     const { buffers, onAddOne, allTags } = this.props;
 
@@ -317,7 +317,7 @@ class HomeScreen extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  if (ownProps.screenProps.currRoute !== 'MainTab') return {};
+  // if (ownProps.screenProps.currRoute !== 'MainTab') return {};
   return {
     buffers: state.orgBuffers,
     allTags: getAllTags(state),
@@ -343,7 +343,7 @@ const mapDispatchToProps = dispatch => {
 function loadOrgFiles() {
   return async (dispatch, getState) => {
     const foo = await loadParseOrgFilesAsync(
-      getState().settings.inboxFile.path,
+      '/org/inbox.org', //getState().settings.inboxFile.path,
       getState().dbxAccessToken
     );
     dispatch({

@@ -35,7 +35,7 @@ export class OrgBuffer extends React.Component {
   render() {
     const { bufferID, tree } = this.props;
     const { isCollapsed } = this.state;
-    console.log('RENDERE BUFFER ??!!!!', bufferID);
+    //console.log('RENDERE BUFFER ??!!!!', bufferID);
     let childList = null;
 
     if (!isCollapsed) {

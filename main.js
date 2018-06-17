@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const Dropbox = require('dropbox');
+const Dropbox = require('dropbox').Dropbox;
 const parseQueryString = str => {
   var ret = Object.create(null);
 

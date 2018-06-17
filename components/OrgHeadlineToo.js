@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
-import { NavigationActions } from 'react-navigation';
+import { NavigationActions, StackActions } from 'react-navigation';
 import Swipeout from 'react-native-swipeout';
 
 import OrgTodoKeywordEditable from './OrgTodoKeywordEditable';
@@ -116,9 +116,7 @@ class OrgHeadline extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
-  console.log(state, ownProps);
   const node = getNode(state, bufferID, nodeID);
-  console.log(node);
   return {
     node
   };
@@ -127,15 +125,15 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     onNodeTitlePress: (bufferID, nodeID) => {
-      dispatch(
-        NavigationActions.navigate({
-          routeName: 'NodeDetail',
-          params: {
-            bufferID,
-            nodeID
-          }
-        })
-      );
+      const pushAction = StackActions.push({
+        routeName: 'NodeDetail',
+        params: {
+          bufferID,
+          nodeID
+        }
+      });
+
+      ownProps.navigation.dispatch(pushAction);
     },
     onDeleteNodePress: (bufferID, nodeID) => {
       dispatch(deleteNode(bufferID, nodeID));
@@ -151,5 +149,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     }
   };
 };
-
-export default connect(mapStateToProps, mapDispatchToProps)(OrgHeadline);
+import { withNavigation } from 'react-navigation';
+export default withNavigation(
+  connect(mapStateToProps, mapDispatchToProps)(OrgHeadline)
+);
