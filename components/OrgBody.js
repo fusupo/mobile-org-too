@@ -38,10 +38,16 @@ class OrgBody extends Component {
     this.setState({ isCollapsed: !this.state.isCollapsed });
   }
 
+  componentWillMount() {
+    // console.log('WILL MOUNT');
+    // console.log(this.props);
+    // console.log(this.state);
+    this.setState({ text: this.props.text });
+  }
+
   render() {
-    const { onUpdateNodeBody, bodyText, section } = this.props;
+    const { onUpdateNodeParagraph, bodyText, section } = this.props;
     const { isCollapsed, isEditing, text } = this.state;
-    console.log('rendering org Body!!!!', section);
     const showEditor = isEditing ? (
       <View>
         <View style={{ flexDirection: 'row' }}>
@@ -58,7 +64,7 @@ class OrgBody extends Component {
           <View style={appStyles.container}>
             <Button
               onPress={() => {
-                onUpdateNodeBody(text);
+                onUpdateNodeParagraph(text);
                 this.setState({ isEditing: false });
                 this._toggleCollapse();
               }}
@@ -70,7 +76,12 @@ class OrgBody extends Component {
         <ScrollView style={[appStyles.container]} horizontal={true}>
           <View style={[appStyles.container]}>
             <TextInput
-              style={[appStyles.baseText, styles.text, { width: '100%' }]}
+              style={[
+                appStyles.baseText,
+                styles.text,
+                { width: '100%' },
+                appStyles.border
+              ]}
               value={text === undefined ? bodyText : text}
               multiline={true}
               autoFocus={true}
@@ -82,7 +93,7 @@ class OrgBody extends Component {
         </ScrollView>
       </View>
     ) : (
-      <View style={[appStyles.border]}>
+      <View>
         <View
           className="OrgBody"
           style={{
@@ -101,8 +112,16 @@ class OrgBody extends Component {
           <ScrollView style={[appStyles.container]} horizontal={true}>
             <View style={[appStyles.container]}>
               <Text
-                style={[appStyles.baseText, styles.text, { width: '100%' }]}>
-                {bodyText}
+                style={[
+                  appStyles.baseText,
+                  styles.text,
+                  { width: '100%' },
+                  appStyles.border
+                ]}>
+                {
+                  // bodyText
+                  text
+                }
               </Text>
             </View>
           </ScrollView>
@@ -113,7 +132,12 @@ class OrgBody extends Component {
             }>
             <ScrollView style={[appStyles.container]} horizontal={true}>
               <View style={[appStyles.container]}>
-                <Text style={[styles.container, styles.text]}>{bodyText}</Text>
+                <Text style={[styles.container, styles.text]}>
+                  {
+                    //bodyText
+                    text
+                  }
+                </Text>
               </View>
             </ScrollView>
           </TouchableHighlight>

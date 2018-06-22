@@ -7,17 +7,21 @@ import {
   ADD_NEW_NODE,
   UPDATE_NODE_TODO_KEYWORD,
   UPDATE_NODE_HEADLINE_TITLE,
+  ADD_NEW_NODE_PLANNING,
   UPDATE_NODE_TIMESTAMP,
   UPDATE_NODE_TIMESTAMP_REP_INT,
   CLEAR_NODE_TIMESTAMP,
+  ADD_NEW_NODE_PROP_DRAWER,
   INSERT_NEW_NODE_PROP,
   UPDATE_NODE_PROP,
   REMOVE_NODE_PROP,
+  ADD_NEW_NODE_LOGBOOK,
   INSERT_NEW_NODE_LOG_NOTE,
   UPDATE_NODE_LOG_NOTE,
   REMOVE_NODE_LOG_NOTE,
-  UPDATE_NODE_BODY,
-  TOGGLE_NODE_TAG
+  UPDATE_NODE_PARAGRAPH,
+  TOGGLE_NODE_TAG,
+  ADD_NEW_NODE_PARAGRAPH
 } from '../actions';
 
 const OrgDrawerUtil = require('../utilities/OrgDrawerUtil');
@@ -67,7 +71,6 @@ function comment(state = null, action) {
 function title(state = null, action) {
   switch (action.type) {
     case UPDATE_NODE_HEADLINE_TITLE:
-      console.log(state, action);
       return action.text;
       break;
     default:
@@ -218,36 +221,71 @@ function logbook(state = null, action) {
       break;
   }
 }
-function section(state = null, action) {
+
+function paragraph(state = '', action) {
+  let nextState;
+  switch (action.type) {
+    case UPDATE_NODE_PARAGRAPH:
+      nextState = { type: 'org.paragraph', value: action.text.split('\n') };
+      return nextState;
+      break;
+  }
+  return nextState || state;
+}
+
+function section(state = { type: 'org.section', children: null }, action) {
+  const removeAndReturnChild = (childType, children) => {
+    let i = 0;
+    let child = null;
+
+    while (children && i < children.length) {
+      if (children[i].type === childType) {
+        child = children[i];
+        children.splice(i, 1);
+        i = children.length;
+      }
+      i++;
+    }
+
+    return child;
+  };
   const initState = (s = null, childType = null) => {
     let ret = s
       ? Object.assign({}, s)
       : { type: 'org.section', children: null };
+    ret.children = ret.children ? ret.children.slice(0) : [];
 
-    if (childType) {
-      if (!ret.children) ret.children = [];
-      if (!ret.children.find(c => c.type === childType)) {
-        switch (childType) {
-          case 'org.propDrawer':
-            ret.children.push({ type: 'org.propDrawer', props: {} });
-            break;
-          case 'org.logbook':
-            ret.children.push({ type: 'org.logbook', items: [] });
-          case 'org.planning':
-            ret.children.push({
-              type: 'org.planning',
-              scheduled: null,
-              deadline: null,
-              closed: null
-            });
-            break;
-        }
-      }
-    }
+    let planning = removeAndReturnChild('org.planning', ret.children);
+    let propDrawer = removeAndReturnChild('org.propDrawer', ret.children);
+    let logbook = removeAndReturnChild('org.logbook', ret.children);
+
+    if (!planning && childType === 'org.planning')
+      planning = {
+        type: 'org.planning',
+        scheduled: null,
+        deadline: null,
+        closed: null
+      };
+    if (!propDrawer && childType === 'org.propDrawer')
+      propDrawer = { type: 'org.propDrawer', props: {} };
+    if (!logbook && childType === 'org.logbook')
+      logbook = { type: 'org.logbook', items: [] };
+
+    // if (!ret.children) ret.children = [];
+
+    if (logbook) ret.children.unshift(logbook);
+    if (propDrawer) ret.children.unshift(propDrawer);
+    if (planning) ret.children.unshift(planning);
+
+    // ret.children.concat(ret.children);
+
     return ret;
   };
 
   switch (action.type) {
+    case ADD_NEW_NODE_PLANNING:
+      return initState(state, 'org.planning');
+      break;
     case COMPLETE_HABIT:
       var nextChildren = state.children.map(c => {
         switch (c.type) {
@@ -283,6 +321,9 @@ function section(state = null, action) {
       });
       return Object.assign({}, state, { children: nextChildren });
       break;
+    case ADD_NEW_NODE_PROP_DRAWER:
+      return initState(state, 'org.propDrawer');
+      break;
     case INSERT_NEW_NODE_PROP:
       state = initState(state, 'org.propDrawer');
     case UPDATE_NODE_PROP:
@@ -299,6 +340,9 @@ function section(state = null, action) {
       });
       return Object.assign({}, state, { children: nextChildren });
       break;
+    case ADD_NEW_NODE_LOGBOOK:
+      return initState(state, 'org.logbook');
+      break;
     case INSERT_NEW_NODE_LOG_NOTE:
       state = initState(state, 'org.logbook');
     case UPDATE_NODE_LOG_NOTE:
@@ -313,6 +357,29 @@ function section(state = null, action) {
             break;
         }
       });
+      return Object.assign({}, state, { children: nextChildren });
+      break;
+    case ADD_NEW_NODE_PARAGRAPH:
+      if (state === null) state = { type: 'org.section', children: [] };
+      var nextChildren = state.children ? state.children.slice(0) : [];
+      nextChildren.push({ type: 'org.paragraph', value: ['hey', 'there'] });
+      // var nextState = Object.assign({}, state);
+      // if (!nextState.children) {
+      //   nextState.children = [];
+      // } else {
+      //   nextState.children = nextState.children.slice(0);
+      // }
+      // nextState.children.push({ type: 'org.paragraph', value: [] });
+      var nextState = Object.assign({}, state, { children: nextChildren });
+      return nextState;
+      break;
+    case UPDATE_NODE_PARAGRAPH:
+      var idx = action.idx;
+      var para = state.children[idx];
+      var nextChildren = state.children
+        .slice(0, idx)
+        .concat([paragraph(para, action)])
+        .concat(state.children.slice(idx + 1));
       return Object.assign({}, state, { children: nextChildren });
       break;
     default:
@@ -512,17 +579,6 @@ function parent(state = null, action) {
 //       nextState = Object.assign({}, state, { entries: clonedEntries });
 //       break;
 //     case COMPLETE_TODO:
-//   }
-//   return nextState || state;
-// }
-
-// function body(state = '', action) {
-//   let nextState;
-//   switch (action.type) {
-//     case UPDATE_NODE_BODY:
-//       nextState = action.text;
-//       return nextState;
-//       break;
 //   }
 //   return nextState || state;
 // }

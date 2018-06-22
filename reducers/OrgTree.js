@@ -7,17 +7,21 @@ import {
   COMPLETE_TODO,
   UPDATE_NODE_TODO_KEYWORD,
   UPDATE_NODE_HEADLINE_TITLE,
+  ADD_NEW_NODE_PLANNING,
   UPDATE_NODE_TIMESTAMP,
   UPDATE_NODE_TIMESTAMP_REP_INT,
   CLEAR_NODE_TIMESTAMP,
+  ADD_NEW_NODE_PROP_DRAWER,
   INSERT_NEW_NODE_PROP,
   UPDATE_NODE_PROP,
   REMOVE_NODE_PROP,
+  ADD_NEW_NODE_LOGBOOK,
   INSERT_NEW_NODE_LOG_NOTE,
   UPDATE_NODE_LOG_NOTE,
   REMOVE_NODE_LOG_NOTE,
-  UPDATE_NODE_BODY,
-  TOGGLE_NODE_TAG
+  UPDATE_NODE_PARAGRAPH,
+  TOGGLE_NODE_TAG,
+  ADD_NEW_NODE_PARAGRAPH
 } from '../actions';
 
 import orgNode from './OrgNode';
@@ -135,19 +139,23 @@ const orgTree = (state = {}, action) => {
     case COMPLETE_HABIT:
     case UPDATE_NODE_TODO_KEYWORD:
     case UPDATE_NODE_HEADLINE_TITLE:
+    case ADD_NEW_NODE_PLANNING:
     case UPDATE_NODE_TIMESTAMP:
     case UPDATE_NODE_TIMESTAMP_REP_INT:
     case CLEAR_NODE_TIMESTAMP:
+    case ADD_NEW_NODE_PROP_DRAWER:
     case INSERT_NEW_NODE_PROP:
     case UPDATE_NODE_PROP:
     case REMOVE_NODE_PROP:
+    case ADD_NEW_NODE_LOGBOOK:
     case INSERT_NEW_NODE_LOG_NOTE:
     case UPDATE_NODE_LOG_NOTE:
     case REMOVE_NODE_LOG_NOTE:
-    case UPDATE_NODE_BODY:
+    case UPDATE_NODE_PARAGRAPH:
     case TOGGLE_NODE_TAG:
+    case ADD_NEW_NODE_PARAGRAPH:
       nextState = Object.assign({}, state);
-      if (state.id === action.nodeID) {
+      if (state.id && state.id === action.nodeID) {
         nextState = orgNode(state, action);
       } else {
         var kids = state.headlines || state.children;

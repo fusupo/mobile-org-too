@@ -16,7 +16,7 @@ export const isObject = val => {
 // }
 
 export const findBranch = (tree, nodeID) => {
-  console.log(tree);
+  //console.log(tree);
 
   let ret = tree.id === nodeID ? tree : undefined;
   let i = 0;
