@@ -10,8 +10,8 @@ const appStyles = StyleSheet.create({
   },
   border: {
     borderWidth: 1,
-    borderStyle: 'solid',
-    margin: 10
+    borderStyle: 'solid'
+    // margin: 10
   }
 });
 
