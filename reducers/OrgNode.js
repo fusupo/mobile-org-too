@@ -301,6 +301,11 @@ function section(state = { type: 'org.section', children: null }, action) {
     case ADD_NEW_NODE_PLANNING:
       return initState(state, 'org.planning');
       break;
+    case COMPLETE_TODO:
+      //NO-OP
+      //TODO: handle logging prop case
+      return state;
+      break;
     case COMPLETE_HABIT:
       var nextChildren = state.children.map(c => {
         switch (c.type) {
@@ -562,39 +567,6 @@ function parent(state = null, action) {
 //     default:
 //       return state;
 //       break;
-//   }
-//   return nextState || state;
-// }
-
-// function logbook(state = { entries: [] }, action) {
-//   let nextState, clonedEntries;
-//   switch (action.type) {
-//     case INSERT_NEW_NODE_LOG_NOTE:
-//       clonedEntries =
-//         state && state.entries && state.entries.length > 0
-//           ? state.entries.slice(0)
-//           : [];
-//       clonedEntries.unshift({
-//         type: 'note',
-//         timestamp: action.timestampStr,
-//         text: 'foo'
-//       });
-//       nextState = Object.assign({}, state, { entries: clonedEntries });
-//       break;
-//     case UPDATE_NODE_LOG_NOTE:
-//       clonedEntries = state.entries.slice(0);
-//       let updatedEntry = Object.assign({}, state.entries[action.idx], {
-//         text: action.text
-//       });
-//       clonedEntries.splice(action.idx, 1, updatedEntry);
-//       nextState = Object.assign({}, state, { entries: clonedEntries });
-//       break;
-//     case REMOVE_NODE_LOG_NOTE:
-//       clonedEntries = state.entries.slice(0);
-//       clonedEntries.splice(action.idx, 1);
-//       nextState = Object.assign({}, state, { entries: clonedEntries });
-//       break;
-//     case COMPLETE_TODO:
 //   }
 //   return nextState || state;
 // }

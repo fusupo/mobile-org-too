@@ -12,7 +12,7 @@ import {
 
 const keywords = require('../constants/TodoKeyword').default; // ?;
 
-const OrgTimestampUtil = require('org-parse').OrgTimestamp;
+const OrgTimestampUtil = require('../utilities/OrgTimestampUtil');
 
 import appStyles from '../styles';
 

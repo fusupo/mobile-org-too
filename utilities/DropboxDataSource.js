@@ -31,7 +31,7 @@ export default class DropboxDataSource {
         .then(res => res.text())
         .then(resText => {
           obj['orgText'] = resText;
-          return parse(resText);
+          return parse(resText, ['PROJ']);
         })
         .then(parsedObj => {
           // const converted = convert2to1(parsedObj);

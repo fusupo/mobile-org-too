@@ -138,6 +138,7 @@ const orgTree = (state = {}, action) => {
       // console.log('NEXT STATE AFTER DELETOION', nextState);
       break;
 
+    case COMPLETE_TODO:
     case COMPLETE_HABIT:
     case UPDATE_NODE_TODO_KEYWORD:
     case UPDATE_NODE_HEADLINE_TITLE:
