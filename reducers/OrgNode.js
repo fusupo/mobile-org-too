@@ -21,7 +21,8 @@ import {
   REMOVE_NODE_LOG_NOTE,
   UPDATE_NODE_PARAGRAPH,
   TOGGLE_NODE_TAG,
-  ADD_NEW_NODE_PARAGRAPH
+  ADD_NEW_NODE_PARAGRAPH,
+  UPDATE_SECTION_ITEM_INDEX
 } from '../actions';
 
 const OrgDrawerUtil = require('../utilities/OrgDrawerUtil');
@@ -283,6 +284,13 @@ function section(state = { type: 'org.section', children: null }, action) {
   };
 
   switch (action.type) {
+    case UPDATE_SECTION_ITEM_INDEX:
+      var nextChildren = state.children.slice(0);
+      var temp = nextChildren[action.from];
+      nextChildren.splice(action.from, 1);
+      nextChildren.splice(action.to, 0, temp);
+      return Object.assign({}, state, { children: nextChildren });
+      break;
     case ADD_NEW_NODE_PLANNING:
       return initState(state, 'org.planning');
       break;
@@ -345,6 +353,7 @@ function section(state = { type: 'org.section', children: null }, action) {
       break;
     case INSERT_NEW_NODE_LOG_NOTE:
       state = initState(state, 'org.logbook');
+      console.log(state);
     case UPDATE_NODE_LOG_NOTE:
     case REMOVE_NODE_LOG_NOTE:
       var nextChildren = state.children.map(c => {

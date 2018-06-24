@@ -26,7 +26,8 @@ import {
   REMOVE_NODE_LOG_NOTE,
   TOGGLE_NODE_TAG,
   ADD_NEW_NODE_PARAGRAPH,
-  UPDATE_NODE_PARAGRAPH
+  UPDATE_NODE_PARAGRAPH,
+  UPDATE_SECTION_ITEM_INDEX
 } from '../actions';
 
 const orgBuffers = (state = {}, action) => {
@@ -66,6 +67,7 @@ const orgBuffers = (state = {}, action) => {
     case UPDATE_NODE_PARAGRAPH:
     case TOGGLE_NODE_TAG:
     case ADD_NEW_NODE_PARAGRAPH:
+    case UPDATE_SECTION_ITEM_INDEX:
     // nextState[action.bufferID].orgNodes = orgNodes(
     //   nextState[action.bufferID].orgNodes,
     //   action

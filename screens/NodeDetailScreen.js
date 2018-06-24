@@ -74,9 +74,9 @@ class NodeDetailScreen extends React.Component {
           </View>
           <SplitPane
             viewA={
-              <ScrollView style={appStyles.container}>
+              <View style={appStyles.container}>
                 <OrgSection bufferID={bufferID} nodeID={nodeID} />
-              </ScrollView>
+              </View>
             }
             viewB={
               <View style={{ flex: 1 }}>

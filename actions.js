@@ -28,6 +28,7 @@ export const REMOVE_NODE_LOG_NOTE = 'REMOVE_NODE_LOG_NOTE';
 export const TOGGLE_NODE_TAG = 'TOGGLE_NODE_TAG';
 export const ADD_NEW_NODE_PARAGRAPH = 'ADD_NEW_NODE_PARAGRAPH';
 export const UPDATE_NODE_PARAGRAPH = 'UPDATE_NODE_PARAGRAPH';
+export const UPDATE_SECTION_ITEM_INDEX = 'UPDATE_SECTION_ITEM_INDEX';
 
 /*
  * other constants
@@ -217,12 +218,21 @@ export function addNewNodeParagraph(bufferID, nodeID) {
 }
 
 export function updateNodeParagraph(bufferID, nodeID, idx, text) {
-  console.log('mutherfucking idx', idx);
   return {
     type: UPDATE_NODE_PARAGRAPH,
     bufferID,
     nodeID,
     idx,
     text
+  };
+}
+
+export function updateSectionItemIndex(bufferID, nodeID, from, to) {
+  return {
+    type: UPDATE_SECTION_ITEM_INDEX,
+    bufferID,
+    nodeID,
+    from,
+    to
   };
 }
