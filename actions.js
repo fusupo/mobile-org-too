@@ -29,6 +29,7 @@ export const TOGGLE_NODE_TAG = 'TOGGLE_NODE_TAG';
 export const ADD_NEW_NODE_PARAGRAPH = 'ADD_NEW_NODE_PARAGRAPH';
 export const UPDATE_NODE_PARAGRAPH = 'UPDATE_NODE_PARAGRAPH';
 export const UPDATE_SECTION_ITEM_INDEX = 'UPDATE_SECTION_ITEM_INDEX';
+export const REMOVE_SECTION_ITEM_AT_INDEX = 'REMOVE_SECTION_ITEM_AT_INDEX';
 
 /*
  * other constants
@@ -234,5 +235,14 @@ export function updateSectionItemIndex(bufferID, nodeID, from, to) {
     nodeID,
     from,
     to
+  };
+}
+
+export function removeSectionItemAtIndex(bufferID, nodeID, idx) {
+  return {
+    type: REMOVE_SECTION_ITEM_AT_INDEX,
+    bufferID,
+    nodeID,
+    idx
   };
 }

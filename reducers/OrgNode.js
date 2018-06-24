@@ -22,7 +22,8 @@ import {
   UPDATE_NODE_PARAGRAPH,
   TOGGLE_NODE_TAG,
   ADD_NEW_NODE_PARAGRAPH,
-  UPDATE_SECTION_ITEM_INDEX
+  UPDATE_SECTION_ITEM_INDEX,
+  REMOVE_SECTION_ITEM_AT_INDEX
 } from '../actions';
 
 const OrgDrawerUtil = require('../utilities/OrgDrawerUtil');
@@ -290,6 +291,12 @@ function section(state = { type: 'org.section', children: null }, action) {
       nextChildren.splice(action.from, 1);
       nextChildren.splice(action.to, 0, temp);
       return Object.assign({}, state, { children: nextChildren });
+      break;
+    case REMOVE_SECTION_ITEM_AT_INDEX:
+      var nextChildren = state.children.slice(0);
+      nextChildren.splice(action.idx, 1);
+      return Object.assign({}, state, { children: nextChildren });
+      break;
       break;
     case ADD_NEW_NODE_PLANNING:
       return initState(state, 'org.planning');

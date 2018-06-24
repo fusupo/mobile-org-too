@@ -22,7 +22,8 @@ import {
   UPDATE_NODE_PARAGRAPH,
   TOGGLE_NODE_TAG,
   ADD_NEW_NODE_PARAGRAPH,
-  UPDATE_SECTION_ITEM_INDEX
+  UPDATE_SECTION_ITEM_INDEX,
+  REMOVE_SECTION_ITEM_AT_INDEX
 } from '../actions';
 
 import orgNode from './OrgNode';
@@ -156,6 +157,7 @@ const orgTree = (state = {}, action) => {
     case TOGGLE_NODE_TAG:
     case ADD_NEW_NODE_PARAGRAPH:
     case UPDATE_SECTION_ITEM_INDEX:
+    case REMOVE_SECTION_ITEM_AT_INDEX:
       nextState = Object.assign({}, state);
       if (state.id && state.id === action.nodeID) {
         nextState = orgNode(state, action);

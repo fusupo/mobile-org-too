@@ -15,10 +15,11 @@ import {
   updateNodeLogNote,
   removeNodeLogNote,
   updateNodeParagraph,
-  updateSectionItemIndex
+  updateSectionItemIndex,
+  removeSectionItemAtIndex
 } from '../actions';
 
-import { View, Text, Button, TouchableHighlight } from 'react-native';
+import { View, Text, Button, FlatList, TouchableHighlight } from 'react-native';
 import {
   Ionicons,
   MaterialIcons,
@@ -43,8 +44,10 @@ import timestampStringNow from '../utilities/utils';
 class OrgSection extends Component {
   constructor(props) {
     super(props);
-    this.state = { selectedIndex: 0 };
+    this.state = { selectedIndex: 0, isLocked: true };
+    this.myRef = React.createRef();
   }
+
   render() {
     const {
       bufferID,
@@ -62,7 +65,8 @@ class OrgSection extends Component {
       onUpdateLogNote,
       onRemoveLogNote,
       onUpdateNodeParagraph,
-      onRowMoved
+      onRowMoved,
+      onRowRemove
     } = this.props;
 
     const inactiveButton = icon => {
@@ -79,6 +83,19 @@ class OrgSection extends Component {
 
     const toolbar = (
       <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          onPress={() => {
+            this.setState({ isLocked: !this.state.isLocked });
+          }}>
+          <View style={{}}>
+            <Ionicons
+              name={this.state.isLocked ? 'md-lock' : 'md-unlock'}
+              size={20}
+              style={{ marginLeft: 5 }}
+            />
+          </View>
+        </TouchableHighlight>
+
         {OrgNodeUtil.getPlanning(node)
           ? inactiveButton(
               <MaterialIcons
@@ -134,11 +151,9 @@ class OrgSection extends Component {
     );
 
     if (node.section && node.section.children) {
-      // const children = node.section.children.map((c, idx) => {
-      // });
-
       const data = node.section.children.reduce((m, c, idx) => {
-        m[c.type + '-' + idx] = c;
+        c.isLocked = false;
+        m[JSON.stringify(c) + '-' + idx] = c;
         return m;
       }, {});
 
@@ -147,81 +162,119 @@ class OrgSection extends Component {
       return (
         <View style={{ flex: 1 }}>
           {toolbar}
-          <SortableListView
-            limitScrolling={true}
-            style={{ flex: 1 }}
-            data={data}
-            order={order}
-            onRowMoved={onRowMoved(bufferID, nodeID)}
-            renderRow={(row, a, b, c) => {
-              console.log('RENDER ROW', a, b, c);
-              return (
-                <RowComponent
-                  key={b}
-                  c={row}
-                  data={row}
-                  node={node}
-                  nodeID={nodeID}
-                  bufferID={bufferID}
-                  eventHandlers={{
-                    // onAddPlanningPress: onAddPlanningPress(bufferID, nodeID),
-                    // onAddPropDrawerPress: onAddPropDrawerPress(
-                    //   bufferID,
-                    //   nodeID
-                    // ),
-                    // onAddLogbookPress: onAddLogbookPress(bufferID, nodeID),
-                    // onAddParagraphPress: onAddParagraphPress(bufferID, nodeID),
-                    onAddProp: onAddProp(bufferID, nodeID),
-                    onUpdateProp: onUpdateProp(bufferID, nodeID),
-                    onRemoveProp: onRemoveProp(bufferID, nodeID),
-                    onAddLogNote: onAddLogNote(bufferID, nodeID),
-                    onUpdateLogNote: onUpdateLogNote(bufferID, nodeID),
-                    onRemoveLogNote: onRemoveLogNote(bufferID, nodeID),
-                    onUpdateNodeParagraph: onUpdateNodeParagraph(
-                      bufferID,
-                      nodeID,
-                      parseInt(b[b.length - 1])
-                    )
-                  }}
-                />
-              );
-            }}
-          />
+          {this.state.isLocked ? (
+            <FlatList
+              style={{ flex: 1 }}
+              data={Object.entries(data)}
+              keyExtractor={(item, idx) => {
+                return item.type + idx;
+              }}
+              renderItem={(({ item }, x, y, z) => {
+                let b = item[0];
+                let row = item[1];
+                return (
+                  <RowComponent
+                    idx={parseInt(b[b.length - 1])}
+                    c={row}
+                    data={row}
+                    node={node}
+                    nodeID={nodeID}
+                    bufferID={bufferID}
+                    isLocked={true}
+                    onRemoveSectionItem={idx => () => {
+                      console.log('no-op');
+                    }}
+                    eventHandlers={{
+                      onAddProp: onAddProp(bufferID, nodeID),
+                      onUpdateProp: onUpdateProp(bufferID, nodeID),
+                      onRemoveProp: onRemoveProp(bufferID, nodeID),
+                      onAddLogNote: onAddLogNote(bufferID, nodeID),
+                      onUpdateLogNote: onUpdateLogNote(bufferID, nodeID),
+                      onRemoveLogNote: onRemoveLogNote(bufferID, nodeID),
+                      onUpdateNodeParagraph: onUpdateNodeParagraph(
+                        bufferID,
+                        nodeID,
+                        parseInt(b[b.length - 1])
+                      )
+                    }}
+                  />
+                );
+              }).bind(this)}
+            />
+          ) : (
+            <SortableListView
+              limitScrolling={true}
+              style={{ flex: 1 }}
+              data={data}
+              order={order}
+              onRowMoved={onRowMoved(bufferID, nodeID)}
+              renderRow={((row, a, b, c) => {
+                const idx = parseInt(b[b.length - 1]);
+                return (
+                  <RowComponent
+                    idx={idx}
+                    key={b}
+                    c={row}
+                    data={row}
+                    node={node}
+                    nodeID={nodeID}
+                    bufferID={bufferID}
+                    isLocked={false}
+                    onRemoveSectionItem={() => {
+                      onRowRemove(bufferID, nodeID, idx);
+                    }}
+                    eventHandlers={{
+                      onAddProp: onAddProp(bufferID, nodeID),
+                      onUpdateProp: onUpdateProp(bufferID, nodeID),
+                      onRemoveProp: onRemoveProp(bufferID, nodeID),
+                      onAddLogNote: onAddLogNote(bufferID, nodeID),
+                      onUpdateLogNote: onUpdateLogNote(bufferID, nodeID),
+                      onRemoveLogNote: onRemoveLogNote(bufferID, nodeID),
+                      onUpdateNodeParagraph: onUpdateNodeParagraph(
+                        bufferID,
+                        nodeID,
+                        idx
+                      )
+                    }}
+                  />
+                );
+              }).bind(this)}
+            />
+          )}
         </View>
       );
-
-      // return (
-      //   <View style={{ flex: 1 }}>
-      //     {toolbar}
-      //     <View style={{ flex: 1 }}>{children}</View>
-      //   </View>
-      // );
     } else {
       return <View style={{ flex: 1 }}>{toolbar}</View>;
     }
-    // const { data, renderItem } = this.props;
-    // let items = data.map((d, idx) => renderItem(d, idx));
-    // console.log(
-    //   data,
-    //   '//////////////////////////////////////////////////////////////////////////////// RENDER LIST'
-    // );
   }
 }
 
-const eoo = sortHandlers => bar => {
-  return (
-    <TouchableHighlight
-      underlayColor={'#eee'}
-      style={{
-        // paddingTop: 10, //25,
-        backgroundColor: '#F8F8F8',
-        // borderBottomWidth: 1,
-        borderColor: '#eee'
-      }}
-      {...sortHandlers}>
-      {bar}
-    </TouchableHighlight>
-  );
+const eoo = (sortHandlers, isLocked, onRemoveSectionItem) => bar => {
+  if (isLocked) {
+    return bar;
+  } else {
+    return (
+      <TouchableHighlight
+        underlayColor={'#eee'}
+        style={{
+          // paddingRight: 50, //25,
+          backgroundColor: '#F8F8F8',
+          // borderBottomWidth: 1,
+          borderColor: '#eee'
+        }}
+        {...sortHandlers}>
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableHighlight style={{ flex: 1 }} onPress={onRemoveSectionItem}>
+            <Text>{'remove'}</Text>
+          </TouchableHighlight>
+          <View style={{ flex: 2 }}>{bar}</View>
+          <View style={{ flex: 1 }}>
+            <Text>{'move'}</Text>
+          </View>
+        </View>
+      </TouchableHighlight>
+    );
+  }
 };
 
 class RowComponent extends React.Component {
@@ -230,13 +283,16 @@ class RowComponent extends React.Component {
     let {
       key,
       c,
+      isLocked,
       node,
       bufferID,
       nodeID,
       sortHandlers,
-      eventHandlers
+      eventHandlers,
+      onRemoveSectionItem,
+      idx
     } = this.props;
-    let foo = eoo(sortHandlers);
+    let foo = eoo(sortHandlers, isLocked, onRemoveSectionItem);
     switch (c.type) {
       case 'org.planning': //  schedule MaterialIcons
         ret = foo(
@@ -301,21 +357,9 @@ class RowComponent extends React.Component {
       // case OrgBlock.name: // code FontAwesome
       // break;
       default:
+        break;
     }
     return ret;
-    // return (
-    //   <TouchableHighlight
-    //     underlayColor={'#eee'}
-    //     style={{
-    //       padding: 25,
-    //       backgroundColor: '#F8F8F8',
-    //       borderBottomWidth: 1,
-    //       borderColor: '#eee'
-    //     }}
-    //     {...this.props.sortHandlers}>
-    //     <Text>{this.props.data.text}</Text>
-    //   </TouchableHighlight>
-    // );
   }
 }
 
@@ -360,8 +404,6 @@ const mapDispatchToProps = dispatch => {
     },
     onAddLogNote: (bufferID, nodeID) => () => {
       const nowStr = OrgTimestampUtil.serialize(OrgTimestampUtil.now());
-      // console.log(nowStr);
-      // console.log('funk');
       dispatch(insertNewNodeLogNote(bufferID, nodeID, nowStr));
     },
     onUpdateLogNote: (bufferID, nodeID) => (idx, text) => {
@@ -375,6 +417,10 @@ const mapDispatchToProps = dispatch => {
     },
     onRowMoved: (bufferID, nodeID) => e => {
       dispatch(updateSectionItemIndex(bufferID, nodeID, e.from, e.to));
+    },
+    onRowRemove: (bufferID, nodeID, idx) => {
+      console.log('suckit', bufferID, nodeID, idx);
+      dispatch(removeSectionItemAtIndex(bufferID, nodeID, idx));
     }
   };
 };
