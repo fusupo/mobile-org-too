@@ -167,11 +167,12 @@ class OrgSection extends Component {
               style={{ flex: 1 }}
               data={Object.entries(data)}
               keyExtractor={(item, idx) => {
-                return item.type + idx;
+                return item[1].type + idx;
               }}
               renderItem={(({ item }, x, y, z) => {
                 let b = item[0];
                 let row = item[1];
+                console.log(b[b.length - 1]);
                 return (
                   <RowComponent
                     idx={parseInt(b[b.length - 1])}
