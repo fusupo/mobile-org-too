@@ -1,17 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-  addNewNode,
-  cycleNodeCollapse,
-  deleteNode,
-  insertNewNodeProp,
-  updateNodeProp,
-  removeNodeProp,
-  insertNewNodeLogNote,
-  updateNodeLogNote,
-  removeNodeLogNote,
-  updateNodeBody
-} from '../actions';
+import { addNewNode, cycleNodeCollapse, deleteNode } from '../actions';
 
 import { NavigationActions } from 'react-navigation';
 
@@ -19,7 +8,6 @@ import {
   ActionSheetIOS,
   Button,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableHighlight,
   View
@@ -28,20 +16,13 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import OrgHeadlineEditable from '../components/OrgHeadlineEditable';
-import OrgPlanning from '../components/OrgPlanning';
-import OrgDrawer from '../components/OrgDrawer';
-import OrgLogbook from '../components/OrgLogbook';
-import OrgBody from '../components/OrgBody';
 import OrgList from '../components/OrgList';
 import SplitPane from '../components/SplitPane';
+import OrgSection from '../components/OrgSection';
 
-import { findBranch, timestampStringNow } from '../utilities/utils';
-const OrgNodeUtil = require('../utilities/OrgNodeUtil');
+import { findBranch } from '../utilities/utils';
 
 import { getNode } from '../selectors';
-
-//const OrgTreeUtil = require('org-parse').OrgTree;
-/* const OrgTimestampUtil = require('org-parse').OrgTimestamp;*/
 
 import appStyles from '../styles';
 
@@ -59,13 +40,6 @@ class NodeDetailScreen extends React.Component {
       nodeID,
       node,
       onPressDeleteNode,
-      onAddProp,
-      onUpdateProp,
-      onRemoveProp,
-      onAddLogNote,
-      onUpdateLogNote,
-      onRemoveLogNote,
-      onUpdateNodeBody,
       onAddOnePress,
       isNew
     } = this.props;
@@ -91,53 +65,18 @@ class NodeDetailScreen extends React.Component {
 
       return (
         <View style={appStyles.container}>
+          <View style={[appStyles.border, { marginTop: 20, height: 40 }]}>
+            <OrgHeadlineEditable
+              bufferID={bufferID}
+              nodeID={nodeID}
+              autoFocus={isNew}
+            />
+          </View>
           <SplitPane
             viewA={
-              <ScrollView style={appStyles.container}>
-                <View
-                  style={[
-                    appStyles.container,
-                    appStyles.border,
-                    { marginTop: 20 }
-                  ]}>
-                  <OrgHeadlineEditable
-                    bufferID={bufferID}
-                    nodeID={nodeID}
-                    autoFocus={isNew}
-                  />
-                </View>
-                <View style={[appStyles.container, appStyles.border]}>
-                  <OrgPlanning
-                    bufferID={bufferID}
-                    nodeID={nodeID}
-                    isCollapsed={true}
-                  />
-                </View>
-                <View style={[appStyles.container, appStyles.border]}>
-                  <OrgDrawer
-                    drawer={OrgNodeUtil.getPropDrawer(node)}
-                    isCollapsed={true}
-                    onAddProp={onAddProp(bufferID, nodeID)}
-                    onUpdateProp={onUpdateProp(bufferID, nodeID)}
-                    onRemoveProp={onRemoveProp(bufferID, nodeID)}
-                  />
-                </View>
-                <View style={[appStyles.container, appStyles.border]}>
-                  <OrgLogbook
-                    log={OrgNodeUtil.getLogbook(node)}
-                    isCollapsed={true}
-                    onAddLogNote={onAddLogNote(bufferID, nodeID)}
-                    onUpdateLogNote={onUpdateLogNote(bufferID, nodeID)}
-                    onRemoveLogNote={onRemoveLogNote(bufferID, nodeID)}
-                  />
-                </View>
-                <View style={[appStyles.container, appStyles.border]}>
-                  <OrgBody
-                    onUpdateNodeBody={onUpdateNodeBody(bufferID, nodeID)}
-                    section={node.section}
-                  />
-                </View>
-              </ScrollView>
+              <View style={appStyles.container}>
+                <OrgSection bufferID={bufferID} nodeID={nodeID} />
+              </View>
             }
             viewB={
               <View style={{ flex: 1 }}>
@@ -240,30 +179,6 @@ const mapDispatchToProps = dispatch => {
     },
     onPressDeleteNode: (bufferID, nodeID) => {
       dispatch(deleteNode(bufferID, nodeID));
-    },
-    onAddProp: (bufferID, nodeID) => () => {
-      dispatch(insertNewNodeProp(bufferID, nodeID));
-    },
-    onUpdateProp: (bufferID, nodeID) => (idx, oldPropKey, propKey, propVal) => {
-      dispatch(
-        updateNodeProp(bufferID, nodeID, idx, oldPropKey, propKey, propVal)
-      );
-    },
-    onRemoveProp: (bufferID, nodeID) => propKey => {
-      dispatch(removeNodeProp(bufferID, nodeID, propKey));
-    },
-    onAddLogNote: (bufferID, nodeID) => () => {
-      const nowStr = timestampStringNow(); //OrgTimestampUtil.serialize(OrgTimestampUtil.now());
-      dispatch(insertNewNodeLogNote(bufferID, nodeID, nowStr));
-    },
-    onUpdateLogNote: (bufferID, nodeID) => (idx, text) => {
-      dispatch(updateNodeLogNote(bufferID, nodeID, idx, text));
-    },
-    onRemoveLogNote: (bufferID, nodeID) => idx => {
-      dispatch(removeNodeLogNote(bufferID, nodeID, idx));
-    },
-    onUpdateNodeBody: (bufferID, nodeID) => text => {
-      /*       dispatch(updateNodeBody(bufferID, nodeID, text));*/
     },
     onAddOnePress: (bufferID, nodeID, node) => {
       //console.log(node);

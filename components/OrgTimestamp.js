@@ -40,6 +40,8 @@ class OrgTimestamp extends Component {
   render() {
     const { timestamp } = this.props;
 
+    console.log('DATE:', this.state.date);
+
     const okCancel = (onCancelPress, onOkPress) => {
       return (
         <View style={{ flexDirection: 'row' }}>
@@ -55,7 +57,7 @@ class OrgTimestamp extends Component {
 
     const repUnitsPicker = selectedVal => (
       <Picker
-        style={[appStyles.container, { height: 150 }]}
+        style={[appStyles.container, { flex: 1 }]}
         selectedValue={this.state[selectedVal]}
         onValueChange={(itemValue, itemIndex) => {
           const obj = {};
@@ -70,6 +72,7 @@ class OrgTimestamp extends Component {
         <Picker.Item label="y" value="y" />
       </Picker>
     );
+
     const repValPicker = selectedVal => {
       let vals = [<Picker.Item key={'-'} label={'-'} value={'-'} />];
       for (let i = 1; i < 10; i++) {
@@ -77,7 +80,7 @@ class OrgTimestamp extends Component {
       }
       return (
         <Picker
-          style={{ flex: 1, height: 150 }}
+          style={{ flex: 1 }}
           selectedValue={this.state[selectedVal]}
           onValueChange={(itemValue, itemIndex) => {
             const obj = {};
@@ -217,13 +220,13 @@ class OrgTimestamp extends Component {
         )}
         <View style={{ flexDirection: 'row' }}>
           <DatePickerIOS
-            style={{ height: 150, flex: 12 }}
+            style={{ flex: 8 }}
             date={this.state.date}
             onDateChange={date => this.setState({ date })}
             mode="datetime"
           />
           <Picker
-            style={appStyles.container}
+            style={(appStyles.container, { flex: 1 })}
             selectedValue={this.state.repInt}
             onValueChange={(itemValue, itemIndex) =>
               this.setState({ repInt: itemValue })}>

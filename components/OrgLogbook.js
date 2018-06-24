@@ -16,6 +16,7 @@ export default class OrgLogbook extends Component {
   }
 
   render() {
+    const { log, onRemoveLogNote, onUpdateLogNote, onAddLogNote } = this.props;
     if (this.state.isCollapsed) {
       return (
         <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
@@ -35,17 +36,17 @@ export default class OrgLogbook extends Component {
       );
     } else {
       const listItems =
-        this.props.log &&
-        this.props.log.items &&
-        this.props.log.items.map((le, idx) => {
+        log &&
+        log.items &&
+        log.items.map((le, idx) => {
           return (
             <OrgLogbookItem
               key={idx}
               idx={idx}
               type={le.type}
               logItem={le}
-              onRemoveLogNote={this.props.onRemoveLogNote}
-              onUpdateLogNote={this.props.onUpdateLogNote}
+              onRemoveLogNote={onRemoveLogNote}
+              onUpdateLogNote={onUpdateLogNote}
             />
           );
         });
@@ -59,7 +60,7 @@ export default class OrgLogbook extends Component {
                 text: 'addOne',
                 backgroundColor: '#33bb33',
                 onPress: () => {
-                  this.props.onAddLogNote();
+                  onAddLogNote();
                 }
               }
             ]}>

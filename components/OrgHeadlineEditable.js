@@ -21,7 +21,6 @@ class OrgHeadlineEditable extends Component {
   }
 
   render() {
-    console.log('RENDER HEADLINE EDITABLE');
     const { bufferID, node, autoFocus, onHeadlineEndEditing } = this.props;
     const { firstEdit, title } = this.state;
 

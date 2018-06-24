@@ -24,9 +24,6 @@ class Tree extends Component {
   }
 
   componentWillReceiveProps() {
-    console.log(
-      'WILL RECIEVE PROPS ######################################################'
-    );
     if (!this.state.isCollapsed) {
       const { getItems, path } = this.props;
       getItems(path, itemData => {
