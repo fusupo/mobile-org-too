@@ -32,6 +32,8 @@ import {
 import { getNode } from '../selectors';
 import appStyles from '../styles';
 
+import OrgTable from '../components/OrgTable';
+import OrgPlainList from '../components/OrgPlainList';
 import OrgPlanning from '../components/OrgPlanning';
 import OrgDrawer from '../components/OrgDrawer';
 import OrgLogbook from '../components/OrgLogbook';
@@ -345,19 +347,44 @@ class RowComponent extends React.Component {
               // )}
               {...eventHandlers}
               text={c.value.join('\n')}
+              isCollapsed={true}
+            />
+          </View>
+        );
+        break;
+      case 'org.plainList': // list Foundation
+        ret = foo(
+          <View key={key} style={[appStyles.container, appStyles.border]}>
+            <OrgPlainList
+              bufferID={bufferID}
+              nodeID={nodeID}
+              {...eventHandlers}
+              items={c.items}
+              isCollapsed={true}
+            />
+          </View>
+        );
+        break;
+      case 'org.table': // table MaterialCommunityIcons
+        console.log(c);
+        ret = foo(
+          <View key={key} style={[appStyles.container, appStyles.border]}>
+            <OrgTable
+              bufferID={bufferID}
+              nodeID={nodeID}
+              {...eventHandlers}
+              table={c}
+              isCollapsed={true}
             />
           </View>
         );
         break;
       // case OrgKeyword.name:  //
       // break;
-      // case OrgTable.name:  // table MaterialCommunityIcons
-      // break;
-      // case OrgPlainList.name:  // list Foundation
-      // break;
       // case OrgBlock.name: // code FontAwesome
       // break;
       default:
+        console.log('unhandled row type', c.type);
         break;
     }
     return ret;
