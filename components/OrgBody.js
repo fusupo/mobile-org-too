@@ -11,6 +11,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import appStyles from '../styles';
+import OrgSectionElementHeader from './OrgSectionElementHeader';
 
 const styles = StyleSheet.create({
   container: {
@@ -39,9 +40,6 @@ class OrgBody extends Component {
   }
 
   componentWillMount() {
-    // console.log('WILL MOUNT');
-    // console.log(this.props);
-    // console.log(this.state);
     this.setState({ text: this.props.text });
   }
 
@@ -92,58 +90,69 @@ class OrgBody extends Component {
           </View>
         </ScrollView>
       </View>
+    ) : isCollapsed ? (
+      <OrgSectionElementHeader
+        iconName={'ios-book-outline'}
+        toggleCollapse={this._toggleCollapse.bind(this)}
+      />
     ) : (
-      <View>
-        <View
-          className="OrgBody"
-          style={{
-            flexDirection: 'row',
-            backgroundColor: '#cccccc'
-          }}>
-          <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
-            <Ionicons
-              name={isCollapsed ? 'ios-book-outline' : 'ios-book'}
-              size={20}
-              style={{ marginLeft: 5 }}
-            />
-          </TouchableHighlight>
-        </View>
-        {isCollapsed ? (
-          <ScrollView style={[appStyles.container]} horizontal={true}>
-            <View style={[appStyles.container]}>
-              <Text
-                style={[
-                  appStyles.baseText,
-                  styles.text,
-                  { width: '100%' },
-                  appStyles.border
-                ]}>
-                {
-                  // bodyText
-                  text
-                }
-              </Text>
-            </View>
-          </ScrollView>
-        ) : (
-          <TouchableHighlight
-            onPress={
-              isCollapsed ? null : () => this.setState({ isEditing: true })
-            }>
-            <ScrollView style={[appStyles.container]} horizontal={true}>
-              <View style={[appStyles.container]}>
-                <Text style={[styles.container, styles.text]}>
-                  {
-                    //bodyText
-                    text
-                  }
-                </Text>
-              </View>
-            </ScrollView>
-          </TouchableHighlight>
-        )}
+      <View style={{ flexDirection: 'column', flex: 1 }}>
+        <OrgSectionElementHeader
+          iconName={'ios-book'}
+          toggleCollapse={this._toggleCollapse.bind(this)}
+        />
+        <ScrollView style={[appStyles.container]} horizontal={true}>
+          <View style={[appStyles.container]}>
+            <Text
+              style={[
+                appStyles.baseText,
+                styles.text,
+                { width: '100%' },
+                appStyles.border
+              ]}>
+              {
+                // bodyText
+                text
+              }
+            </Text>
+          </View>
+        </ScrollView>
       </View>
-    );
+    ); // <View>
+    //   <View
+    //     className="OrgBody"
+    //     style={{
+    //       flexDirection: 'row',
+    //       backgroundColor: '#cccccc'
+    //     }}>
+    //     <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
+    //       <Ionicons
+    //         name={isCollapsed ? 'ios-book-outline' : 'ios-book'}
+    //         size={20}
+    //         style={{ marginLeft: 5 }}
+    //       />
+    //     </TouchableHighlight>
+    //   </View>
+    //   {isCollapsed ? (
+
+    //   ) : (
+    //     <TouchableHighlight
+    //       onPress={
+    //         isCollapsed ? null : () => this.setState({ isEditing: true })
+    //       }>
+    //       <ScrollView style={[appStyles.container]} horizontal={true}>
+    //         <View style={[appStyles.container]}>
+    //           <Text style={[styles.container, styles.text]}>
+    //             {
+    //               //bodyText
+    //               text
+    //             }
+    //           </Text>
+    //         </View>
+    //       </ScrollView>
+    //     </TouchableHighlight>
+    //   )}
+    // </View>
     return <View style={{ flex: 16 }}>{showEditor}</View>;
   }
 }

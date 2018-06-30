@@ -20,6 +20,8 @@ import appStyles from '../styles';
 
 import { getNode } from '../selectors';
 
+import OrgSectionElementHeader from './OrgSectionElementHeader';
+
 class OrgPlanning extends Component {
   constructor(props) {
     super(props);
@@ -33,20 +35,10 @@ class OrgPlanning extends Component {
   render() {
     if (this.state.isCollapsed) {
       return (
-        <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
-          <View
-            className="OrgPlanning"
-            style={{
-              flexDirection: 'row',
-              backgroundColor: '#cccccc'
-            }}>
-            <Ionicons
-              name={'ios-alarm-outline'}
-              size={20}
-              style={{ marginLeft: 5 }}
-            />
-          </View>
-        </TouchableHighlight>
+        <OrgSectionElementHeader
+          iconName={'ios-alarm-outline'}
+          toggleCollapse={this._toggleCollapse.bind(this)}
+        />
       );
     } else {
       const {
@@ -71,20 +63,10 @@ class OrgPlanning extends Component {
 
       return (
         <View style={appStyles.container}>
-          <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
-            <View
-              className="OrgPlanning"
-              style={{
-                flexDirection: 'row',
-                backgroundColor: '#cccccc'
-              }}>
-              <Ionicons
-                name={'ios-alarm'}
-                size={20}
-                style={{ marginLeft: 5 }}
-              />
-            </View>
-          </TouchableHighlight>
+          <OrgSectionElementHeader
+            iconName={'ios-alarm'}
+            toggleCollapse={this._toggleCollapse.bind(this)}
+          />
           <View>{timings}</View>
         </View>
       );

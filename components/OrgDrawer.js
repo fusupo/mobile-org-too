@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Swipeout from 'react-native-swipeout';
 
 import OrgDrawerItem from './OrgDrawerItem';
-
+import OrgSectionElementHeader from './OrgSectionElementHeader';
 class OrgDrawer extends Component {
   constructor(props) {
     super(props);
@@ -21,20 +21,10 @@ class OrgDrawer extends Component {
   render() {
     if (this.state.isCollapsed) {
       return (
-        <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
-          <View
-            className="OrgDrawer"
-            style={{
-              flexDirection: 'row',
-              backgroundColor: '#cccccc'
-            }}>
-            <Ionicons
-              name={'ios-list-box-outline'}
-              size={20}
-              style={{ marginLeft: 5 }}
-            />
-          </View>
-        </TouchableHighlight>
+        <OrgSectionElementHeader
+          iconName={'ios-list-box-outline'}
+          toggleCollapse={this._toggleCollapse.bind(this)}
+        />
       );
     } else {
       const listItems =
@@ -79,20 +69,10 @@ class OrgDrawer extends Component {
                 }
               }
             ]}>
-            <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
-              <View
-                className="OrgDrawer"
-                style={{
-                  flexDirection: 'row',
-                  backgroundColor: '#cccccc'
-                }}>
-                <Ionicons
-                  name={'ios-list-box'}
-                  size={20}
-                  style={{ marginLeft: 5 }}
-                />
-              </View>
-            </TouchableHighlight>
+            <OrgSectionElementHeader
+              iconName={'ios-list-box'}
+              toggleCollapse={this._toggleCollapse.bind(this)}
+            />
           </Swipeout>
           <View className="OrgDrawerProperties">{listItems}</View>
         </View>

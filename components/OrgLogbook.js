@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Swipeout from 'react-native-swipeout';
 
 import OrgLogbookItem from './OrgLogbookItem';
+import OrgSectionElementHeader from './OrgSectionElementHeader';
 
 export default class OrgLogbook extends Component {
   constructor(props) {
@@ -19,20 +20,10 @@ export default class OrgLogbook extends Component {
     const { log, onRemoveLogNote, onUpdateLogNote, onAddLogNote } = this.props;
     if (this.state.isCollapsed) {
       return (
-        <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
-          <View
-            className="OrgLogbook"
-            style={{
-              flexDirection: 'row',
-              backgroundColor: '#cccccc'
-            }}>
-            <Ionicons
-              name={'ios-recording-outline'}
-              size={20}
-              style={{ marginLeft: 5 }}
-            />
-          </View>
-        </TouchableHighlight>
+        <OrgSectionElementHeader
+          iconName={'ios-recording-outline'}
+          toggleCollapse={this._toggleCollapse.bind(this)}
+        />
       );
     } else {
       const listItems =
@@ -64,21 +55,10 @@ export default class OrgLogbook extends Component {
                 }
               }
             ]}>
-            <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
-              <View
-                className="OrgLogbook"
-                style={{
-                  flexDirection: 'row',
-                  backgroundColor: '#cccccc'
-                }}
-                onPress={this._toggleCollapse.bind(this)}>
-                <Ionicons
-                  name={'ios-recording'}
-                  size={20}
-                  style={{ marginLeft: 5 }}
-                />
-              </View>
-            </TouchableHighlight>
+            <OrgSectionElementHeader
+              iconName={'ios-recording'}
+              toggleCollapse={this._toggleCollapse.bind(this)}
+            />
           </Swipeout>
           <View className="OrgDrawerProperties">{listItems}</View>
         </View>
