@@ -31,38 +31,16 @@ class OrgTableRow extends Component {
 }
 
 export default class OrgTable extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { isCollapsed: this.props.isCollapsed };
-  }
-
-  _toggleCollapse() {
-    this.setState({ isCollapsed: !this.state.isCollapsed });
-  }
-
   render() {
     const { table } = this.props;
 
-    if (this.state.isCollapsed) {
-      return (
-        <OrgSectionElementHeader
-          iconName={'ios-grid-outline'}
-          toggleCollapse={this._toggleCollapse.bind(this)}
-        />
-      );
+    if (this.props.isCollapsed) {
+      return null;
     } else {
       const rows = table.rows.map(r => (
         <OrgTableRow key={JSON.stringify(r)} row={r} />
       ));
-      return (
-        <View style={{ flexDirection: 'column', flex: 1 }}>
-          <OrgSectionElementHeader
-            iconName={'ios-grid'}
-            toggleCollapse={this._toggleCollapse.bind(this)}
-          />
-          {rows}
-        </View>
-      );
+      return <View style={{ flexDirection: 'column', flex: 1 }}>{rows}</View>;
     }
   }
 }

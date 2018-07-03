@@ -302,6 +302,7 @@ const mapStateToProps = (state, ownProps) => {
     return ns.filter(n => {
       const scheduled = n.scheduled; //OrgNodeUtil.getScheduled(n);
       const deadline = n.deadline; //OrgNodeUtil.getDeadline(n);
+      console.log(n);
       return (
         (scheduled &&
           OrgTimestampUtil.compare(scheduled, start) >= 0 &&
@@ -404,7 +405,8 @@ const mapStateToProps = (state, ownProps) => {
   console.log('GOT THIS FAR ?? 2');
   const dayAfterTomorrow = OrgTimestampUtil.add(today, { days: 2 });
 
-  console.log('GOT THIS FAR ?? 3');
+  console.log('WTF:::', OrgTimestampUtil.add(today, { days: 2 }));
+  console.log('GOT THIS FAR ?? 3', nodes, yesterday, dayAfterTomorrow);
 
   candidates = filterRange(nodes, yesterday, dayAfterTomorrow);
   console.log('GOT THIS FAR ?? 4');

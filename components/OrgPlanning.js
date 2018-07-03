@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { View, TouchableHighlight } from 'react-native';
+import { View, Text, TouchableHighlight } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {
@@ -20,26 +20,11 @@ import appStyles from '../styles';
 
 import { getNode } from '../selectors';
 
-import OrgSectionElementHeader from './OrgSectionElementHeader';
-
 class OrgPlanning extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { isCollapsed: this.props.isCollapsed };
-  }
-
-  _toggleCollapse() {
-    this.setState({ isCollapsed: !this.state.isCollapsed });
-  }
-
   render() {
-    if (this.state.isCollapsed) {
-      return (
-        <OrgSectionElementHeader
-          iconName={'ios-alarm-outline'}
-          toggleCollapse={this._toggleCollapse.bind(this)}
-        />
-      );
+    const { isCollapsed, isLocked } = this.props;
+    if (isCollapsed) {
+      return null;
     } else {
       const {
         bufferID,
@@ -50,26 +35,33 @@ class OrgPlanning extends Component {
         onTimestampClear
       } = this.props;
       const planning = OrgNodeUtil.getPlanning(node);
-      const timings = timestampTypes.map(t => (
-        <OrgTimestamp
-          key={t}
-          onTimestampUpdate={onTimestampUpdate(bufferID, nodeID, t)}
-          onTimestampRepIntUpdate={onTimestampRepIntUpdate(bufferID, nodeID, t)}
-          onTimestampClear={onTimestampClear(bufferID, nodeID, t)}
-          timestamp={planning ? planning[t.toLowerCase()] : null}
-          label={t}
-        />
-      ));
-
-      return (
-        <View style={appStyles.container}>
-          <OrgSectionElementHeader
-            iconName={'ios-alarm'}
-            toggleCollapse={this._toggleCollapse.bind(this)}
-          />
-          <View>{timings}</View>
-        </View>
+      console.log(planning);
+      const timings = timestampTypes.map(
+        t =>
+          isLocked ? (
+            <Text>
+              {planning && planning[t.toLowerCase()]
+                ? planning[t.toLowerCase()].value
+                : 'null'}
+            </Text>
+          ) : (
+            <OrgTimestamp
+              key={t}
+              isLocked={isLocked}
+              onTimestampUpdate={onTimestampUpdate(bufferID, nodeID, t)}
+              onTimestampRepIntUpdate={onTimestampRepIntUpdate(
+                bufferID,
+                nodeID,
+                t
+              )}
+              onTimestampClear={onTimestampClear(bufferID, nodeID, t)}
+              timestamp={planning ? planning[t.toLowerCase()] : null}
+              label={t}
+            />
+          )
       );
+
+      return <View style={appStyles.container}>{timings}</View>;
     }
   }
 }

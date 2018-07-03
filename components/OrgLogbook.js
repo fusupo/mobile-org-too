@@ -1,30 +1,36 @@
 import React, { Component } from 'react';
-import { TouchableHighlight, ScrollView, Text, View } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { connect } from 'react-redux';
+
+import { View } from 'react-native';
 import Swipeout from 'react-native-swipeout';
 
 import OrgLogbookItem from './OrgLogbookItem';
-import OrgSectionElementHeader from './OrgSectionElementHeader';
 
-export default class OrgLogbook extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { isCollapsed: this.props.isCollapsed };
-  }
+import {
+  addNewNodePlanning,
+  addNewNodePropDrawer,
+  addNewNodeLogbook,
+  addNewNodeParagraph,
+  insertNewNodeLogNote,
+  updateNodeLogNote,
+  removeNodeLogNote,
+  updateNodeParagraph,
+  updateSectionItemIndex,
+  removeSectionItemAtIndex
+} from '../actions';
 
-  _toggleCollapse() {
-    this.setState({ isCollapsed: !this.state.isCollapsed });
-  }
-
+class OrgLogbook extends Component {
   render() {
-    const { log, onRemoveLogNote, onUpdateLogNote, onAddLogNote } = this.props;
-    if (this.state.isCollapsed) {
-      return (
-        <OrgSectionElementHeader
-          iconName={'ios-recording-outline'}
-          toggleCollapse={this._toggleCollapse.bind(this)}
-        />
-      );
+    const {
+      isCollapsed,
+      isLocked,
+      log,
+      onRemoveLogNote,
+      onUpdateLogNote,
+      onAddLogNote
+    } = this.props;
+    if (isCollapsed) {
+      return null;
     } else {
       const listItems =
         log &&
@@ -32,6 +38,7 @@ export default class OrgLogbook extends Component {
         log.items.map((le, idx) => {
           return (
             <OrgLogbookItem
+              isLocked={isLocked}
               key={idx}
               idx={idx}
               type={le.type}
@@ -42,27 +49,49 @@ export default class OrgLogbook extends Component {
           );
         });
 
-      return (
-        <View style={{ flexDirection: 'column', flex: 1 }}>
-          <Swipeout
-            autoClose={true}
-            left={[
-              {
-                text: 'addOne',
-                backgroundColor: '#33bb33',
-                onPress: () => {
-                  onAddLogNote();
-                }
-              }
-            ]}>
-            <OrgSectionElementHeader
-              iconName={'ios-recording'}
-              toggleCollapse={this._toggleCollapse.bind(this)}
-            />
-          </Swipeout>
-          <View className="OrgDrawerProperties">{listItems}</View>
-        </View>
-      );
+      //   <Swipeout
+      // autoClose={true}
+      // left={[
+      //   {
+      //     text: 'addOne',
+      //     backgroundColor: '#33bb33',
+      //     onPress: () => {
+      //       onAddLogNote();
+      //     }
+      //   }
+      // ]}>
+      return <View className="OrgDrawerProperties">{listItems}</View>;
     }
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  //const params = ownProps.navigation.state.params;
+  // const { bufferID, nodeID } = ownProps;
+  // const tree = state.orgBuffers[bufferID].orgTree;
+  // const node = getNode(state, bufferID, nodeID);
+  return {
+    // bufferID,
+    // nodeID,
+    // node,
+    // tree
+    // isNew
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onAddLogNote: (bufferID, nodeID) => () => {
+      const nowStr = OrgTimestampUtil.serialize(OrgTimestampUtil.now());
+      dispatch(insertNewNodeLogNote(bufferID, nodeID, nowStr));
+    },
+    onUpdateLogNote: (bufferID, nodeID) => (idx, text) => {
+      dispatch(updateNodeLogNote(bufferID, nodeID, idx, text));
+    },
+    onRemoveLogNote: (bufferID, nodeID) => idx => {
+      dispatch(removeNodeLogNote(bufferID, nodeID, idx));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrgLogbook);

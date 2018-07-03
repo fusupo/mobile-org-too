@@ -52,13 +52,14 @@ class OrgDrawerItem extends Component {
   }
 
   render() {
-    let showEditor = (
-      <View>
-        <Text style={styles.text}>{'editor'}</Text>
-      </View>
-    );
+    // let showEditor = (
+    //   <View>
+    //     <Text style={styles.text}>{'editor'}</Text>
+    //   </View>
+    // );
     let ret;
     let le = this.props.logItem;
+    const { isLocked } = this.props;
     text = le.text ? (
       <Text
         style={{
@@ -83,7 +84,9 @@ class OrgDrawerItem extends Component {
                 <Text style={styles.text}>{`${le.timestamp.value}`}</Text>
               </View>
             </View>
-            <ScrollView horizontal={true}>{text}</ScrollView>
+            <ScrollView horizontal={true} alwaysBounceHorizontal={false}>
+              {text}
+            </ScrollView>
           </View>
         );
         break;
@@ -196,7 +199,9 @@ class OrgDrawerItem extends Component {
         break;
     }
 
-    return (
+    return isLocked ? (
+      <View style={{ flexDirection: 'row', marginLeft: 5 }}>{ret}</View>
+    ) : (
       <Swipeout
         autoClose={true}
         right={[

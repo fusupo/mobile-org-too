@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+
 import {
   Text,
   TextInput,
   View,
   Button,
-  TouchableHighlight,
   ScrollView,
-  StyleSheet
+  StyleSheet,
+  TouchableHighlight
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import { updateNodeParagraph } from '../actions';
 
 import appStyles from '../styles';
-import OrgSectionElementHeader from './OrgSectionElementHeader';
 
 const styles = StyleSheet.create({
   container: {
@@ -31,12 +33,9 @@ class OrgBody extends Component {
     this.state = {
       isEditing: false,
       text: undefined,
-      isCollapsed: true
+      isCollapsed: true,
+      isLocked: true
     };
-  }
-
-  _toggleCollapse() {
-    this.setState({ isCollapsed: !this.state.isCollapsed });
   }
 
   componentWillMount() {
@@ -44,63 +43,62 @@ class OrgBody extends Component {
   }
 
   render() {
-    const { onUpdateNodeParagraph, bodyText, section } = this.props;
-    const { isCollapsed, isEditing, text } = this.state;
-    const showEditor = isEditing ? (
-      <View>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={appStyles.container}>
-            <Button
-              onPress={() => {
-                this.setState({ isEditing: false });
-                this._toggleCollapse();
-              }}
-              title="cancel"
-              color="#aa3333"
-            />
+    const {
+      idx,
+      bufferID,
+      nodeID,
+      onUpdateNodeParagraph,
+      bodyText,
+      isCollapsed,
+      isLocked
+    } = this.props;
+    const { isEditing, text } = this.state;
+    const showEditor =
+      !isLocked && isEditing ? (
+        <View>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={appStyles.container}>
+              <Button
+                onPress={() => {
+                  this.setState({ isEditing: false });
+                  //this._toggleCollapse();
+                }}
+                title="cancel"
+                color="#aa3333"
+              />
+            </View>
+            <View style={appStyles.container}>
+              <Button
+                onPress={() => {
+                  onUpdateNodeParagraph(bufferID, nodeID, idx, text);
+                  this.setState({ isEditing: false });
+                  //this._toggleCollapse();
+                }}
+                title="ok"
+                color="#33aa33"
+              />
+            </View>
           </View>
-          <View style={appStyles.container}>
-            <Button
-              onPress={() => {
-                onUpdateNodeParagraph(text);
-                this.setState({ isEditing: false });
-                this._toggleCollapse();
-              }}
-              title="ok"
-              color="#33aa33"
-            />
-          </View>
+          <ScrollView style={[appStyles.container]} horizontal={true}>
+            <View style={[appStyles.container]}>
+              <TextInput
+                style={[
+                  appStyles.baseText,
+                  styles.text,
+                  { width: '100%' },
+                  appStyles.border
+                ]}
+                value={text === undefined ? bodyText : text}
+                multiline={true}
+                autoFocus={true}
+                onChangeText={text => {
+                  this.setState({ text });
+                }}
+              />
+            </View>
+          </ScrollView>
         </View>
-        <ScrollView style={[appStyles.container]} horizontal={true}>
-          <View style={[appStyles.container]}>
-            <TextInput
-              style={[
-                appStyles.baseText,
-                styles.text,
-                { width: '100%' },
-                appStyles.border
-              ]}
-              value={text === undefined ? bodyText : text}
-              multiline={true}
-              autoFocus={true}
-              onChangeText={text => {
-                this.setState({ text });
-              }}
-            />
-          </View>
-        </ScrollView>
-      </View>
-    ) : isCollapsed ? (
-      <OrgSectionElementHeader
-        iconName={'ios-book-outline'}
-        toggleCollapse={this._toggleCollapse.bind(this)}
-      />
-    ) : (
-      <View style={{ flexDirection: 'column', flex: 1 }}>
-        <OrgSectionElementHeader
-          iconName={'ios-book'}
-          toggleCollapse={this._toggleCollapse.bind(this)}
-        />
+      ) : isCollapsed ? null : isLocked ? (
         <ScrollView style={[appStyles.container]} horizontal={true}>
           <View style={[appStyles.container]}>
             <Text
@@ -117,44 +115,48 @@ class OrgBody extends Component {
             </Text>
           </View>
         </ScrollView>
-      </View>
-    ); // <View>
-    //   <View
-    //     className="OrgBody"
-    //     style={{
-    //       flexDirection: 'row',
-    //       backgroundColor: '#cccccc'
-    //     }}>
-    //     <TouchableHighlight onPress={this._toggleCollapse.bind(this)}>
-    //       <Ionicons
-    //         name={isCollapsed ? 'ios-book-outline' : 'ios-book'}
-    //         size={20}
-    //         style={{ marginLeft: 5 }}
-    //       />
-    //     </TouchableHighlight>
-    //   </View>
-    //   {isCollapsed ? (
+      ) : (
+        <TouchableHighlight
+          onPress={
+            isCollapsed ? null : () => this.setState({ isEditing: true })
+          }>
+          <ScrollView style={[appStyles.container]} horizontal={true}>
+            <View style={[appStyles.container]}>
+              <Text style={[styles.container, styles.text]}>
+                {
+                  //bodyText
+                  text
+                }
+              </Text>
+            </View>
+          </ScrollView>
+        </TouchableHighlight>
+      );
 
-    //   ) : (
-    //     <TouchableHighlight
-    //       onPress={
-    //         isCollapsed ? null : () => this.setState({ isEditing: true })
-    //       }>
-    //       <ScrollView style={[appStyles.container]} horizontal={true}>
-    //         <View style={[appStyles.container]}>
-    //           <Text style={[styles.container, styles.text]}>
-    //             {
-    //               //bodyText
-    //               text
-    //             }
-    //           </Text>
-    //         </View>
-    //       </ScrollView>
-    //     </TouchableHighlight>
-    //   )}
-    // </View>
     return <View style={{ flex: 16 }}>{showEditor}</View>;
   }
 }
 
-export default OrgBody;
+const mapStateToProps = (state, ownProps) => {
+  //const params = ownProps.navigation.state.params;
+  // const { bufferID, nodeID } = ownProps;
+  // const tree = state.orgBuffers[bufferID].orgTree;
+  // const node = getNode(state, bufferID, nodeID);
+  return {
+    // bufferID,
+    // nodeID,
+    // node,
+    // tree
+    // isNew
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onUpdateNodeParagraph: (bufferID, nodeID, idx, text) => {
+      dispatch(updateNodeParagraph(bufferID, nodeID, idx, text));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrgBody);

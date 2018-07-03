@@ -84,6 +84,7 @@ class OrgDrawerItem extends Component {
 
   render() {
     const {
+      isLocked,
       idx,
       onItemEditBegin,
       onUpdateProp,
@@ -141,6 +142,7 @@ class OrgDrawerItem extends Component {
         <View style={{ flex: 1, flexDirection: 'row' }}>
           <Button
             onPress={() => {
+              console.log(onUpdateProp);
               onUpdateProp(idx, oldKey, key, val);
               this.onEditEnd();
             }}
@@ -172,11 +174,15 @@ class OrgDrawerItem extends Component {
             }
           ]}
           style={{ flex: 16 }}>
-          <TouchableHighlight
-            style={{ flex: 16 }}
-            onPress={this.onEditBegin.bind(this)}>
-            {base}
-          </TouchableHighlight>
+          {isLocked ? (
+            base
+          ) : (
+            <TouchableHighlight
+              style={{ flex: 16 }}
+              onPress={this.onEditBegin.bind(this)}>
+              {base}
+            </TouchableHighlight>
+          )}
         </Swipeout>
       );
 

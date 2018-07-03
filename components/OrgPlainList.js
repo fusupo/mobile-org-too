@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { View, Text, TouchableHighlight } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {
   updateNodeTimestamp,
@@ -20,26 +19,11 @@ import appStyles from '../styles';
 
 import { getNode } from '../selectors';
 
-import OrgSectionElementHeader from './OrgSectionElementHeader';
-
 class OrgPlainList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { isCollapsed: this.props.isCollapsed };
-  }
-
-  _toggleCollapse() {
-    this.setState({ isCollapsed: !this.state.isCollapsed });
-  }
-
   render() {
-    if (this.state.isCollapsed) {
-      return (
-        <OrgSectionElementHeader
-          iconName={'ios-list'}
-          toggleCollapse={this._toggleCollapse.bind(this)}
-        />
-      );
+    const { isCollapsed } = this.props;
+    if (isCollapsed) {
+      return null;
     } else {
       const { items, bufferID, nodeID } = this.props;
       const listItems = items.map(i => {
@@ -73,15 +57,7 @@ class OrgPlainList extends Component {
           return valueComp;
         }
       });
-      return (
-        <View style={appStyles.container}>
-          <OrgSectionElementHeader
-            iconName={'ios-list'}
-            toggleCollapse={this._toggleCollapse.bind(this)}
-          />
-          <View>{listItems}</View>
-        </View>
-      );
+      return <View style={appStyles.container}>{listItems}</View>;
     }
   }
 }

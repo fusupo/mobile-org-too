@@ -8,18 +8,11 @@ import {
   addNewNodePropDrawer,
   addNewNodeLogbook,
   addNewNodeParagraph,
-  insertNewNodeProp,
-  updateNodeProp,
-  removeNodeProp,
-  insertNewNodeLogNote,
-  updateNodeLogNote,
-  removeNodeLogNote,
-  updateNodeParagraph,
   updateSectionItemIndex,
   removeSectionItemAtIndex
 } from '../actions';
 
-import { View, Text, Button, FlatList, TouchableHighlight } from 'react-native';
+import { View, Text, FlatList, TouchableHighlight } from 'react-native';
 import {
   Ionicons,
   MaterialIcons,
@@ -32,12 +25,7 @@ import {
 import { getNode } from '../selectors';
 import appStyles from '../styles';
 
-import OrgTable from '../components/OrgTable';
-import OrgPlainList from '../components/OrgPlainList';
-import OrgPlanning from '../components/OrgPlanning';
-import OrgDrawer from '../components/OrgDrawer';
-import OrgLogbook from '../components/OrgLogbook';
-import OrgBody from '../components/OrgBody';
+import OrgSectionElementHeader from './OrgSectionElementHeader';
 
 const OrgNodeUtil = require('../utilities/OrgNodeUtil');
 const OrgTimestampUtil = require('../utilities/OrgTimestampUtil');
@@ -55,18 +43,10 @@ class OrgSection extends Component {
       bufferID,
       nodeID,
       node,
-      tree,
       onAddPlanningPress,
       onAddPropDrawerPress,
       onAddLogbookPress,
       onAddParagraphPress,
-      onAddProp,
-      onUpdateProp,
-      onRemoveProp,
-      onAddLogNote,
-      onUpdateLogNote,
-      onRemoveLogNote,
-      onUpdateNodeParagraph,
       onRowMoved,
       onRowRemove
     } = this.props;
@@ -174,7 +154,6 @@ class OrgSection extends Component {
               renderItem={(({ item }, x, y, z) => {
                 let b = item[0];
                 let row = item[1];
-                console.log(b[b.length - 1]);
                 return (
                   <RowComponent
                     idx={parseInt(b[b.length - 1])}
@@ -186,19 +165,6 @@ class OrgSection extends Component {
                     isLocked={true}
                     onRemoveSectionItem={idx => () => {
                       console.log('no-op');
-                    }}
-                    eventHandlers={{
-                      onAddProp: onAddProp(bufferID, nodeID),
-                      onUpdateProp: onUpdateProp(bufferID, nodeID),
-                      onRemoveProp: onRemoveProp(bufferID, nodeID),
-                      onAddLogNote: onAddLogNote(bufferID, nodeID),
-                      onUpdateLogNote: onUpdateLogNote(bufferID, nodeID),
-                      onRemoveLogNote: onRemoveLogNote(bufferID, nodeID),
-                      onUpdateNodeParagraph: onUpdateNodeParagraph(
-                        bufferID,
-                        nodeID,
-                        parseInt(b[b.length - 1])
-                      )
                     }}
                   />
                 );
@@ -225,19 +191,6 @@ class OrgSection extends Component {
                     isLocked={false}
                     onRemoveSectionItem={() => {
                       onRowRemove(bufferID, nodeID, idx);
-                    }}
-                    eventHandlers={{
-                      onAddProp: onAddProp(bufferID, nodeID),
-                      onUpdateProp: onUpdateProp(bufferID, nodeID),
-                      onRemoveProp: onRemoveProp(bufferID, nodeID),
-                      onAddLogNote: onAddLogNote(bufferID, nodeID),
-                      onUpdateLogNote: onUpdateLogNote(bufferID, nodeID),
-                      onRemoveLogNote: onRemoveLogNote(bufferID, nodeID),
-                      onUpdateNodeParagraph: onUpdateNodeParagraph(
-                        bufferID,
-                        nodeID,
-                        idx
-                      )
                     }}
                   />
                 );
@@ -284,109 +237,25 @@ class RowComponent extends React.Component {
   render() {
     let ret = null;
     let {
-      key,
+      idx,
       c,
       isLocked,
       node,
       bufferID,
       nodeID,
       sortHandlers,
-      eventHandlers,
-      onRemoveSectionItem,
-      idx
+      onRemoveSectionItem
     } = this.props;
     let foo = eoo(sortHandlers, isLocked, onRemoveSectionItem);
-    switch (c.type) {
-      case 'org.planning': //  schedule MaterialIcons
-        ret = foo(
-          <View key={key} style={[appStyles.container, appStyles.border]}>
-            <OrgPlanning
-              bufferID={bufferID}
-              nodeID={nodeID}
-              isCollapsed={true}
-            />
-          </View>
-        );
-        break;
-      case 'org.propDrawer': // drawer SimpleLineIcons
-        ret = foo(
-          <View key={key} style={[appStyles.container, appStyles.border]}>
-            <OrgDrawer
-              drawer={OrgNodeUtil.getPropDrawer(node)}
-              isCollapsed={true}
-              // onAddProp={onAddProp(bufferID, nodeID)}
-              // onUpdateProp={onUpdateProp(bufferID, nodeID)}
-              // onRemoveProp={onRemoveProp(bufferID, nodeID)}
-              {...eventHandlers}
-            />
-          </View>
-        );
-        break;
-      case 'org.logbook': // book FontAwesome
-        ret = foo(
-          <View key={key} style={[appStyles.container, appStyles.border]}>
-            <OrgLogbook
-              log={OrgNodeUtil.getLogbook(node)}
-              isCollapsed={true}
-              // onAddLogNote={onAddLogNote(bufferID, nodeID)}
-              // onUpdateLogNote={onUpdateLogNote(bufferID, nodeID)}
-              // onRemoveLogNote={onRemoveLogNote(bufferID, nodeID)}
-              {...eventHandlers}
-            />
-          </View>
-        );
-        break;
-      case 'org.paragraph': // paragraph FontAwesome
-        ret = foo(
-          <View key={key} style={[appStyles.container, appStyles.border]}>
-            <OrgBody
-              // onUpdateNodeParagraph={onUpdateNodeParagraph(
-              //   bufferID,
-              //   nodeID,
-              //   idx
-              // )}
-              {...eventHandlers}
-              text={c.value.join('\n')}
-              isCollapsed={true}
-            />
-          </View>
-        );
-        break;
-      case 'org.plainList': // list Foundation
-        ret = foo(
-          <View key={key} style={[appStyles.container, appStyles.border]}>
-            <OrgPlainList
-              bufferID={bufferID}
-              nodeID={nodeID}
-              {...eventHandlers}
-              items={c.items}
-              isCollapsed={true}
-            />
-          </View>
-        );
-        break;
-      case 'org.table': // table MaterialCommunityIcons
-        console.log(c);
-        ret = foo(
-          <View key={key} style={[appStyles.container, appStyles.border]}>
-            <OrgTable
-              bufferID={bufferID}
-              nodeID={nodeID}
-              {...eventHandlers}
-              table={c}
-              isCollapsed={true}
-            />
-          </View>
-        );
-        break;
-      // case OrgKeyword.name:  //
-      // break;
-      // case OrgBlock.name: // code FontAwesome
-      // break;
-      default:
-        console.log('unhandled row type', c.type);
-        break;
-    }
+    ret = foo(
+      <OrgSectionElementHeader
+        idx={idx}
+        data={c}
+        node={node}
+        bufferID={bufferID}
+        nodeID={nodeID}
+      />
+    );
     return ret;
   }
 }
@@ -418,30 +287,6 @@ const mapDispatchToProps = dispatch => {
     },
     onAddParagraphPress: (bufferID, nodeID) => {
       dispatch(addNewNodeParagraph(bufferID, nodeID));
-    },
-    onAddProp: (bufferID, nodeID) => () => {
-      dispatch(insertNewNodeProp(bufferID, nodeID));
-    },
-    onUpdateProp: (bufferID, nodeID) => (idx, oldPropKey, propKey, propVal) => {
-      dispatch(
-        updateNodeProp(bufferID, nodeID, idx, oldPropKey, propKey, propVal)
-      );
-    },
-    onRemoveProp: (bufferID, nodeID) => propKey => {
-      dispatch(removeNodeProp(bufferID, nodeID, propKey));
-    },
-    onAddLogNote: (bufferID, nodeID) => () => {
-      const nowStr = OrgTimestampUtil.serialize(OrgTimestampUtil.now());
-      dispatch(insertNewNodeLogNote(bufferID, nodeID, nowStr));
-    },
-    onUpdateLogNote: (bufferID, nodeID) => (idx, text) => {
-      dispatch(updateNodeLogNote(bufferID, nodeID, idx, text));
-    },
-    onRemoveLogNote: (bufferID, nodeID) => idx => {
-      dispatch(removeNodeLogNote(bufferID, nodeID, idx));
-    },
-    onUpdateNodeParagraph: (bufferID, nodeID, idx) => text => {
-      dispatch(updateNodeParagraph(bufferID, nodeID, idx, text));
     },
     onRowMoved: (bufferID, nodeID) => e => {
       dispatch(updateSectionItemIndex(bufferID, nodeID, e.from, e.to));

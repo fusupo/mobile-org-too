@@ -1,31 +1,33 @@
 import React, { Component } from 'react';
-import { Text, TouchableHighlight, View } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { connect } from 'react-redux';
+
+import { View } from 'react-native';
 import Swipeout from 'react-native-swipeout';
 
+import { insertNewNodeProp, updateNodeProp, removeNodeProp } from '../actions';
+
 import OrgDrawerItem from './OrgDrawerItem';
-import OrgSectionElementHeader from './OrgSectionElementHeader';
+
 class OrgDrawer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isCollapsed: this.props.isCollapsed,
       editIdx: null
     };
   }
 
-  _toggleCollapse() {
-    this.setState({ isCollapsed: !this.state.isCollapsed });
-  }
-
   render() {
-    if (this.state.isCollapsed) {
-      return (
-        <OrgSectionElementHeader
-          iconName={'ios-list-box-outline'}
-          toggleCollapse={this._toggleCollapse.bind(this)}
-        />
-      );
+    const {
+      bufferID,
+      nodeID,
+      isCollapsed,
+      isLocked,
+      onAddProp,
+      onRemoveProp,
+      onUpdateProp
+    } = this.props;
+    if (isCollapsed) {
+      return null;
     } else {
       const listItems =
         this.props.drawer && this.props.drawer.props
@@ -34,12 +36,13 @@ class OrgDrawer extends Component {
               const val = keyval[1];
               return (
                 <OrgDrawerItem
+                  isLocked={isLocked}
                   key={idx}
                   idx={idx}
                   propKey={key}
                   propVal={typeof val === 'object' ? val.value : val}
-                  onRemoveProp={this.props.onRemoveProp}
-                  onUpdateProp={this.props.onUpdateProp}
+                  onRemoveProp={onRemoveProp(bufferID, nodeID)}
+                  onUpdateProp={onUpdateProp(bufferID, nodeID)}
                   onItemEditBegin={itemIdx => {
                     this.setState({ editIdx: itemIdx });
                   }}
@@ -55,30 +58,52 @@ class OrgDrawer extends Component {
               );
             })
           : [];
+      //   <Swipeout
+      // autoClose={true}
+      // left={[
+      //   {
+      //     text: 'addOne',
+      //     backgroundColor: '#33bb33',
+      //     onPress: () => {
+      //       this.props.onAddProp();
+      //     }
+      //   }
+      // ]}>
 
-      return (
-        <View style={{ flexDirection: 'column', flex: 1 }}>
-          <Swipeout
-            autoClose={true}
-            left={[
-              {
-                text: 'addOne',
-                backgroundColor: '#33bb33',
-                onPress: () => {
-                  this.props.onAddProp();
-                }
-              }
-            ]}>
-            <OrgSectionElementHeader
-              iconName={'ios-list-box'}
-              toggleCollapse={this._toggleCollapse.bind(this)}
-            />
-          </Swipeout>
-          <View className="OrgDrawerProperties">{listItems}</View>
-        </View>
-      );
+      return <View className="OrgDrawerProperties">{listItems}</View>;
     }
   }
 }
 
-export default OrgDrawer;
+const mapStateToProps = (state, ownProps) => {
+  //const params = ownProps.navigation.state.params;
+  // const { bufferID, nodeID } = ownProps;
+  // const tree = state.orgBuffers[bufferID].orgTree;
+  // const node = getNode(state, bufferID, nodeID);
+  return {
+    // bufferID,
+    // nodeID,
+    // node,
+    // tree
+    // isNew
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onAddProp: (bufferID, nodeID) => () => {
+      dispatch(insertNewNodeProp(bufferID, nodeID));
+    },
+    onUpdateProp: (bufferID, nodeID) => (idx, oldPropKey, propKey, propVal) => {
+      console.log(bufferID, nodeID, idx, oldPropKey, propKey, propVal);
+      dispatch(
+        updateNodeProp(bufferID, nodeID, idx, oldPropKey, propKey, propVal)
+      );
+    },
+    onRemoveProp: (bufferID, nodeID) => propKey => {
+      dispatch(removeNodeProp(bufferID, nodeID, propKey));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrgDrawer);
