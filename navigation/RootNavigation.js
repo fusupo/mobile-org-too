@@ -40,10 +40,15 @@ const TabNav = createBottomTabNavigator(
         let iconName;
         if (routeName === 'Home') {
           iconName = `ios-information-circle${focused ? '' : '-outline'}`;
+        } else if (routeName === 'agenda') {
+          iconName = `ios-clock${focused ? '' : '-outline'}`;
+        } else if (routeName === 'ledger') {
+          iconName = 'logo-usd';
         } else if (routeName === 'Settings') {
           iconName = `ios-options${focused ? '' : '-outline'}`;
         }
 
+        console.log('Route Name', routeName);
         // You can return any component that you like here! We usually use an
         // icon component from react-native-vector-icons
         return <Ionicons name={iconName} size={25} color={tintColor} />;
