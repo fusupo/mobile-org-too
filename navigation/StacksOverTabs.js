@@ -24,22 +24,29 @@ export const StacksOverTabs = createStackNavigator(
                 <TouchableHighlight
                   key={idx}
                   onPress={() => {
-                    console.log('navigatr mutherfucker!', idx);
                     for (i = 0; i < routes.length - idx - 1; i++) {
                       navigation.pop();
                     }
                   }}>
-                  <Text>{s.routeName}</Text>
+                  <Text style={{ padding: 5 }}>{s.routeName + ' > '}</Text>
                 </TouchableHighlight>
               );
             } else {
-              return <Text key={idx}>{s.routeName}</Text>;
+              return (
+                <Text style={{ padding: 5 }} key={idx}>
+                  {s.routeName}
+                </Text>
+              );
             }
           });
           /* const bar = <View>{foo}</View>;*/
           return (
             <View
-              style={{ backgroundColor: '#ccc', marginTop: 20, height: 50 }}>
+              style={{
+                flexDirection: 'row',
+                backgroundColor: '#ccc',
+                marginTop: 20
+              }}>
               {foo}
             </View>
           );
