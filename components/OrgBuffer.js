@@ -9,6 +9,7 @@ import {
 import { connect } from 'react-redux';
 
 import OrgList from '../components/OrgList';
+import OrgSection from '../components/OrgSection';
 
 import appStyles from '../styles';
 
@@ -35,7 +36,7 @@ export class OrgBuffer extends React.Component {
   render() {
     const { bufferID, tree } = this.props;
     const { isCollapsed } = this.state;
-    //console.log('RENDERE BUFFER ??!!!!', bufferID);
+    console.log('RENDERE BUFFER ??!!!!', bufferID, tree.section);
     let childList = null;
 
     if (!isCollapsed) {
@@ -75,6 +76,7 @@ export class OrgBuffer extends React.Component {
             />
           )}
         </View>
+        {isCollapsed ? null : <OrgSection />}
         {childList}
       </View>
     );
