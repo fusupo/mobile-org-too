@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import R from 'ramda';
 
 function ledger(state = null, action) {
   let nextState, ledgernodes;
