@@ -1,6 +1,13 @@
 import Expo from 'expo';
 import React from 'react';
-import { WebView, StyleSheet, AsyncStorage } from 'react-native';
+import {
+  TouchableHighlight,
+  Text,
+  View,
+  WebView,
+  StyleSheet,
+  AsyncStorage
+} from 'react-native';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 
 import { createStore, applyMiddleware } from 'redux';
@@ -11,10 +18,13 @@ import DropboxDataSource from './utilities/DropboxDataSource.js';
 import mobileOrgTooApp from './reducers/main';
 
 import StacksOverTabs from './navigation/StacksOverTabs';
+import DrawerPanelScreen from './screens/DrawerPanelScreen';
 
 import { registerDbxAccessToken } from './actions';
 
 let store, settings;
+
+import DrawerLayout from 'react-native-drawer-layout';
 
 const styles = StyleSheet.create({
   container: {
@@ -162,7 +172,14 @@ class AppContainer extends React.Component {
       } else if (this.state.userIsLoggedIn) {
         return (
           <Provider store={store}>
-            <StacksOverTabs />
+            <DrawerLayout
+              drawerBackgroundColor="red"
+              drawerWidth={300}
+              keyboardDismissMode="on-drag"
+              statusBarBackgroundColor="blue"
+              renderNavigationView={() => <DrawerPanelScreen />}>
+              <StacksOverTabs />
+            </DrawerLayout>
           </Provider>
         );
       }
