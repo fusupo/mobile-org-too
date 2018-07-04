@@ -7,6 +7,7 @@ import {
   View
 } from 'react-native';
 import { connect } from 'react-redux';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import OrgList from '../components/OrgList';
 import OrgSection from '../components/OrgSection';
@@ -31,13 +32,27 @@ import appStyles from '../styles';
 export class OrgBuffer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { isCollapsed: true };
+    this.state = {
+      isCollapsed: true,
+      sectionIsCollapsed: true,
+      sectionIsLocked: true
+    };
   }
+
+  _toggleSectionCollapse() {
+    this.setState({ sectionIsCollapsed: !this.state.sectionIsCollapsed });
+  }
+
+  _toggleSectionLock() {
+    this.setState({ sectionIsLocked: !this.state.sectionIsLocked });
+  }
+
   render() {
     const { bufferID, tree } = this.props;
-    const { isCollapsed } = this.state;
-    console.log('RENDERE BUFFER ??!!!!', bufferID, tree.section);
+    const { isCollapsed, sectionIsCollapsed, sectionIsLocked } = this.state;
+
     let childList = null;
+    let section = null;
 
     if (!isCollapsed) {
       childList = (
@@ -48,6 +63,52 @@ export class OrgBuffer extends React.Component {
         />
       );
     }
+
+    section = (
+      <View>
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableHighlight
+            style={{ flex: 1 }}
+            onPress={this._toggleSectionCollapse.bind(this)}>
+            <View
+              style={{
+                flexDirection: 'row',
+                backgroundColor: '#cccccc'
+              }}>
+              <Ionicons
+                name={
+                  sectionIsCollapsed ? 'ios-construct-outline' : 'ios-construct'
+                }
+                size={20}
+                style={{ marginLeft: 5 }}
+              />
+            </View>
+          </TouchableHighlight>
+          {sectionIsCollapsed ? null : (
+            <TouchableHighlight onPress={this._toggleSectionLock.bind(this)}>
+              <View style={{ marginRight: 5 }}>
+                <Ionicons
+                  size={20}
+                  name={sectionIsLocked ? 'md-lock' : 'md-unlock'}
+                  style={{ marginLeft: 5 }}
+                />
+              </View>
+            </TouchableHighlight>
+          )}
+        </View>
+        {sectionIsCollapsed ? null : (
+          <View
+            style={{
+              borderRadius: 4,
+              borderWidth: 0.5,
+              borderColor: '#333',
+              padding: 10
+            }}>
+            <OrgSection bufferID={bufferID} nodeID={null} />
+          </View>
+        )}
+      </View>
+    );
 
     return (
       <View style={{ flexDirection: 'column' }}>
@@ -76,7 +137,7 @@ export class OrgBuffer extends React.Component {
             />
           )}
         </View>
-        {isCollapsed ? null : <OrgSection />}
+        {isCollapsed ? null : section}
         {childList}
       </View>
     );

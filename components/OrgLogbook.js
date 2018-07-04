@@ -7,17 +7,13 @@ import Swipeout from 'react-native-swipeout';
 import OrgLogbookItem from './OrgLogbookItem';
 
 import {
-  addNewNodePlanning,
-  addNewNodePropDrawer,
-  addNewNodeLogbook,
-  addNewNodeParagraph,
   insertNewNodeLogNote,
   updateNodeLogNote,
-  removeNodeLogNote,
-  updateNodeParagraph,
-  updateSectionItemIndex,
-  removeSectionItemAtIndex
+  removeNodeLogNote
 } from '../actions';
+
+const OrgNodeUtil = require('../utilities/OrgNodeUtil');
+import { getNode } from '../selectors';
 
 class OrgLogbook extends Component {
   render() {
@@ -66,16 +62,14 @@ class OrgLogbook extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  //const params = ownProps.navigation.state.params;
-  // const { bufferID, nodeID } = ownProps;
-  // const tree = state.orgBuffers[bufferID].orgTree;
-  // const node = getNode(state, bufferID, nodeID);
+  const { bufferID, nodeID } = ownProps;
+  const tree = state.orgBuffers[bufferID].orgTree;
+  const node = nodeID ? getNode(state, bufferID, nodeID) : null;
+  const log = OrgNodeUtil.getLogbook(node || tree);
   return {
-    // bufferID,
-    // nodeID,
-    // node,
-    // tree
-    // isNew
+    bufferID,
+    nodeID,
+    log
   };
 };
 

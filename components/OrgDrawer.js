@@ -8,6 +8,9 @@ import { insertNewNodeProp, updateNodeProp, removeNodeProp } from '../actions';
 
 import OrgDrawerItem from './OrgDrawerItem';
 
+const OrgNodeUtil = require('../utilities/OrgNodeUtil');
+import { getNode } from '../selectors';
+
 class OrgDrawer extends Component {
   constructor(props) {
     super(props);
@@ -77,12 +80,14 @@ class OrgDrawer extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   //const params = ownProps.navigation.state.params;
-  // const { bufferID, nodeID } = ownProps;
-  // const tree = state.orgBuffers[bufferID].orgTree;
-  // const node = getNode(state, bufferID, nodeID);
+  const { bufferID, nodeID } = ownProps;
+  const tree = state.orgBuffers[bufferID].orgTree;
+  const node = nodeID ? getNode(state, bufferID, nodeID) : null;
+  const drawer = OrgNodeUtil.getPropDrawer(node || tree);
   return {
-    // bufferID,
-    // nodeID,
+    bufferID,
+    nodeID,
+    drawer
     // node,
     // tree
     // isNew

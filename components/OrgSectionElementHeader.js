@@ -17,6 +17,7 @@ import OrgPlanning from '../components/OrgPlanning';
 import OrgDrawer from '../components/OrgDrawer';
 import OrgLogbook from '../components/OrgLogbook';
 import OrgBody from '../components/OrgBody';
+import OrgKeyword from '../components/OrgKeyword';
 
 const OrgNodeUtil = require('../utilities/OrgNodeUtil');
 
@@ -43,7 +44,7 @@ export default class OrgSectionElementHeader extends Component {
   }
 
   render() {
-    const { idx, data, node, bufferID, nodeID } = this.props;
+    const { idx, data, bufferID, nodeID } = this.props;
     const { isCollapsed, isLocked } = this.state;
 
     let ret, iconName;
@@ -69,7 +70,6 @@ export default class OrgSectionElementHeader extends Component {
             <OrgDrawer
               bufferID={bufferID}
               nodeID={nodeID}
-              drawer={OrgNodeUtil.getPropDrawer(node)}
               isCollapsed={isCollapsed}
               isLocked={isLocked}
             />
@@ -83,7 +83,6 @@ export default class OrgSectionElementHeader extends Component {
             <OrgLogbook
               bufferID={bufferID}
               nodeID={nodeID}
-              log={OrgNodeUtil.getLogbook(node)}
               isCollapsed={isCollapsed}
               isLocked={isLocked}
             />
@@ -95,10 +94,9 @@ export default class OrgSectionElementHeader extends Component {
         ret = (
           <View style={[appStyles.container, appStyles.border]}>
             <OrgBody
-              idx={idx} // this is suboptimal
               bufferID={bufferID}
               nodeID={nodeID}
-              text={data.value.join('\n')}
+              idx={idx} // this is suboptimal
               isCollapsed={isCollapsed}
               isLocked={isLocked}
             />
@@ -113,7 +111,7 @@ export default class OrgSectionElementHeader extends Component {
             <OrgPlainList
               bufferID={bufferID}
               nodeID={nodeID}
-              items={data.items}
+              idx={idx} // becoming a bit of a standard
               isCollapsed={isCollapsed}
               isLocked={isLocked}
             />
@@ -127,7 +125,21 @@ export default class OrgSectionElementHeader extends Component {
             <OrgTable
               bufferID={bufferID}
               nodeID={nodeID}
-              table={data}
+              idx={idx} // becoming a bit of a standard
+              isCollapsed={isCollapsed}
+              isLocked={isLocked}
+            />
+          </View>
+        );
+        break;
+      case 'org.keyword': // table MaterialCommunityIcons
+        iconName = isCollapsed ? 'ios-clipboard-outline' : 'ios-clipboard';
+        ret = (
+          <View style={[appStyles.container, appStyles.border]}>
+            <OrgKeyword
+              bufferID={bufferID}
+              nodeID={nodeID}
+              idx={idx} // becoming a bit of a standard
               isCollapsed={isCollapsed}
               isLocked={isLocked}
             />
@@ -140,6 +152,7 @@ export default class OrgSectionElementHeader extends Component {
       // break;
       default:
         console.log('unhandled row type', data.type);
+        console.log(data);
         break;
     }
 

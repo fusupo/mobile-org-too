@@ -27,6 +27,26 @@ import {
 } from '../actions';
 
 import orgNode from './OrgNode';
+import Section from './Section';
+
+const doSomeShit = (state, action) => {
+  let nextState = Object.assign({}, state);
+  if (state.id && state.id === action.nodeID) {
+    nextState = orgNode(state, action);
+  } else {
+    var kids = state.headlines || state.children;
+    var nextKids = null;
+    if (kids) {
+      nextKids = kids.map(k => {
+        return orgTree(k, action);
+      });
+    }
+    state.type === 'org.document'
+      ? (nextState.headlines = nextKids)
+      : (nextState.children = nextKids);
+  }
+  return nextState;
+};
 
 const orgTree = (state = {}, action) => {
   let nextState, clonedKids;
@@ -100,80 +120,40 @@ const orgTree = (state = {}, action) => {
           nextState = Object.assign({}, state);
         }
       }
-
-      // const findAndDelete = tree => {
-      //   if (tree.type === 'org.document') {
-      //     let newTree = { type: 'org.document', headlines: [] };
-      //     if (action.parentID === 'root') {
-      //       return null;
-      //       // let section = tree.section && Object.assign({}, tree.section);
-      //       // let clonedKids = tree.headlines.slice(0).filter((c)=>c.id !== action.nodeID);
-      //       // newTree.headlines = clonedKids;
-      //       // newTree.section = section || null;
-      //       // return newTree;
-      //     } else {
-      //       if (tree.headlines) {
-      //         tree.headlines.forEach(c => {
-      //           let newChild = findAndDelete(c);
-      //           if (newChild !== null) newTree.headlines.push(newChild);
-      //         });
-      //       }
-      //       return newTree;
-      //     }
-      //   } else {
-      //     if (tree.id === action.nodeID) {
-      //       return null;
-      //     } else {
-      //       let newTree = { id: tree.id, children: [] };
-      //       if (tree.children)
-      //         tree.children.forEach(c => {
-      //           let newChild = findAndDelete(c);
-      //           if (newChild !== null) newTree.children.push(newChild);
-      //         });
-      //       return newTree;
-      //     }
-      //   }
-      // };
-      // nextState = findAndDelete(state);
-      // console.log('NEXT STATE AFTER DELETOION', nextState);
       break;
 
-    case COMPLETE_TODO:
-    case COMPLETE_HABIT:
-    case UPDATE_NODE_TODO_KEYWORD:
-    case UPDATE_NODE_HEADLINE_TITLE:
-    case ADD_NEW_NODE_PLANNING:
     case UPDATE_NODE_TIMESTAMP:
     case UPDATE_NODE_TIMESTAMP_REP_INT:
     case CLEAR_NODE_TIMESTAMP:
-    case ADD_NEW_NODE_PROP_DRAWER:
     case INSERT_NEW_NODE_PROP:
     case UPDATE_NODE_PROP:
     case REMOVE_NODE_PROP:
-    case ADD_NEW_NODE_LOGBOOK:
     case INSERT_NEW_NODE_LOG_NOTE:
     case UPDATE_NODE_LOG_NOTE:
     case REMOVE_NODE_LOG_NOTE:
     case UPDATE_NODE_PARAGRAPH:
-    case TOGGLE_NODE_TAG:
-    case ADD_NEW_NODE_PARAGRAPH:
     case UPDATE_SECTION_ITEM_INDEX:
     case REMOVE_SECTION_ITEM_AT_INDEX:
-      nextState = Object.assign({}, state);
-      if (state.id && state.id === action.nodeID) {
-        nextState = orgNode(state, action);
+
+    case ADD_NEW_NODE_PLANNING:
+    case ADD_NEW_NODE_PROP_DRAWER:
+    case ADD_NEW_NODE_LOGBOOK:
+    case ADD_NEW_NODE_PARAGRAPH:
+      console.log(state, action);
+      if (action.nodeID === null) {
+        nextState = Object.assign({}, state, {
+          section: Section(state.section, action)
+        });
       } else {
-        var kids = state.headlines || state.children;
-        var nextKids = null;
-        if (kids) {
-          nextKids = kids.map(k => {
-            return orgTree(k, action);
-          });
-        }
-        state.type === 'org.document'
-          ? (nextState.headlines = nextKids)
-          : (nextState.children = nextKids);
+        nextState = doSomeShit(state, action);
       }
+      break;
+    case COMPLETE_TODO:
+    case COMPLETE_HABIT:
+    case UPDATE_NODE_TODO_KEYWORD:
+    case UPDATE_NODE_HEADLINE_TITLE:
+    case TOGGLE_NODE_TAG:
+      nextState = doSomeShit(state, action);
       break;
     default:
       break;

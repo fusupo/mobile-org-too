@@ -1,13 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import R from 'ramda';
-
-import OrgHeadline from './OrgHeadlineToo';
-import List from './List';
-import Tree from './Tree';
-import OrgSectionElementHeader from './OrgSectionElementHeader';
+import { getNode } from '../selectors';
 
 class OrgTableCell extends Component {
   render() {
@@ -30,7 +25,7 @@ class OrgTableRow extends Component {
   }
 }
 
-export default class OrgTable extends Component {
+class OrgTable extends Component {
   render() {
     const { table } = this.props;
 
@@ -44,3 +39,21 @@ export default class OrgTable extends Component {
     }
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  const { bufferID, nodeID, idx } = ownProps;
+  const tree = state.orgBuffers[bufferID].orgTree;
+  const node = nodeID ? getNode(state, bufferID, nodeID) : null;
+  const table = node ? node.section.children[idx] : tree.section.children[idx];
+  return {
+    bufferID,
+    nodeID,
+    table
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrgTable);

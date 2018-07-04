@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import { updateNodeParagraph } from '../actions';
+import { getNode } from '../selectors';
 
 import appStyles from '../styles';
 
@@ -138,16 +139,16 @@ class OrgBody extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  //const params = ownProps.navigation.state.params;
-  // const { bufferID, nodeID } = ownProps;
-  // const tree = state.orgBuffers[bufferID].orgTree;
-  // const node = getNode(state, bufferID, nodeID);
+  const { bufferID, nodeID, idx } = ownProps;
+  const tree = state.orgBuffers[bufferID].orgTree;
+  const node = nodeID ? getNode(state, bufferID, nodeID) : null;
+  const text = node
+    ? node.section.children[idx].value.join('\n')
+    : tree.section.children[idx].value.join('\n');
   return {
-    // bufferID,
-    // nodeID,
-    // node,
-    // tree
-    // isNew
+    bufferID,
+    nodeID,
+    text
   };
 };
 

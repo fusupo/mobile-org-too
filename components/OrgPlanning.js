@@ -29,13 +29,11 @@ class OrgPlanning extends Component {
       const {
         bufferID,
         nodeID,
-        node,
+        planning,
         onTimestampUpdate,
         onTimestampRepIntUpdate,
         onTimestampClear
       } = this.props;
-      const planning = OrgNodeUtil.getPlanning(node);
-      console.log(planning);
       const timings = timestampTypes.map(
         t =>
           isLocked ? (
@@ -68,11 +66,15 @@ class OrgPlanning extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
+  const tree = state.orgBuffers[bufferID].orgTree;
   const node = getNode(state, bufferID, nodeID);
+  const planning = node
+    ? OrgNodeUtil.getPlanning(node)
+    : OrgNodeUtil.getPlanning(tree);
   return {
     bufferID,
     nodeID,
-    node
+    planning
   };
 };
 

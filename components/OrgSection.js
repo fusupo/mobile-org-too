@@ -43,6 +43,7 @@ class OrgSection extends Component {
       bufferID,
       nodeID,
       node,
+      tree,
       onAddPlanningPress,
       onAddPropDrawerPress,
       onAddLogbookPress,
@@ -50,6 +51,8 @@ class OrgSection extends Component {
       onRowMoved,
       onRowRemove
     } = this.props;
+
+    const entity = node || tree;
 
     const inactiveButton = icon => {
       return <View style={{ flex: 1, padding: 8 }}>{icon}</View>;
@@ -78,7 +81,7 @@ class OrgSection extends Component {
           </View>
         </TouchableHighlight>
 
-        {OrgNodeUtil.getPlanning(node)
+        {OrgNodeUtil.getPlanning(entity)
           ? inactiveButton(
               <MaterialIcons
                 name="schedule"
@@ -90,7 +93,7 @@ class OrgSection extends Component {
               onAddPlanningPress(bufferID, nodeID);
             })}
 
-        {OrgNodeUtil.getPropDrawer(node)
+        {OrgNodeUtil.getPropDrawer(entity)
           ? inactiveButton(
               <SimpleLineIcons
                 name="drawer"
@@ -102,7 +105,7 @@ class OrgSection extends Component {
               onAddPropDrawerPress(bufferID, nodeID);
             })}
 
-        {OrgNodeUtil.getLogbook(node)
+        {OrgNodeUtil.getLogbook(entity)
           ? inactiveButton(
               <FontAwesome name="book" size={12} style={{ color: '#999' }} />
             )
@@ -132,8 +135,8 @@ class OrgSection extends Component {
       </View>
     );
 
-    if (node.section && node.section.children) {
-      const data = node.section.children.reduce((m, c, idx) => {
+    if (entity.section && entity.section.children) {
+      const data = entity.section.children.reduce((m, c, idx) => {
         c.isLocked = false;
         m[JSON.stringify(c) + '-' + idx] = c;
         return m;
@@ -159,7 +162,6 @@ class OrgSection extends Component {
                     idx={parseInt(b[b.length - 1])}
                     c={row}
                     data={row}
-                    node={node}
                     nodeID={nodeID}
                     bufferID={bufferID}
                     isLocked={true}
@@ -185,7 +187,6 @@ class OrgSection extends Component {
                     key={b}
                     c={row}
                     data={row}
-                    node={node}
                     nodeID={nodeID}
                     bufferID={bufferID}
                     isLocked={false}
@@ -240,7 +241,6 @@ class RowComponent extends React.Component {
       idx,
       c,
       isLocked,
-      node,
       bufferID,
       nodeID,
       sortHandlers,
@@ -251,7 +251,6 @@ class RowComponent extends React.Component {
       <OrgSectionElementHeader
         idx={idx}
         data={c}
-        node={node}
         bufferID={bufferID}
         nodeID={nodeID}
       />
@@ -261,16 +260,14 @@ class RowComponent extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  //const params = ownProps.navigation.state.params;
   const { bufferID, nodeID } = ownProps;
   const tree = state.orgBuffers[bufferID].orgTree;
-  const node = getNode(state, bufferID, nodeID);
+  const node = nodeID ? getNode(state, bufferID, nodeID) : null;
   return {
     bufferID,
     nodeID,
     node,
     tree
-    // isNew
   };
 };
 
@@ -292,7 +289,6 @@ const mapDispatchToProps = dispatch => {
       dispatch(updateSectionItemIndex(bufferID, nodeID, e.from, e.to));
     },
     onRowRemove: (bufferID, nodeID, idx) => {
-      console.log('suckit', bufferID, nodeID, idx);
       dispatch(removeSectionItemAtIndex(bufferID, nodeID, idx));
     }
   };

@@ -63,12 +63,16 @@ class OrgPlainList extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { bufferID, nodeID } = ownProps;
-  const node = getNode(state, bufferID, nodeID);
+  const { bufferID, nodeID, idx } = ownProps;
+  const tree = state.orgBuffers[bufferID].orgTree;
+  const node = nodeID ? getNode(state, bufferID, nodeID) : null;
+  const items = node
+    ? node.section.children[idx].items
+    : tree.section.children[idx].items;
   return {
     bufferID,
     nodeID,
-    node
+    items
   };
 };
 
