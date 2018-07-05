@@ -16,8 +16,11 @@ import CheckBox from 'react-native-check-box';
 
 import { doCloudUpload } from '../main';
 import DropboxDataSource from '../utilities/DropboxDataSource';
+import OrgDocUtil from '../utilities/OrgDocUtil';
+import OrgNodeUtil from '../utilities/OrgNodeUtil';
 
 import Tree from '../components/Tree';
+import OrgSectionElementHeader from '../components/OrgSectionElementHeader';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import R from 'ramda';
@@ -193,10 +196,34 @@ class SettingsScreen extends React.Component {
       onClearInboxPress,
       onClearLedgerPress,
       tryUpdateInboxFile,
-      tryUpdateLedgerFile
+      tryUpdateLedgerFile,
+      settings,
+      bufferID
     } = this.props;
+
+    const todoKeywords = OrgDocUtil.findHeadlineWithTitle(
+      settings,
+      'Todo Keywords'
+    );
+    console.log(todoKeywords);
+    const todoKeywordsProps = OrgNodeUtil.getPropDrawer(todoKeywords);
+    const keywords = (
+      <OrgSectionElementHeader
+        idx={-1}
+        data={todoKeywordsProps}
+        bufferID={bufferID}
+        nodeID={todoKeywords.id}
+      />
+    );
+    /* Object.entries(todoKeywordsProps).map(([k, v]) => (
+             <View>
+             <Text>{`${k}:${v}`}</Text>
+             </View>
+             ));*/
+    console.log(keywords);
+
     return (
-      <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }}>
         <View style={{ flex: 1, margin: 10 }}>
           <Text style={{ margin: 5 }}>{'inbox file'}</Text>
           <FileNameInput
@@ -239,53 +266,37 @@ class SettingsScreen extends React.Component {
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center'
-            }}>
-            <Button
-              title={'sync w/ dropbox'}
-              onPress={() => {
-                this.setState({ showSpinner: true });
-                this.props.onSync(
-                  () => {
-                    setTimeout(
-                      () => this.setState({ showSpinner: false }),
-                      1000
-                    );
-                  },
-                  e => {
-                    this.setState({
-                      showSpinner: false,
-                      showError: true,
-                      error: e
-                    });
-                  }
-                );
-              }}
-            />
-            {this.state.showSpinner ? (
-              <View>
-                <ActivityIndicator />
-              </View>
-            ) : null}
-          </View>
+            }}
+          />
           {this.state.showError ? (
             <Text style={{ color: '#f00' }}>{this.state.error}</Text>
           ) : null}
         </View>
-      </View>
+        <View style={{ flex: 1 }}>{keywords}</View>
+      </ScrollView>
     );
   }
 }
 
 const mapStateToProps = (state, ownProps) => {
   /* if (ownProps.screenProps.currRoute !== 'SettingsTab') return {};*/
+  const bufferEntry = Object.entries(state.orgBuffers).find(([k, v]) => {
+    return k.endsWith('settings.org');
+  });
+  const bufferID = bufferEntry[0];
+  const settings = bufferEntry[1].orgTree;
+  console.log(bufferEntry[1], settings);
   const dbxds = new DropboxDataSource({
     accessToken: state.dbxAccessToken
   });
+
   return {
     inboxFile: state.settings.inboxFile,
     ledgerFile: state.settings.ledgerFile,
     orgFiles: state.settings.orgFiles,
-    dbxds
+    dbxds,
+    bufferID,
+    settings
   };
 };
 
@@ -296,9 +307,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     tryUpdateLedgerFile: path => {
       dispatch(someActionThree(path));
-    },
-    onSync: (onSucc, onErr) => {
-      dispatch(doCloudUpload(onSucc, onErr));
     },
     onClearInboxPress: () => {
       dispatch(clearInboxFile());

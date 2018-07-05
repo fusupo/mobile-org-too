@@ -84,6 +84,7 @@ const mapStateToProps = (state, ownProps) => {
   const tree = state.orgBuffers[bufferID].orgTree;
   const node = nodeID ? getNode(state, bufferID, nodeID) : null;
   const drawer = OrgNodeUtil.getPropDrawer(node || tree);
+  console.log(bufferID, nodeID, node, drawer);
   return {
     bufferID,
     nodeID,

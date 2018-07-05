@@ -1,9 +1,13 @@
 import { createSelector } from 'reselect';
+
+import OrgDocUtil from './utilities/OrgDocUtil';
+import OrgNodeUtil from './utilities/OrgNodeUtil';
+
 import R from 'ramda';
 
 const getBuffers = state => state.orgBuffers;
 const getNav = state => state.nav;
-const getSettings = state => state.settings;
+//const getSettings = state => state.settings;
 
 export const getFlattenedBufferObj = state => {
   // given org.document tree, returns flattened object where keys are node ids
@@ -68,3 +72,21 @@ export const getAllTags = createSelector([getBuffers], buffers =>
     )
   )
 );
+
+export const getSettings = state => {
+  const bufferEntry = Object.entries(state.orgBuffers).find(([k, v]) => {
+    return k.endsWith('settings.org');
+  });
+  const settings = bufferEntry[1].orgTree;
+  return settings;
+};
+
+export const getTodoKeywordSettings = state => {
+  const settings = getSettings(state);
+  const todoKeywords = OrgDocUtil.findHeadlineWithTitle(
+    settings,
+    'Todo Keywords'
+  );
+  const todoKeywordsProps = OrgNodeUtil.getPropDrawer(todoKeywords);
+  return todoKeywordsProps.props;
+};

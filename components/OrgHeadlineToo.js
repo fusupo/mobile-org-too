@@ -19,13 +19,9 @@ import OrgTags from './OrgTagsEditable';
 
 import appStyles from '../styles';
 
-import { getNode } from '../selectors';
+import { getTodoKeywordSettings, getNode } from '../selectors';
 
 class OrgHeadline extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const {
       bufferID,
@@ -34,8 +30,10 @@ class OrgHeadline extends Component {
       isLocked,
       onNodeTitlePress,
       onDeleteNodePress,
-      onAddOnePress
+      onAddOnePress,
+      keywordSettings
     } = this.props;
+
     const keyword = node.keyword;
     const tags = node.tags;
 
@@ -47,8 +45,8 @@ class OrgHeadline extends Component {
               appStyles.baseText,
               {
                 backgroundColor: keyword
-                  ? '#f00' //OrgHeadlineUtil.colorForKeyword(keyword)
-                  : '#fff'
+                  ? keywordSettings[keyword]
+                  : keywordSettings['none']
               }
             ]}>
             {keyword ? keyword : 'none'}
@@ -117,8 +115,10 @@ class OrgHeadline extends Component {
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
   const node = getNode(state, bufferID, nodeID);
+  const keywordSettings = getTodoKeywordSettings(state);
   return {
-    node
+    node,
+    keywordSettings
   };
 };
 

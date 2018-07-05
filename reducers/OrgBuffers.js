@@ -36,6 +36,7 @@ const orgBuffers = (state = {}, action) => {
   nextState = Object.assign({}, state);
   switch (action.type) {
     case 'addOrgBuffer':
+      console.log(action);
       nextState = R.assoc(action.path, action.data, state);
       break;
     case 'removeOrgBuffer':

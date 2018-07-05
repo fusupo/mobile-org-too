@@ -16,30 +16,23 @@ const OrgTimestampUtil = require('../utilities/OrgTimestampUtil');
 
 import appStyles from '../styles';
 
-import { getNode } from '../selectors';
+import { getTodoKeywordSettings, getNode } from '../selectors';
 
 class OrgTodoKeywordEditable extends Component {
-  constructor(props) {
-    super(props);
-    // let keywords = OrgHeadlineUtil.keywords().slice(0);
-    // keywords.shift('none');
-    this.state = {
-      keywords
-    };
-  }
-
   render() {
     const {
       keyword,
+      keywordSettings,
       onNodeTodoKeywordUpdate,
       onSelectDone,
       bufferID,
       nodeID
     } = this.props;
-    const { keywords } = this.state;
+    const keywords = Object.keys(keywordSettings);
+
     const todoKeyword = (
       <ModalDropdown
-        options={this.state.keywords}
+        options={keywords}
         onSelect={idx => {
           const targKeyword = keywords[idx];
           if (keyword === 'TODO' && targKeyword === 'DONE')
@@ -51,8 +44,8 @@ class OrgTodoKeywordEditable extends Component {
             appStyles.baseText,
             {
               backgroundColor: keyword
-                ? '#f00' //OrgHeadlineUtil.colorForKeyword(keyword)
-                : '#fff'
+                ? keywordSettings[keyword]
+                : keywordSettings['none']
             }
           ]}>
           {keyword ? keyword : 'none'}
@@ -66,9 +59,11 @@ class OrgTodoKeywordEditable extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { bufferID, nodeID } = ownProps;
+  const keywordSettings = getTodoKeywordSettings(state);
 
   return {
-    keyword: getNode(state, bufferID, nodeID).keyword
+    keyword: getNode(state, bufferID, nodeID).keyword,
+    keywordSettings
   };
 };
 
