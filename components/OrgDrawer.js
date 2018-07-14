@@ -27,23 +27,25 @@ class OrgDrawer extends Component {
       isLocked,
       onAddProp,
       onRemoveProp,
-      onUpdateProp
+      onUpdateProp,
+      drawer
     } = this.props;
     if (isCollapsed) {
       return null;
     } else {
       const listItems =
-        this.props.drawer && this.props.drawer.props
-          ? Object.entries(this.props.drawer.props).map((keyval, idx) => {
+        drawer && drawer.props
+          ? Object.entries(drawer.props).map((keyval, idx) => {
               const key = keyval[0];
               const val = keyval[1];
+              console.log(val);
               return (
                 <OrgDrawerItem
                   isLocked={isLocked}
                   key={idx}
                   idx={idx}
                   propKey={key}
-                  propVal={typeof val === 'object' ? val.value : val}
+                  propVal={val}
                   onRemoveProp={onRemoveProp(bufferID, nodeID)}
                   onUpdateProp={onUpdateProp(bufferID, nodeID)}
                   onItemEditBegin={itemIdx => {
