@@ -17,8 +17,8 @@ class OrgTimestampUtil {
       date: obj.date.dd,
       // you really should be doing a try/catch somewhere around here
       // maybe throw a meaningful error, son!
-      hour: obj.time ? obj.time.hh : obj.timeStart.hh,
-      minute: obj.time ? obj.time.mm : obj.timeStart.mm
+      hour: obj.time ? obj.time.hh : obj.timeStart ? obj.timeStart.hh : 0,
+      minute: obj.time ? obj.time.mm : obj.timeStart ? obj.timeStart.mm : 0
     });
   }
 
