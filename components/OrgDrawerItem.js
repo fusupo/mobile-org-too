@@ -114,6 +114,31 @@ class OrgDrawerItem extends Component {
       />
     );
 
+    const baseText = (key, val) => (
+      <Text
+        key={key}
+        style={{
+          fontFamily: 'space-mono',
+          fontSize: 10
+        }}>
+        {key > 0 ? '+' : ''}:{val}
+      </Text>
+    );
+
+    let valComp;
+    if (Array.isArray(val)) {
+      valComp = val.map((v, i) => baseText(i, v));
+    } else if (
+      typeof val === 'object' &&
+      val.type &&
+      (val.type === 'org.timestamp.active' ||
+        val.type === 'org.timestamp.inactive')
+    ) {
+      valComp = baseText(0, val.value);
+    } else {
+      valComp = baseText(0, val);
+    }
+
     const base = (
       <View style={{ flexDirection: 'row', marginLeft: 5 }}>
         <View style={{ flex: 4 }}>
@@ -125,16 +150,17 @@ class OrgDrawerItem extends Component {
             {key}
           </Text>
         </View>
-        <View style={{ flex: 12 }}>
-          <Text
-            style={{
-              fontFamily: 'space-mono',
-              fontSize: 10
-            }}>
-            :{val}
-          </Text>
-        </View>
+        <View style={{ flex: 12 }}>{valComp}</View>
       </View>
+    );
+
+    const editorValText = (val, key) => (
+      <TextInput
+        key={key}
+        style={{ flex: 1, borderColor: 'gray', borderWidth: 1 }}
+        value={val}
+        onChangeText={propVal => this.setState({ propVal })}
+      />
     );
 
     const showEditor =
@@ -155,11 +181,14 @@ class OrgDrawerItem extends Component {
             color="#aa3333"
           />
           {showKeyEditor}
-          <TextInput
-            style={{ flex: 1, borderColor: 'gray', borderWidth: 1 }}
-            value={val}
-            onChangeText={propVal => this.setState({ propVal })}
-          />
+
+          {Array.isArray(val) ? (
+            <View style={{ flexDirection: 'column' }}>
+              {val.map((v, i) => editorValText(v, i))}
+            </View>
+          ) : (
+            editorValText(val, 0)
+          )}
         </View>
       ) : (
         <Swipeout
