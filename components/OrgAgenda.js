@@ -302,7 +302,6 @@ const mapStateToProps = (state, ownProps) => {
     return ns.filter(n => {
       const scheduled = n.scheduled; //OrgNodeUtil.getScheduled(n);
       const deadline = n.deadline; //OrgNodeUtil.getDeadline(n);
-      console.log(n);
       return (
         (scheduled &&
           OrgTimestampUtil.compare(scheduled, start) >= 0 &&
@@ -325,7 +324,9 @@ const mapStateToProps = (state, ownProps) => {
         res.push({
           bufferID: d.bufferID,
           nodeID: d.nodeID,
-          time: `${padMaybe(scheduled.time.hh)}:${padMaybe(scheduled.time.mm)}`,
+          time: scheduled.time
+            ? `${padMaybe(scheduled.time.hh)}:${padMaybe(scheduled.time.mm)}`
+            : '00:00',
           content: 'scheduled: ' + d.content
         });
       }
@@ -333,14 +334,15 @@ const mapStateToProps = (state, ownProps) => {
         res.push({
           bufferID: d.bufferID,
           nodeID: d.nodeID,
-          time: `${padMaybe(deadline.time.hh)}:${padMaybe(deadline.time.mm)}`,
+          time: deadline.time
+            ? `${padMaybe(deadline.time.hh)}:${padMaybe(deadline.time.mm)}`
+            : '00:00',
           content: 'deadline: ' + d.content
         });
       }
       return m.concat(res);
     };
     let now = date;
-    console.log('DATE', date);
     const nowStr = {
       bufferID: 'NOW',
       nodeID: 'NOW',
@@ -351,7 +353,6 @@ const mapStateToProps = (state, ownProps) => {
     };
     const cand = filterRange(candidates, start, end);
 
-    console.log('FILTER RANGE', cand);
     let agenda = { headerStr, schedule: {} };
     for (let i = 0; i < hours.length - 1; i++) {
       const a = OrgTimestampUtil.add(start, { hours: hours[i] });
@@ -387,29 +388,20 @@ const mapStateToProps = (state, ownProps) => {
   };
 
   let today = OrgTimestampUtil.clone(date);
-  console.log('TODAY', today);
   today.time.hh -= today.time.hh;
   today.time.mm -= today.time.mm;
 
   let realToday = OrgTimestampUtil.now();
-  console.log('REAL-TODAY', realToday);
   realToday.time.hh -= realToday.time.hh;
   realToday.time.mm -= realToday.time.mm;
 
   let diff = OrgTimestampUtil.diff(today, realToday, 'days');
 
-  console.log('GOT THIS FAR ??');
   const yesterday = OrgTimestampUtil.sub(today, { days: 1 });
-  console.log('GOT THIS FAR ?? 1');
   const tomorrow = OrgTimestampUtil.add(today, { days: 1 });
-  console.log('GOT THIS FAR ?? 2');
   const dayAfterTomorrow = OrgTimestampUtil.add(today, { days: 2 });
 
-  console.log('WTF:::', OrgTimestampUtil.add(today, { days: 2 }));
-  console.log('GOT THIS FAR ?? 3', nodes, yesterday, dayAfterTomorrow);
-
   candidates = filterRange(nodes, yesterday, dayAfterTomorrow);
-  console.log('GOT THIS FAR ?? 4');
   candidates.sort((a, b) => {
     const scheduledA = a.scheduled; //OrgNodeUtil.getScheduled(a);
     const deadlineA = a.deadline; //OrgNodeUtil.getDeadline(a);
@@ -417,7 +409,6 @@ const mapStateToProps = (state, ownProps) => {
     const deadlineB = b.deadline; //OrgNodeUtil.getDeadline(b);
     const timeA = !scheduledA ? deadlineA : scheduledA;
     const timeB = !scheduledB ? deadlineB : scheduledB;
-    console.log(timeA !== null, timeB !== null);
     return OrgTimestampUtil.compare(timeA, timeB);
   });
 
@@ -462,7 +453,6 @@ const mapStateToProps = (state, ownProps) => {
       targTomStr = dateStr(tomorrow);
       break;
   }
-
   agendaYesterday = buildDayToo(targYesStr, yesterday, today);
   agendaToday = buildDayToo(targTodStr, today, tomorrow);
   agendaTomorrow = buildDayToo(targTomStr, tomorrow, dayAfterTomorrow);
