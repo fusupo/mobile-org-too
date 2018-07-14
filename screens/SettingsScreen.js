@@ -205,7 +205,6 @@ class SettingsScreen extends React.Component {
       settings,
       'Todo Keywords'
     );
-    console.log(todoKeywords);
     const todoKeywordsProps = OrgNodeUtil.getPropDrawer(todoKeywords);
     const keywords = (
       <OrgSectionElementHeader
@@ -215,12 +214,17 @@ class SettingsScreen extends React.Component {
         nodeID={todoKeywords.id}
       />
     );
-    /* Object.entries(todoKeywordsProps).map(([k, v]) => (
-             <View>
-             <Text>{`${k}:${v}`}</Text>
-             </View>
-             ));*/
-    console.log(keywords);
+
+    const files = OrgDocUtil.findHeadlineWithTitle(settings, 'Org Files');
+    const filesProps = OrgNodeUtil.getPropDrawer(files);
+    const filesComp = (
+      <OrgSectionElementHeader
+        idx={-1}
+        data={filesProps}
+        bufferID={bufferID}
+        nodeID={files.id}
+      />
+    );
 
     return (
       <ScrollView style={{ flex: 1 }}>
@@ -272,7 +276,14 @@ class SettingsScreen extends React.Component {
             <Text style={{ color: '#f00' }}>{this.state.error}</Text>
           ) : null}
         </View>
-        <View style={{ flex: 1 }}>{keywords}</View>
+        <View style={{ flex: 1 }}>
+          <Text>Todo Keywords</Text>
+          {keywords}
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text>Files</Text>
+          {filesComp}
+        </View>
       </ScrollView>
     );
   }
@@ -285,7 +296,6 @@ const mapStateToProps = (state, ownProps) => {
   });
   const bufferID = bufferEntry[0];
   const settings = bufferEntry[1].orgTree;
-  console.log(bufferEntry[1], settings);
   const dbxds = new DropboxDataSource({
     accessToken: state.dbxAccessToken
   });
