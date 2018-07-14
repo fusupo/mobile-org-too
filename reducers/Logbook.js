@@ -5,6 +5,8 @@ import {
   REMOVE_NODE_LOG_NOTE
 } from '../actions';
 
+const OrgTimestampUtil = require('../utilities/OrgTimestampUtil');
+
 const Logbook = (state = null, action) => {
   const getClonedItems = () => {
     return state && state.items ? state.items.slice(0) : [];
