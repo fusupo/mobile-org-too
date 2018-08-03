@@ -17,14 +17,12 @@ import { getNode } from '../selectors';
 import appStyles from '../styles';
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   textInput: {
     height: 70
   },
   text: {
-    margin: 10
+    margin: 10,
+    fontSize: 8
   }
 });
 
@@ -123,7 +121,8 @@ class OrgBody extends Component {
           }>
           <ScrollView style={[appStyles.container]} horizontal={true}>
             <View style={[appStyles.container]}>
-              <Text style={[styles.container, styles.text]}>
+              <Text
+                style={[appStyles.baseText, appStyles.container, styles.text]}>
                 {
                   //bodyText
                   text

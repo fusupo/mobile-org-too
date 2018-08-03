@@ -9,9 +9,10 @@ const appStyles = StyleSheet.create({
     flex: 1
   },
   border: {
-    borderWidth: 1,
-    borderStyle: 'solid'
-    // margin: 10
+    borderRadius: 2,
+    borderWidth: 0.5,
+    borderColor: '#333'
+    // padding: 10
   }
 });
 

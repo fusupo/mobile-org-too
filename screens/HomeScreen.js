@@ -57,7 +57,6 @@ class HomeScreen extends React.Component {
   }
 
   render() {
-    // console.log('FOOOO -> ', this.props);
     // if (this.props.screenProps.currRoute !== 'MainTab') return null;
 
     const { buffers, onAddOne, allTags } = this.props;
@@ -317,6 +316,7 @@ class HomeScreen extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
+  console.log('HOME SCREEN', ownProps);
   // if (ownProps.screenProps.currRoute !== 'MainTab') return {};
   return {
     buffers: state.orgBuffers,

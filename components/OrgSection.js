@@ -135,6 +135,11 @@ class OrgSection extends Component {
       </View>
     );
 
+    const sectionStyle = {
+      flex: 1,
+      padding: 10
+    };
+
     if (entity.section && entity.section.children) {
       const data = entity.section.children.reduce((m, c, idx) => {
         c.isLocked = false;
@@ -145,7 +150,7 @@ class OrgSection extends Component {
       const order = Object.keys(data);
 
       return (
-        <View style={{ flex: 1 }}>
+        <View style={sectionStyle}>
           {toolbar}
           {this.state.isLocked ? (
             <FlatList
@@ -201,7 +206,7 @@ class OrgSection extends Component {
         </View>
       );
     } else {
-      return <View style={{ flex: 1 }}>{toolbar}</View>;
+      return <View style={sectionStyle}>{toolbar}</View>;
     }
   }
 }
