@@ -1,5 +1,5 @@
 import R from 'ramda';
-import Expo from 'expo';
+import * as Expo from 'expo';
 import React from 'react';
 import { connect } from 'react-redux';
 import {
@@ -86,12 +86,12 @@ class HomeScreen extends React.Component {
     };
 
     const search = pool => {
-      const results = R.filter(
-        n =>
-          n.content.toLowerCase().search(this.state.searchStr.toLowerCase()) >
-          -1,
-        pool
-      );
+      const results = R.filter(n => {
+        return n.content
+          ? n.content.toLowerCase().search(this.state.searchStr.toLowerCase()) >
+              -1
+          : false;
+      }, pool);
       return results;
     };
 

@@ -5,6 +5,24 @@ import OrgNodeUtil from './utilities/OrgNodeUtil';
 
 import R from 'ramda';
 
+const orgParse = require('org-parse');
+const parse = orgParse.parse;
+
+export const defaultSettings = parse(`
+* Org Files
+:PROPERTIES:
+:inbox:    /org/inbox.org
+:files:    undefined
+:END:
+* Todo Keywords
+:PROPERTIES:
+:none:     #fff
+:PROJ:     #f00
+:TODO:     #ff56a3
+:END:
+`);
+
+
 const getBuffers = state => state.orgBuffers;
 const getNav = state => state.nav;
 //const getSettings = state => state.settings;
@@ -77,12 +95,14 @@ export const getSettings = state => {
   const bufferEntry = Object.entries(state.orgBuffers).find(([k, v]) => {
     return k.endsWith('settings.org');
   });
+  if(!bufferEntry)return defaultSettings;
   const settings = bufferEntry[1].orgTree;
   return settings;
 };
 
 export const getTodoKeywordSettings = state => {
   const settings = getSettings(state);
+  if(!settings)return {};
   const todoKeywords = OrgDocUtil.findHeadlineWithTitle(
     settings,
     'Todo Keywords'

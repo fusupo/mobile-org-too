@@ -3,8 +3,8 @@ let currency = '';
 import R from 'ramda';
 import shortid from 'shortid';
 
-const RegPost = /^(?:[ ]{2,})((?:[\w\:]|(?:[ ]\w))*)(?:[ ]{2,}|)(\$?)(?:[ ]*)([\.\-0-9]*)/i;
-const RegDate = /^(2[0-9]+\/[0-9]{2}\/[0-9]{2})(?:[ ]*)([\*\! ]{1})(?:[ ]*)([ a-z0-9\(\)'*.\/]+)/i;
+const RegPost = /^(?:[ ]{2,})((?:[\w\:]|(?:[ ][\w&]))*)(?:[ ]{2,}|)(\$?)(?:[ ]*)([\.\-0-9]*)/i;
+const RegDate = /^(2[0-9]+\/[0-9]{2}\/[0-9]{2})(?:[ ]*)([\*\! ]{1})(?:[ ]*)([ a-z0-9\(\)'*.\/\-\>&]+)/i;
 
 const parseLedger = srcStr =>
   new Promise((res, rej) => {
@@ -27,7 +27,8 @@ const parseLedger = srcStr =>
         transaction.payee = matched[3];
         transaction.postings = [];
       } else if (e.match(RegPost)) {
-        var matched = e.match(RegPost), posting = {};
+        var matched = e.match(RegPost),
+          posting = {};
         posting.account = matched[1].split(':');
         posting.currency = matched[2];
         posting.amount = matched[3];

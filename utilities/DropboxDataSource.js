@@ -2,13 +2,12 @@ import { parseLedger, serialize as ledgerSerialize } from './ledger-parse';
 import { uuid } from './utils';
 
 const orgParse = require('org-parse');
-import { parseOrg } from 'org-parse';
-console.log(
-  '////////////////////////////////////////ORG-PARSE:',
-  parseOrg,
-  orgParse
-);
-const parse = orgParse.parse;
+import {parse} from 'org-parse';
+// console.log(
+//   '////////////////////////////////////////ORG-PARSE:',
+//   orgParse
+// );
+// const parse = orgParse.parse;
 const orgSerialize = require('org-parse').serialize;
 const Dropbox = require('dropbox').Dropbox;
 

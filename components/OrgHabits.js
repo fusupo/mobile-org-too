@@ -367,7 +367,7 @@ const mapStateToProps = (state, ownProps) => {
         ? parseInt(repMax.substr(0, repMax.length - 1))
         : null;
       const repMaxU = repMax ? repMax[repMax.length - 1] : null;
-      const logData = logbook.items.filter(
+      let logData = logbook.items.filter(
         le =>
           le.type === 'state' &&
           le.state === '"DONE"' &&

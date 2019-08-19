@@ -25,6 +25,10 @@ import OrgSectionElementHeader from '../components/OrgSectionElementHeader';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import R from 'ramda';
 
+import { defaultSettings } from '../selectors';
+
+const DEFAULT_TODO_KEYWORDS = ["TODO", "DONE"];
+
 const styles = StyleSheet.create({
   container: {
     flex: 1
@@ -201,30 +205,33 @@ class SettingsScreen extends React.Component {
       bufferID
     } = this.props;
 
-    const todoKeywords = OrgDocUtil.findHeadlineWithTitle(
+    const todoKeywords = settings ? OrgDocUtil.findHeadlineWithTitle(
       settings,
       'Todo Keywords'
-    );
+    ): DEFAULT_TODO_KEYWORDS;
     const todoKeywordsProps = OrgNodeUtil.getPropDrawer(todoKeywords);
-    const keywords = (
+    const keywords = bufferID ? (
       <OrgSectionElementHeader
         idx={-1}
         data={todoKeywordsProps}
         bufferID={bufferID}
         nodeID={todoKeywords.id}
       />
-    );
+    ):null;
 
-    const files = OrgDocUtil.findHeadlineWithTitle(settings, 'Org Files');
-    const filesProps = OrgNodeUtil.getPropDrawer(files);
-    const filesComp = (
-      <OrgSectionElementHeader
-        idx={-1}
-        data={filesProps}
-        bufferID={bufferID}
-        nodeID={files.id}
-      />
-    );
+    let filesComp = null;
+    if(settings){
+        const files = OrgDocUtil.findHeadlineWithTitle(settings, 'Org Files');
+        const filesProps = OrgNodeUtil.getPropDrawer(files);
+        filesComp = (
+            <OrgSectionElementHeader
+                idx={-1}
+                data={filesProps}
+                bufferID={bufferID}
+                nodeID={files.id}
+            />
+        );
+    }
 
     return (
       <ScrollView style={{ flex: 1 }}>
@@ -280,10 +287,12 @@ class SettingsScreen extends React.Component {
           <Text>Todo Keywords</Text>
           {keywords}
         </View>
-        <View style={{ flex: 1 }}>
-          <Text>Files</Text>
-          {filesComp}
-        </View>
+        {/*
+            <View style={{ flex: 1 }}>
+                <Text>Files</Text>
+                {filesComp}
+            </View>
+        */}
       </ScrollView>
     );
   }
@@ -294,8 +303,9 @@ const mapStateToProps = (state, ownProps) => {
   const bufferEntry = Object.entries(state.orgBuffers).find(([k, v]) => {
     return k.endsWith('settings.org');
   });
-  const bufferID = bufferEntry[0];
-  const settings = bufferEntry[1].orgTree;
+  const bufferID = bufferEntry && bufferEntry[0];
+  const settings = bufferEntry && bufferEntry[1].orgTree;
+
   const dbxds = new DropboxDataSource({
     accessToken: state.dbxAccessToken
   });
@@ -306,7 +316,7 @@ const mapStateToProps = (state, ownProps) => {
     orgFiles: state.settings.orgFiles,
     dbxds,
     bufferID,
-    settings
+    settings: settings || defaultSettings
   };
 };
 

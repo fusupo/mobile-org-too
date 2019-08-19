@@ -15,6 +15,8 @@ import {
   TouchableHighlight,
   View
 } from 'react-native';
+import CheckBox from 'react-native-check-box';
+
 import ModalDropdown from 'react-native-modal-dropdown';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import R from 'ramda';
@@ -147,6 +149,7 @@ class ListItem extends Component {
         ) : (
           <View>
             <TouchableHighlight
+              style={{ marginLeft: 5 }}
               onPress={() => {
                 this.setState({ isCollapsed: !this.state.isCollapsed });
               }}>
@@ -222,14 +225,26 @@ class LedgerItemDetails extends Component {
       date,
       oldDate,
       postings,
-      datePickerIsVisible
+      datePickerIsVisible,
+      consolidated
     } = this.state;
 
+    console.log('LEDGER ITEM DETAILS PROPS:', this.props);
     return (
       <Modal visible={visible}>
         <View style={[styles.container, styles.border, { marginTop: 22 }]}>
           <Text style={[styles.textInput]}>{id + ' - item details'}</Text>
           <View style={[styles.container, { flexDirection: 'row' }]}>
+            <CheckBox
+              isChecked={consolidated === '*'}
+              onClick={() => {
+                if (consolidated === '*') {
+                  this.setState({ consolidated: ' ' });
+                } else {
+                  this.setState({ consolidated: '*' });
+                }
+              }}
+            />
             <View style={styles.container}>
               <TextInputWithModalSelect
                 value={payee}

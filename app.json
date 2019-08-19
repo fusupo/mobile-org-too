@@ -4,8 +4,11 @@
     "description": "This project is really great.",
     "slug": "mobile-org-too",
     "privacy": "public",
-    "sdkVersion": "28.0.0",
-    "platforms": ["ios", "android"],
+    "sdkVersion": "34.0.0",
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icons/app-icon.png",
@@ -17,11 +20,12 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
-
     "notification": {
       "icon": "./assets/icons/notification-icon.png",
       "color": "#000000"
@@ -31,7 +35,9 @@
       "hideExponentText": false
     },
     "packagerOpts": {
-      "assetExts": ["ttf"]
+      "assetExts": [
+        "ttf"
+      ]
     }
   }
 }
